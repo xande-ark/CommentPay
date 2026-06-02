@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love PG - Dicas e Estratégias de Jogos Digitais</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Customização temática para o Love PG (estilo cassino/ouro/neon) */
+    :root {
+      --blog-bg: #06050a;
+      --blog-card-bg: #0e0d14;
+      --purple: #f59e0b; /* Amarelo Ouro */
+      --purple-hover: #fbbf24;
+      --cyan: #ec4899; /* Rosa Neon */
+    }
+    
+    blockquote {
+      border-left-color: var(--cyan) !important;
+      background: rgba(236, 72, 153, 0.02) !important;
+    }
+    
+    .category {
+      background-color: rgba(236, 72, 153, 0.1) !important;
+      border-color: rgba(236, 72, 153, 0.2) !important;
+      color: var(--cyan) !important;
+    }
+    
+    .blog-nav a.admin-link {
+      color: var(--cyan) !important;
+      border-color: rgba(236, 72, 153, 0.3) !important;
+      background: rgba(236, 72, 153, 0.05) !important;
+    }
+    
+    .blog-nav a.admin-link:hover {
+      background: rgba(236, 72, 153, 0.15) !important;
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Topbar do Blog -->
+  <header class="blog-header">
+    <div class="blog-container">
+      <div class="blog-logo">
+        <i class="fa-solid fa-gamepad text-purple"></i>
+        <span>Love<span>PG</span></span>
+      </div>
+      <nav class="blog-nav">
+        <a href="#">Lançamentos</a>
+        <a href="#">Estratégias</a>
+        <a href="/index.html" target="_blank" class="hub-link"><i class="fa-solid fa-wallet"></i> Ir para o Central Hub</a>
+        <a href="/demo-site/admin.html" target="_blank" class="admin-link"><i class="fa-solid fa-user-gear"></i> Painel Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Corpo do Artigo -->
+  <main class="article-container">
+    <article class="blog-card">
+      <div class="article-meta">
+        <span class="category">Jogos Online</span>
+        <span class="date">Publicado em 01 de Junho de 2026</span>
+      </div>
+      
+      <h1>Guia de Otimização e Performance em Jogos Digitais</h1>
+      <p class="author">Por <strong>Equipe Love PG</strong>, Portal de Conteúdo</p>
+
+      <div class="article-content">
+        <p>A indústria de jogos digitais e entretenimento online tem evoluído de forma absurda no Brasil. Com gráficos cada vez mais fidedignos e tempos de resposta velozes, os jogadores procuram guias completos sobre como otimizar suas conexões e dispositivos para obter a máxima performance.</p>
+
+        <h2>Como melhorar o Ping e a Conexão</h2>
+        <p>Para jogos multiplayer em tempo real, cada milissegundo conta. Ter uma conexão de fibra óptica estável e jogar conectado via cabo de rede (Ethernet) ao invés do Wi-Fi são passos primordiais para evitar perda de pacotes e garantir fluidez nas partidas.</p>
+
+        <blockquote>
+          "A estabilidade da conexão é mais importante do que a velocidade bruta de download quando falamos de jogos em tempo real."
+        </blockquote>
+
+        <h2>Dicas de Configuração de Hardware</h2>
+        <ul>
+          <li><strong>Modo Jogo (Windows):</strong> Deixe ativado para que o sistema dê prioridade de CPU e RAM ao executável do jogo.</li>
+          <li><strong>Drivers Atualizados:</strong> Mantenha os drivers da placa de vídeo (GPU) sempre atualizados para evitar bugs de renderização.</li>
+          <li><strong>DNS Gamer:</strong> Configurar servidores DNS como Cloudflare (1.1.1.1) ou Google (8.8.8.8) pode reduzir ligeiramente a latência de resolução de nomes de rede.</li>
+        </ul>
+
+        <p>Qual é a sua estratégia de otimização favorita? Deixe sua dica nos comentários abaixo para ajudar outros membros da comunidade!</p>
+      </div>
+    </article>
+
+    <!-- ÁREA DO WIDGET DE COMENTÁRIOS REMUNERADOS -->
+    <section class="comments-section blog-card">
+      <div class="comments-title-row">
+        <h3><i class="fa-solid fa-fire text-purple"></i> Comentários da Comunidade</h3>
+        <span class="promo-badge"><i class="fa-solid fa-gift"></i> Comente e Ganhe R$ 0,50</span>
+      </div>
+      
+      <p class="promo-text">
+        Deixe sua opinião legítima! Comentários com mais de <strong>150 caracteres</strong> são elegíveis a remuneração direta na sua carteira virtual.
+      </p>
+
+      <!-- Contêiner do widget CommentPay, configurado com o site ID da Love PG! -->
+      <div id="commentpay-widget" data-site-id="site-lovepg-123" data-post-id="1"></div>
+
+      <!-- Exibição de Comentários Aprovados -->
+      <div class="approved-comments-box">
+        <h4>Discussão</h4>
+        <div id="approved-comments-list">
+          <!-- Carregado via JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="blog-footer">
+    <p>&copy; 2026 Love PG. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="widget.js"></script>
+</body>
+</html>

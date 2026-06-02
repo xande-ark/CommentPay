@@ -1,0 +1,432 @@
+/* --- ESTILOS DO BLOG PARCEIRO --- */
+:root {
+  --blog-bg: #090b11;
+  --blog-card-bg: #10131f;
+  --blog-border: rgba(255, 255, 255, 0.05);
+  --text-main: #e2e8f0;
+  --text-sub: #94a3b8;
+  --text-muted: #64748b;
+  
+  --purple: #8b5cf6;
+  --purple-glow: rgba(139, 92, 246, 0.2);
+  --cyan: #06b6d4;
+  --cyan-glow: rgba(6, 182, 212, 0.2);
+  
+  --green: #10b981;
+  --red: #ef4444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--blog-bg);
+  color: var(--text-main);
+  line-height: 1.6;
+  padding-bottom: 60px;
+}
+
+/* --- HEADER --- */
+.blog-header {
+  background-color: rgba(16, 19, 31, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--blog-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 16px 0;
+}
+
+.blog-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.blog-logo {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blog-logo span span {
+  color: var(--cyan);
+}
+
+.blog-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.blog-nav a {
+  color: var(--text-sub);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.blog-nav a:hover {
+  color: var(--text-main);
+}
+
+.blog-nav a.hub-link {
+  color: var(--purple);
+  font-weight: 600;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.blog-nav a.hub-link:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #fff;
+  box-shadow: 0 0 12px var(--purple-glow);
+}
+
+.blog-nav a.admin-link {
+  color: var(--cyan);
+  font-weight: 600;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.blog-nav a.admin-link:hover {
+  background: rgba(6, 182, 212, 0.15);
+  color: #fff;
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+/* --- ARTIGO --- */
+.article-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.blog-card {
+  background-color: var(--blog-card-bg);
+  border: 1px solid var(--blog-border);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+  .blog-card {
+    padding: 24px;
+  }
+}
+
+.article-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.category {
+  background-color: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  color: var(--cyan);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.article-container h1 {
+  font-size: 2.4rem;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.author {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--blog-border);
+  padding-bottom: 16px;
+}
+
+.article-content p {
+  margin-bottom: 20px;
+  color: var(--text-main);
+  font-size: 1.05rem;
+}
+
+.article-content h2 {
+  font-size: 1.5rem;
+  margin: 30px 0 15px 0;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--purple);
+  padding: 10px 20px;
+  margin: 30px 0;
+  background: rgba(139, 92, 246, 0.03);
+  font-style: italic;
+  color: #fff;
+  border-radius: 0 8px 8px 0;
+}
+
+.article-content ul {
+  margin-left: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.article-content li {
+  font-size: 1.05rem;
+}
+
+.article-content li strong {
+  color: #fff;
+}
+
+/* --- SEÇÃO DE COMENTÁRIOS --- */
+.comments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comments-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--blog-border);
+  padding-bottom: 16px;
+}
+
+.promo-badge {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-hover) 100%);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promo-text {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+/* --- WIDGET STYLE (INJETADO PELO JS) --- */
+.commentpay-widget-box {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--blog-border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.commentpay-logged-out {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.commentpay-logged-out p {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-bottom: 16px;
+}
+
+.commentpay-logged-in {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.user-info {
+  color: var(--text-main);
+}
+
+.user-info strong {
+  color: var(--purple);
+}
+
+.btn-disconnect {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.btn-disconnect:hover {
+  color: var(--red);
+}
+
+.textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.commentpay-textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--blog-border);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+
+.commentpay-textarea:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.char-counter {
+  font-size: 0.75rem;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.char-counter.valid {
+  color: var(--green);
+}
+
+.commentpay-alert {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commentpay-alert.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.commentpay-alert.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.commentpay-btn {
+  background-color: var(--purple);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-end;
+}
+
+.commentpay-btn:hover:not(:disabled) {
+  background-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.commentpay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- LISTA DE COMENTÁRIOS PUBLICADOS --- */
+.approved-comments-box {
+  margin-top: 30px;
+  border-top: 1px solid var(--blog-border);
+  padding-top: 24px;
+}
+
+.approved-comments-box h4 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.comment-item {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--blog-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+}
+
+.comment-user {
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+.comment-date {
+  color: var(--text-muted);
+}
+
+.comment-body {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.text-blue { color: var(--cyan); }
+.text-purple { color: var(--purple); }
+.hidden { display: none !important; }
+
+/* --- BLOG FOOTER --- */
+.blog-footer {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--blog-border);
+  margin-top: 40px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}

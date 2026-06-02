@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central Hub - Comente & Ganhe</title>
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Efeitos de Fundo Luminosos -->
+  <div class="glow-bg-1"></div>
+  <div class="glow-bg-2"></div>
+
+  <div class="container">
+    <!-- 1. TELA DE LOGIN MOCK -->
+    <div id="auth-view" class="card fade-in">
+      <div class="logo">
+        <i class="fa-solid fa-comments-dollar logo-icon"></i>
+        <h1>Comment<span>Pay</span></h1>
+      </div>
+      <p class="subtitle">Monetize sua opinião legítima em blogs parceiros de forma rápida e segura.</p>
+      
+      <div class="google-login-box">
+        <h3>Acesse sua Conta</h3>
+        <p>Utilize seu login do Google para acessar o painel e gerenciar seu saldo.</p>
+        
+        <!-- Formulário simplificado de e-mail para simular o Google OAuth -->
+        <div class="mock-auth-form">
+          <div class="input-group">
+            <label for="google-email"><i class="fa-regular fa-envelope"></i> E-mail do Google</label>
+            <input type="email" id="google-email" placeholder="nome@gmail.com" value="alexandre.silva@gmail.com">
+          </div>
+          <div class="input-group">
+            <label for="google-name"><i class="fa-regular fa-user"></i> Nome Completo</label>
+            <input type="text" id="google-name" placeholder="Alexandre Silva" value="Alexandre Silva">
+          </div>
+          <button id="btn-google-login" class="btn btn-google">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo">
+            Entrar com o Google
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TELA DE CADASTRO DE CPF & LGPD -->
+    <div id="register-view" class="card fade-in hidden">
+      <h2><i class="fa-solid fa-user-shield text-purple"></i> Validação Cadastral</h2>
+      <p class="subtitle">Para garantir a unicidade das contas e realizar pagamentos PIX automáticos, precisamos validar seu CPF.</p>
+      
+      <div class="register-form">
+        <div class="input-group">
+          <label for="reg-cpf"><i class="fa-regular fa-id-card"></i> CPF (Cadastro de Pessoa Física)</label>
+          <input type="text" id="reg-cpf" placeholder="000.000.000-00" maxlength="14">
+          <small class="helper-text">Insira apenas números ou o CPF formatado.</small>
+        </div>
+
+        <div class="consent-box">
+          <label class="checkbox-container">
+            <input type="checkbox" id="reg-consent">
+            <span class="checkmark"></span>
+            <span class="consent-text">
+              Eu aceito os Termos de Uso e a <strong class="text-purple">Política de Privacidade (LGPD)</strong>. Declaro consentimento expresso para o tratamento e criptografia do meu CPF e IP para fins de repasse financeiro e prevenção de fraudes.
+            </span>
+          </label>
+        </div>
+
+        <div id="register-error" class="alert error hidden">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span id="register-error-msg">Erro</span>
+        </div>
+
+        <button id="btn-register-submit" class="btn btn-primary">
+          <i class="fa-solid fa-check"></i> Concluir Cadastro & Ativar Conta
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. PAINEL PRINCIPAL (DASHBOARD) -->
+    <div id="dashboard-view" class="dashboard-layout fade-in hidden">
+      
+      <!-- Topo / Navbar -->
+      <header class="dashboard-header card">
+        <div class="logo-sm">
+          <i class="fa-solid fa-comments-dollar logo-icon"></i>
+          <h2>Comment<span>Pay</span></h2>
+        </div>
+        
+        <!-- Menu de Navegação Centralizado -->
+        <nav class="hub-nav">
+          <a href="#" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+          <a href="#" id="nav-sites" class="nav-item"><i class="fa-solid fa-globe"></i> Sites Parceiros</a>
+          <a href="/demo-site/admin.html" target="_blank" class="nav-item"><i class="fa-solid fa-user-gear"></i> CMS Admin</a>
+        </nav>
+
+        <div class="user-profile">
+          <span class="user-badge"><i class="fa-solid fa-circle text-green animate-pulse"></i> Conta Ativa</span>
+          <span id="user-display-name" class="user-name">Alexandre</span>
+          <button id="btn-logout" class="btn btn-icon-only" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
+
+      <!-- Conteúdo da Aba Dashboard -->
+      <div id="tab-dashboard-content" class="tab-content fade-in">
+        <!-- Grid Principal de Cartões -->
+        <div class="dashboard-grid">
+        
+        <!-- Cartão da Carteira (Saldos) -->
+        <div class="card wallet-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-wallet"></i> Carteira Virtual</h3>
+            <button id="btn-refresh" class="btn-refresh" title="Atualizar saldos"><i class="fa-solid fa-rotate"></i></button>
+          </div>
+          
+          <div class="balances-container">
+            <div class="balance-box available">
+              <span class="balance-label">Disponível para Saque</span>
+              <span class="balance-value" id="val-available">R$ 0,00</span>
+            </div>
+            
+            <div class="balance-box pending">
+              <span class="balance-label">Pendente (Escrow)</span>
+              <span class="balance-value" id="val-pending">R$ 0,00</span>
+            </div>
+          </div>
+          
+          <div class="withdraw-section">
+            <p class="limit-warning">Limite mínimo para saque: <strong>R$ 20,00</strong>. Chave PIX: CPF cadastrado.</p>
+            <div class="withdraw-form">
+              <div class="input-group-inline">
+                <span class="currency-prefix">R$</span>
+                <input type="number" id="withdraw-amount" placeholder="0,00" min="20" step="0.01">
+                <button id="btn-withdraw" class="btn btn-primary" disabled>
+                  <i class="fa-solid fa-paper-plane"></i> Solicitar Saque
+                </button>
+              </div>
+              <div id="withdraw-status" class="alert success hidden"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartão Blogs de Comentário (Resumo) -->
+        <div class="card blogs-card">
+          <h3><i class="fa-solid fa-square-rss text-blue"></i> Explorar Sites Parceiros</h3>
+          <p class="subtitle" style="margin-bottom: 16px;">Temos diversos sites e blogs parceiros onde você pode comentar e ganhar. Acesse a aba de sites para escolher o seu favorito.</p>
+          
+          <div class="blogs-list">
+            <!-- Call to action para a aba de sites -->
+            <div class="blog-item" style="justify-content: center; text-align: center; padding: 24px;">
+              <div class="blog-info" style="align-items: center;">
+                <i class="fa-solid fa-globe text-blue" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.8;"></i>
+                <span class="blog-name" style="font-size: 1.1rem;">Muitos sites disponíveis</span>
+                <p class="blog-desc">Explore nosso catálogo completo de parceiros integrados.</p>
+                <button id="btn-go-to-sites" class="btn btn-primary" style="margin-top: 16px;">
+                  <i class="fa-solid fa-list"></i> Ver Lista de Sites
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Históricos (Comentários e Transações) -->
+      <div class="history-grid">
+        
+        <!-- Tabela de Comentários -->
+        <div class="card history-card">
+          <h3><i class="fa-solid fa-comments"></i> Histórico de Comentários</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Blog / Site</th>
+                  <th>ID Externo</th>
+                  <th>Recompensa</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody id="comments-table-body">
+                <tr>
+                  <td colspan="5" class="table-placeholder">Nenhum comentário registrado ainda.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tabela de Saques -->
+        <div class="card history-card">
+          <h3><i class="fa-solid fa-receipt"></i> Histórico de Saques (PIX)</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>ID Gateway</th>
+                  <th>Solicitado em</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawals-table-body">
+                <tr>
+                  <td colspan="4" class="table-placeholder">Nenhuma transação de saque solicitada.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div> <!-- Fechamento de history-grid -->
+      
+      </div> <!-- Fechamento de tab-dashboard-content -->
+
+      <!-- Conteúdo da Aba Sites Parceiros -->
+      <div id="tab-sites-content" class="tab-content fade-in hidden" style="width: 100%;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--card-border); padding-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h3 style="margin-bottom: 4px;"><i class="fa-solid fa-globe text-blue"></i> Sites e Blogs Parceiros Habilitados</h3>
+              <p class="subtitle" style="margin-bottom: 0; font-size: 0.85rem; color: var(--text-secondary);">Escolha um dos blogs parceiros integrados com o CommentPay para comentar e receber saldo.</p>
+            </div>
+            <div style="position: relative;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+              <input type="text" id="sites-search-input" placeholder="Pesquisar site..." style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border); padding: 10px 16px 10px 38px; border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none; width: 220px; transition: var(--transition-smooth);">
+            </div>
+          </div>
+          
+          <div class="sites-grid-container" id="sites-list-grid">
+            <!-- Preenchido dinamicamente via JS -->
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- Fechamento de dashboard-view -->
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

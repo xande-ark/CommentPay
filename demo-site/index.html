@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Finanças - Renda Fixa em 2026</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Topbar do Blog -->
+  <header class="blog-header">
+    <div class="blog-container">
+      <div class="blog-logo">
+        <i class="fa-solid fa-chart-line text-blue"></i>
+        <span>Finanças<span>Ativas</span></span>
+      </div>
+      <nav class="blog-nav">
+        <a href="#">Artigos</a>
+        <a href="#">Sobre Nós</a>
+        <a href="/index.html" target="_blank" class="hub-link"><i class="fa-solid fa-wallet"></i> Ir para o Central Hub</a>
+        <a href="/demo-site/admin.html" target="_blank" class="admin-link"><i class="fa-solid fa-user-gear"></i> Painel Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Corpo do Artigo -->
+  <main class="article-container">
+    <article class="blog-card">
+      <div class="article-meta">
+        <span class="category">Investimentos</span>
+        <span class="date">Publicado em 01 de Junho de 2026</span>
+      </div>
+      
+      <h1>Como Investir em Renda Fixa em 2026: O Guia Definitivo</h1>
+      <p class="author">Por <strong>Alexandre Silva</strong>, Analista de Investimentos</p>
+
+      <div class="article-content">
+        <p>O cenário macroeconômico global em 2026 tem trazido desafios e, ao mesmo tempo, oportunidades fantásticas para investidores brasileiros. Com a flutuação constante das taxas de juros básicas e a inflação sob controle, a Renda Fixa retoma um papel central na diversificação de qualquer carteira de investimentos saudável.</p>
+
+        <h2>Por que focar em Renda Fixa agora?</h2>
+        <p>Muitos investidores acreditam erroneamente que a renda fixa perde atratividade em momentos de estabilização de juros. No entanto, títulos prefixados de longo prazo e títulos atrelados ao IPCA (como o Tesouro IPCA+) oferecem taxas reais de juros muito acima da média histórica internacional, permitindo ganho real substancial com riscos extremamente mitigados.</p>
+
+        <blockquote>
+          "A renda fixa não serve apenas para proteger o patrimônio, mas para alavancar ganhos consistentes em momentos de transição de ciclos econômicos."
+        </blockquote>
+
+        <h2>Principais Títulos Recomendados</h2>
+        <ul>
+          <li><strong>Tesouro Selic:</strong> Excelente para reserva de emergência devido à liquidez diária e volatilidade nula.</li>
+          <li><strong>LCI e LCA:</strong> Isentas de Imposto de Renda para pessoa física, ótimas opções para prazos de 1 a 3 anos.</li>
+          <li><strong>CDBs de Bancos Médios:</strong> Taxas superiores à média do mercado, cobertos pelo FGC (Fundo Garantidor de Créditos) até R$ 250.000.</li>
+        </ul>
+
+        <p>Seja qual for seu perfil de investidor, planejar seus aportes com metas claras de prazo é o segredo para maximizar os rendimentos dos juros compostos. Comece pequeno, crie consistência e veja seu patrimônio crescer exponencialmente.</p>
+      </div>
+    </article>
+
+    <!-- ÁREA DO WIDGET DE COMENTÁRIOS REMUNERADOS -->
+    <section class="comments-section blog-card">
+      <div class="comments-title-row">
+        <h3><i class="fa-solid fa-comments text-purple"></i> Opiniões dos Leitores</h3>
+        <span class="promo-badge"><i class="fa-solid fa-gift"></i> Comente e Ganhe R$ 0,50</span>
+      </div>
+      
+      <p class="promo-text">
+        Participe do debate acadêmico! Comentários construtivos com mais de <strong>150 caracteres</strong> são elegíveis a remuneração direta na carteira virtual.
+      </p>
+
+      <!-- Este é o contêiner onde o widget CommentPay se autoinjeta -->
+      <div id="commentpay-widget"></div>
+
+      <!-- Exibição de Comentários Aprovados -->
+      <div class="approved-comments-box">
+        <h4>Comentários Recentes</h4>
+        <div id="approved-comments-list">
+          <!-- Carregado via JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="blog-footer">
+    <p>&copy; 2026 Finanças Ativas. Plataforma de testes CommentPay.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="widget.js"></script>
+</body>
+</html>
