@@ -249,6 +249,7 @@
               <th>E-mail</th>
               <th>IP</th>
               <th>ID Externo</th>
+              <th>Site</th>
               <th>Comentário</th>
               <th>Data Envio</th>
               <th>Status</th>
@@ -257,7 +258,7 @@
           </thead>
           <tbody id="admin-table-body">
             <tr>
-              <td colspan="7" class="empty-state">Buscando comentários pendentes no servidor...</td>
+              <td colspan="9" class="empty-state">Buscando comentários pendentes no servidor...</td>
             </tr>
           </tbody>
         </table>
@@ -300,7 +301,7 @@
 
     function renderTable(comments) {
       if (comments.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="fa-solid fa-circle-check text-green"></i> Tudo limpo! Nenhum comentário pendente de moderação no momento.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="9" class="empty-state"><i class="fa-solid fa-circle-check text-green"></i> Tudo limpo! Nenhum comentário pendente de moderação no momento.</td></tr>`;
         return;
       }
 
@@ -312,6 +313,7 @@
             <td>${escapeHTML(c.user_email)}</td>
             <td><code>${escapeHTML(c.user_ip || 'Desconhecido')}</code></td>
             <td><code>${escapeHTML(c.external_comment_id)}</code></td>
+            <td><strong style="color: var(--cyan);">${escapeHTML(c.site_name || 'Desconhecido')}</strong></td>
             <td style="max-width: 320px; white-space: normal; word-break: break-word; font-style: italic; color: #cbd5e1; line-height: 1.4;">
               "${escapeHTML(c.comment_text || '(Comentário nativo do WordPress - Texto indisponível)')}"
             </td>
