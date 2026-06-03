@@ -1,8 +1,8 @@
-// --- ESTADO GLOBAL DA APLICAÇÃO ---
 let sessionToken = localStorage.getItem('cp_session_token') || null;
 let sessionUser = JSON.parse(localStorage.getItem('cp_session_user')) || null;
 let tempGoogleData = null; // Para guardar temporariamente dados do Google antes do CPF
 let pollingInterval = null;
+let userCommentsCache = []; // Cache global de comentários do usuário
 
 // --- DOM ELEMENTS ---
 const authView = document.getElementById('auth-view');
@@ -213,6 +213,14 @@ async function fetchWalletData() {
       // Atualiza Saldos na Tela
       valAvailable.textContent = `R$ ${wallet.balance_available.toFixed(2).replace('.', ',')}`;
       valPending.textContent = `R$ ${wallet.balance_pending.toFixed(2).replace('.', ',')}`;
+      
+      // Armazena no cache global e renderiza
+      userCommentsCache = comments;
+      
+      // Atualiza a lista de sites se a aba de sites estiver ativa (para desativar botões)
+      if (navSites.classList.contains('active') && cachedSites.length > 0) {
+        renderSitesList(cachedSites);
+      }
       
       // Habilita saque se tiver saldo disponível suficiente (>= 20)
       if (wallet.balance_available >= 20.00) {
@@ -457,6 +465,24 @@ function renderSitesList(sites) {
     const badgeText = isDemo ? 'Ambiente de Teste' : 'Remuneração Ativa';
     const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-gamepad text-purple';
 
+    // Verifica se o usuário já tem um comentário pendente ou aprovado neste site
+    const hasCommented = userCommentsCache.some(c => c.site_id === s.id && (c.status === 'pending' || c.status === 'approved'));
+
+    let actionButton = '';
+    if (hasCommented) {
+      actionButton = `
+        <button disabled class="btn btn-primary btn-sm-card" style="background: #334155; color: #94a3b8; cursor: not-allowed; border: 1px solid #475569;">
+          <i class="fa-solid fa-lock"></i> Limite Atingido
+        </button>
+      `;
+    } else {
+      actionButton = `
+        <a href="${targetUrl}" target="_blank" class="btn btn-primary btn-sm-card" style="${isDemo ? 'background: linear-gradient(135deg, var(--cyan), #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);' : ''}">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Acessar Blog
+        </a>
+      `;
+    }
+
     return `
       <div class="site-card-item">
         <div class="site-card-logo">
@@ -470,9 +496,7 @@ function renderSitesList(sites) {
           </span>
           <div class="site-card-footer">
             <span class="site-card-reward">R$ ${s.reward_amount.toFixed(2).replace('.', ',')}</span>
-            <a href="${targetUrl}" target="_blank" class="btn btn-primary btn-sm-card" style="${isDemo ? 'background: linear-gradient(135deg, var(--cyan), #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);' : ''}">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Acessar Blogs
-            </a>
+            ${actionButton}
           </div>
         </div>
       </div>

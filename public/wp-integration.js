@@ -193,12 +193,35 @@
   }
 
   // Render & Update UI Elements
-  function initOrUpdateIntegration() {
+  async function initOrUpdateIntegration() {
     // 1. Locate WordPress Comment Form (usually #commentform)
     const commentForm = document.getElementById('commentform') || document.querySelector('form.comment-form');
     if (!commentForm) {
       console.warn('[CommentPay] WordPress comment form not found on this page.');
       return;
+    }
+
+    // Se estiver logado, verifica se já comentou neste site
+    if (token) {
+      try {
+        const domain = window.location.hostname;
+        const res = await fetch(`${HUB_URL}/api/v1/user/site-status?domain=${encodeURIComponent(domain)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success' && data.has_commented) {
+          console.log('[CommentPay] Usuário já comentou neste site. Ocultando widget.');
+          // Remove badge and banner if they exist
+          const banner = document.getElementById('commentpay-form-banner');
+          if (banner) banner.remove();
+          const floatingBadge = document.getElementById('commentpay-floating-badge');
+          if (floatingBadge) floatingBadge.remove();
+          return; // Para a execução, não exibe mais nada do CommentPay
+        }
+      } catch (e) {
+        console.error('[CommentPay] Erro ao verificar status do site:', e);
+      }
     }
 
     // 2. Insert/Update Hidden Input for the token

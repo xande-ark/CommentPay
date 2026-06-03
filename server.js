@@ -454,6 +454,38 @@ app.get('/api/v1/wallet/status', authMiddleware, async (req, res) => {
   }
 });
 
+// 5.5 Verifica status do usuário no site atual (se já comentou)
+app.get('/api/v1/user/site-status', authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  const domain = req.query.domain;
+
+  if (!domain) {
+    return res.status(400).json({ status: 'error', message: 'Domínio não fornecido.' });
+  }
+
+  try {
+    const site = await dbGet("SELECT id FROM peripheral_sites WHERE domain = ?", [domain]);
+    if (!site) {
+      return res.json({ status: 'error', message: 'Site não encontrado.' });
+    }
+
+    const existingComment = await dbGet(`
+      SELECT status FROM comments 
+      WHERE user_id = ? AND site_id = ? AND (status = 'pending' OR status = 'approved')
+      LIMIT 1
+    `, [userId, site.id]);
+
+    res.json({
+      status: 'success',
+      has_commented: !!existingComment,
+      comment_status: existingComment ? existingComment.status : null
+    });
+  } catch (err) {
+    console.error("Erro ao verificar site status:", err);
+    res.status(500).json({ status: 'error', message: 'Erro ao verificar status do site.' });
+  }
+});
+
 // 6. Solicitação de Saque via PIX (Com Fila de Worker simulada)
 app.post('/api/v1/wallet/withdraw', authMiddleware, async (req, res) => {
   const userId = req.userId;
