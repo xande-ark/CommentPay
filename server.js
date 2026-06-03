@@ -778,14 +778,36 @@ app.post('/api/blog/moderate', async (req, res) => {
 // Retorna os comentários pendentes locais para serem moderados
 app.get('/api/v1/comments/pending-local', async (req, res) => {
   try {
-    const comments = await dbAll(`
-      SELECT cl.id, cl.external_comment_id, cl.comment_text, cl.status, cl.created_at, cl.site_id, u.name as user_name, u.email as user_email, ps.name as site_name
+    const rawComments = await dbAll(`
+      SELECT cl.id, cl.external_comment_id, cl.comment_text, cl.status, cl.created_at, cl.site_id, 
+             cl.ip_encrypted, cl.ip_iv, cl.ip_auth_tag,
+             u.name as user_name, u.email as user_email, ps.name as site_name
       FROM comments_log cl
       JOIN users u ON cl.user_id = u.id
       JOIN peripheral_sites ps ON cl.site_id = ps.id
       WHERE cl.status = 'pending'
       ORDER BY cl.created_at ASC
     `);
+    
+    // Descriptografa o IP para o Administrador do Blog
+    const comments = rawComments.map(c => {
+      let user_ip = 'Desconhecido';
+      if (c.ip_encrypted && c.ip_iv && c.ip_auth_tag) {
+        try {
+          user_ip = decrypt(c.ip_encrypted, c.ip_iv, c.ip_auth_tag);
+        } catch (e) {
+          console.error("Erro ao descriptografar IP do comentário:", c.id);
+        }
+      }
+      
+      // Remove campos sensíveis antes de enviar ao frontend
+      delete c.ip_encrypted;
+      delete c.ip_iv;
+      delete c.ip_auth_tag;
+      
+      return { ...c, user_ip };
+    });
+    
     res.json({ status: 'success', data: comments });
   } catch (err) {
     console.error(err);
