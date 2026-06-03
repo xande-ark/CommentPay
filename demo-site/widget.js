@@ -56,8 +56,8 @@ function renderWidget() {
           </div>
           
           <div class="textarea-container">
-            <textarea id="widget-comment-text" class="commentpay-textarea" placeholder="Deixe seu comentário construtivo sobre o artigo aqui... (mínimo de 150 caracteres)"></textarea>
-            <div class="char-counter" id="widget-char-counter">0 / 150 caracteres</div>
+            <textarea id="widget-comment-text" class="commentpay-textarea" placeholder="Deixe seu comentário construtivo sobre o artigo aqui... (mínimo de 100 caracteres)"></textarea>
+            <div class="char-counter" id="widget-char-counter">0 / 100 caracteres</div>
           </div>
           
           <div id="widget-alert" class="commentpay-alert hidden"></div>
@@ -83,9 +83,9 @@ function renderWidget() {
     
     textarea.addEventListener('input', () => {
       const length = textarea.value.length;
-      counter.textContent = `${length} / 150 caracteres`;
+      counter.textContent = `${length} / 100 caracteres`;
       
-      if (length >= 150) {
+      if (length >= 100) {
         counter.classList.add('valid');
         btnSubmit.disabled = false;
       } else {
@@ -161,7 +161,7 @@ function renderWidget() {
           alertBox.innerHTML = successMsg;
           alertBox.classList.remove('hidden');
           textarea.value = '';
-          counter.textContent = "0 / 150 caracteres";
+          counter.textContent = "0 / 100 caracteres";
           counter.classList.remove('valid');
         } else {
           alertBox.className = "commentpay-alert error";

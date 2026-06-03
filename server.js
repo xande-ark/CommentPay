@@ -235,11 +235,11 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     }
     
     // Camada B: Limite de tamanho mínimo
-    if (comment_text.trim().length < 150) {
+    if (comment_text.trim().length < 100) {
       return res.status(400).json({ 
         status: 'error', 
         code: 'CONTENT_TOO_SHORT', 
-        message: 'O comentário deve conter no mínimo 150 caracteres para ser elegível para remuneração.' 
+        message: 'O comentário deve conter no mínimo 100 caracteres para ser elegível para remuneração.' 
       });
     }
     

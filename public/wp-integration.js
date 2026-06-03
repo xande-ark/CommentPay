@@ -255,7 +255,7 @@
           </div>
         </div>
         <p class="commentpay-wp-desc" style="margin-top: 10px; margin-bottom: 0; font-size: 0.75rem; color: #64748b;">
-          * O comentário deve ter pelo menos 150 caracteres e respeitar as regras anti-fraude. O saldo ficará pendente até ser aprovado pelos administradores da Love PG.
+          * O comentário deve ter pelo menos 100 caracteres e respeitar as regras anti-fraude. O saldo ficará pendente até ser aprovado pelos administradores da Love PG.
         </p>
       `;
       document.getElementById('commentpay-disconnect-btn').addEventListener('click', disconnect);
