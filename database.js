@@ -182,6 +182,13 @@ async function initDb() {
         domain: 'lovepg.com.br',
         blog_url: 'https://lovepg.com.br/blog/',
         secret: 'api_secret_key_lovepg_789'
+      },
+      {
+        id: 'site-amorpg-123',
+        name: 'Amor PG',
+        domain: 'amorpg.com.br',
+        blog_url: 'https://amorpg.com.br/',
+        secret: 'api_secret_key_amorpg_abc'
       }
     ];
 
