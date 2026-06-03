@@ -24,6 +24,7 @@ app.use(express.json({
     req.rawBody = buf.toString(encoding || 'utf8');
   }
 }));
+app.use(express.urlencoded({ extended: true }));
 
 // Servir arquivos estáticos do dashboard e demo-site
 app.use(express.static('public'));
@@ -96,13 +97,13 @@ const googleClient = new OAuth2Client("1081514821662-nj1oankja03vijqvccb0fbl25rt
 
 // 1. Google OAuth (Oficial)
 app.post('/api/v1/auth/google', async (req, res) => {
+  // Código antigo mantido para debug/fallback
   const { credential } = req.body;
   if (!credential) {
     return res.status(400).json({ status: 'error', message: 'Token do Google ausente.' });
   }
   
   try {
-    // Verifica a assinatura e a validade do Token do Google
     const ticket = await googleClient.verifyIdToken({
         idToken: credential,
         audience: "1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com",
@@ -111,9 +112,8 @@ app.post('/api/v1/auth/google', async (req, res) => {
     const payload = ticket.getPayload();
     const email = payload.email;
     const name = payload.name;
-    const google_sub = payload.sub; // ID único do usuário no Google
+    const google_sub = payload.sub;
 
-    // Verifica se usuário já está cadastrado
     const user = await dbGet("SELECT * FROM users WHERE google_sub = ?", [google_sub]);
     
     if (user) {
@@ -129,6 +129,65 @@ app.post('/api/v1/auth/google', async (req, res) => {
   } catch (err) {
     console.error("Erro na verificação do Google JWT:", err);
     res.status(500).json({ status: 'error', message: 'Falha na autenticação com o Google.' });
+  }
+});
+
+// 1.5 Google OAuth (Callback para modo Redirect do Mobile)
+app.post('/api/v1/auth/google/callback', async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) {
+    return res.status(400).send("Token do Google ausente.");
+  }
+  
+  try {
+    const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: "1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com",
+    });
+    
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name;
+    const google_sub = payload.sub;
+
+    const user = await dbGet("SELECT * FROM users WHERE google_sub = ?", [google_sub]);
+    
+    let htmlResponse = "";
+    
+    if (user && user.status === 'active') {
+      const token = generateUserToken(user.id);
+      const safeUser = JSON.stringify({ id: user.id, email: user.email, name: user.name, status: user.status });
+      htmlResponse = `
+        <script>
+          localStorage.setItem('cp_session_token', '${token}');
+          localStorage.setItem('cp_session_user', '${safeUser}');
+          window.location.href = '/index.html';
+        </script>
+      `;
+    } else {
+      const pendingData = JSON.stringify({ email, name, google_sub });
+      htmlResponse = `
+        <script>
+          localStorage.setItem('cp_pending_google_data', '${pendingData}');
+          window.location.href = '/index.html?action=register';
+        </script>
+      `;
+    }
+    
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Autenticando...</title></head>
+      <body style="background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
+        <h2>Aguarde, redirecionando...</h2>
+        ${htmlResponse}
+      </body>
+      </html>
+    `);
+    
+  } catch (err) {
+    console.error("Erro no callback do Google:", err);
+    res.status(500).send("Falha na autenticação. Tente novamente.");
   }
 });
 

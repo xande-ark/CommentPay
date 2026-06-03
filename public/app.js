@@ -60,6 +60,24 @@ regCpfInput.addEventListener('input', (e) => {
 
 // --- INICIALIZAÇÃO ---
 function init() {
+  // Update tokens if they were just set by redirect script
+  sessionToken = localStorage.getItem('cp_session_token') || null;
+  sessionUser = JSON.parse(localStorage.getItem('cp_session_user')) || null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  if (urlParams.get('action') === 'register') {
+    const pendingData = localStorage.getItem('cp_pending_google_data');
+    if (pendingData) {
+      tempGoogleData = JSON.parse(pendingData);
+      localStorage.removeItem('cp_pending_google_data');
+      // Limpa a URL para não ficar suja
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showRegister();
+      return;
+    }
+  }
+
   if (sessionToken && sessionUser) {
     showDashboard();
   } else {
@@ -108,37 +126,6 @@ function showDashboard() {
   clearInterval(pollingInterval);
   pollingInterval = setInterval(fetchWalletData, 6000);
 }
-
-// --- FLUXO DE LOGIN (GOOGLE OFICIAL) ---
-window.handleCredentialResponse = async (response) => {
-  try {
-    const res = await fetch('/api/v1/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credential: response.credential })
-    });
-    
-    const data = await res.json();
-    
-    if (data.status === 'success') {
-      // Usuário já cadastrado com CPF. Login direto!
-      localStorage.setItem('cp_session_token', data.token);
-      localStorage.setItem('cp_session_user', JSON.stringify(data.user));
-      sessionToken = data.token;
-      sessionUser = data.user;
-      showDashboard();
-    } else if (data.status === 'pending_cpf') {
-      // Usuário novo ou sem CPF. Exige preenchimento cadastral
-      tempGoogleData = data.user;
-      showRegister();
-    } else {
-      alert("Erro do Servidor: " + (data.message || "Falha desconhecida."));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Erro na comunicação com a API.");
-  }
-};
 
 // --- FLUXO DE REGISTRO DE CPF ---
 btnRegisterSubmit.addEventListener('click', async () => {
