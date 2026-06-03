@@ -138,7 +138,7 @@ window.handleCredentialResponse = async (response) => {
     console.error(err);
     alert("Erro na comunicação com a API.");
   }
-});
+};
 
 // --- FLUXO DE REGISTRO DE CPF ---
 btnRegisterSubmit.addEventListener('click', async () => {
