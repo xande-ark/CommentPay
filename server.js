@@ -243,7 +243,7 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
     return res.status(201).json({ status: 'success', token, user: { id: userId, email, name, status: 'active' } });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ status: 'error', message: 'Erro ao registrar usuário.' });
+    res.status(500).json({ status: 'error', message: 'Erro ao registrar usuário: ' + err.message });
   }
 });
 
