@@ -706,7 +706,11 @@ app.post('/api/blog/comment', async (req, res) => {
     const payloadStr = JSON.stringify(webhookPayload);
     const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
 
-    const hubRes = await fetch(`http://localhost:${PORT}/api/v1/comments/submit`, {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers.host;
+    const baseUrl = process.env.VERCEL ? `https://${host}` : `http://localhost:${PORT}`;
+
+    const hubRes = await fetch(`${baseUrl}/api/v1/comments/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -756,7 +760,11 @@ app.post('/api/blog/moderate', async (req, res) => {
     const payloadStr = JSON.stringify(webhookPayload);
     const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
 
-    const hubRes = await fetch(`http://localhost:${PORT}/api/v1/comments/status-update`, {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers.host;
+    const baseUrl = process.env.VERCEL ? `https://${host}` : `http://localhost:${PORT}`;
+
+    const hubRes = await fetch(`${baseUrl}/api/v1/comments/status-update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

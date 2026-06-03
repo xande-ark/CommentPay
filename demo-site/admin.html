@@ -320,13 +320,13 @@
             <td>${formattedDate}</td>
             <td><span class="badge-pending">PENDENTE</span></td>
             <td>
-              <button onclick="moderateComment('${c.external_comment_id}', 'approved')" class="btn-action btn-approve">
+              <button onclick="moderateComment('${c.external_comment_id}', 'approved', '${c.site_id}')" class="btn-action btn-approve">
                 <i class="fa-solid fa-check"></i> Aprovar
               </button>
-              <button onclick="moderateComment('${c.external_comment_id}', 'rejected')" class="btn-action btn-reject">
+              <button onclick="moderateComment('${c.external_comment_id}', 'rejected', '${c.site_id}')" class="btn-action btn-reject">
                 <i class="fa-solid fa-xmark"></i> Rejeitar
               </button>
-              <button onclick="moderateComment('${c.external_comment_id}', 'spam')" class="btn-action btn-spam">
+              <button onclick="moderateComment('${c.external_comment_id}', 'spam', '${c.site_id}')" class="btn-action btn-spam">
                 <i class="fa-solid fa-ban"></i> Spam
               </button>
             </td>
@@ -336,14 +336,14 @@
     }
 
     // Ação de Moderação
-    async function moderateComment(externalCommentId, status) {
+    async function moderateComment(externalCommentId, status, siteId) {
       alertBox.classList.add('hidden');
       
       try {
         const res = await fetch('/api/blog/moderate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ external_comment_id: externalCommentId, status })
+          body: JSON.stringify({ external_comment_id: externalCommentId, status, site_id: siteId })
         });
         
         const data = await res.json();
