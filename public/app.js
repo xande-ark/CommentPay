@@ -131,6 +131,8 @@ window.handleCredentialResponse = async (response) => {
       // Usuário novo ou sem CPF. Exige preenchimento cadastral
       tempGoogleData = data.user;
       showRegister();
+    } else {
+      alert("Erro do Servidor: " + (data.message || "Falha desconhecida."));
     }
   } catch (err) {
     console.error(err);
