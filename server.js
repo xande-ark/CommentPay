@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const { OAuth2Client } = require('google-auth-library');
 const { 
   initDb, 
   hashSHA256, 
@@ -90,21 +91,35 @@ function validateCPF(cpf) {
 
 // --- ROTAS DA API ---
 
-// 1. Google OAuth (Mock)
-app.post('/api/v1/auth/google-mock', async (req, res) => {
-  const { email, name, google_sub } = req.body;
-  if (!email || !name || !google_sub) {
-    return res.status(400).json({ status: 'error', message: 'Dados incompletos do Google.' });
+// Cliente OAuth2 do Google
+const googleClient = new OAuth2Client("1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com");
+
+// 1. Google OAuth (Oficial)
+app.post('/api/v1/auth/google', async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) {
+    return res.status(400).json({ status: 'error', message: 'Token do Google ausente.' });
   }
   
   try {
+    // Verifica a assinatura e a validade do Token do Google
+    const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: "1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com",
+    });
+    
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name;
+    const google_sub = payload.sub; // ID único do usuário no Google
+
     // Verifica se usuário já está cadastrado
     const user = await dbGet("SELECT * FROM users WHERE google_sub = ?", [google_sub]);
     
     if (user) {
       if (user.status === 'active') {
         const token = generateUserToken(user.id);
-        return res.json({ status: 'success', token, user: { id: user.id, email: user.id, name: user.name, status: user.status } });
+        return res.json({ status: 'success', token, user: { id: user.id, email: user.email, name: user.name, status: user.status } });
       } else {
         return res.json({ status: 'pending_cpf', user: { email, name, google_sub } });
       }
@@ -112,8 +127,8 @@ app.post('/api/v1/auth/google-mock', async (req, res) => {
       return res.json({ status: 'pending_cpf', user: { email, name, google_sub } });
     }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: 'error', message: 'Erro interno do servidor.' });
+    console.error("Erro na verificação do Google JWT:", err);
+    res.status(500).json({ status: 'error', message: 'Falha na autenticação com o Google.' });
   }
 });
 

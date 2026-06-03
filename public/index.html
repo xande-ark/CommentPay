@@ -11,6 +11,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <!-- Efeitos de Fundo Luminosos -->
@@ -30,20 +32,23 @@
         <h3>Acesse sua Conta</h3>
         <p>Utilize seu login do Google para acessar o painel e gerenciar seu saldo.</p>
         
-        <!-- Formulário simplificado de e-mail para simular o Google OAuth -->
-        <div class="mock-auth-form">
-          <div class="input-group">
-            <label for="google-email"><i class="fa-regular fa-envelope"></i> E-mail do Google</label>
-            <input type="email" id="google-email" placeholder="nome@gmail.com" value="alexandre.silva@gmail.com">
+        <div id="google-login-container" style="display: flex; justify-content: center; margin-top: 2rem;">
+          <!-- O botão oficial do Google será renderizado aqui -->
+          <div id="g_id_onload"
+               data-client_id="1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com"
+               data-context="signin"
+               data-ux_mode="popup"
+               data-callback="handleCredentialResponse"
+               data-auto_prompt="false">
           </div>
-          <div class="input-group">
-            <label for="google-name"><i class="fa-regular fa-user"></i> Nome Completo</label>
-            <input type="text" id="google-name" placeholder="Alexandre Silva" value="Alexandre Silva">
+          <div class="g_id_signin"
+               data-type="standard"
+               data-shape="rectangular"
+               data-theme="outline"
+               data-text="signin_with"
+               data-size="large"
+               data-logo_alignment="left">
           </div>
-          <button id="btn-google-login" class="btn btn-google">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo">
-            Entrar com o Google
-          </button>
         </div>
       </div>
     </div>

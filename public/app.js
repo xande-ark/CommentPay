@@ -109,23 +109,13 @@ function showDashboard() {
   pollingInterval = setInterval(fetchWalletData, 6000);
 }
 
-// --- FLUXO DE LOGIN (GOOGLE MOCK) ---
-btnGoogleLogin.addEventListener('click', async () => {
-  const email = googleEmailInput.value.trim();
-  const name = googleNameInput.value.trim();
-  
-  if (!email || !name) {
-    alert("Por favor, preencha os dados de simulação do Google.");
-    return;
-  }
-  
-  const googleSub = 'sub_' + btoa(email).replace(/=/g, '');
-  
+// --- FLUXO DE LOGIN (GOOGLE OFICIAL) ---
+window.handleCredentialResponse = async (response) => {
   try {
-    const res = await fetch('/api/v1/auth/google-mock', {
+    const res = await fetch('/api/v1/auth/google', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name, google_sub: googleSub })
+      body: JSON.stringify({ credential: response.credential })
     });
     
     const data = await res.json();
