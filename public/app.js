@@ -129,7 +129,7 @@ window.handleCredentialResponse = async (response) => {
       showDashboard();
     } else if (data.status === 'pending_cpf') {
       // Usuário novo ou sem CPF. Exige preenchimento cadastral
-      tempGoogleData = { email, name, google_sub: googleSub };
+      tempGoogleData = data.user;
       showRegister();
     }
   } catch (err) {
