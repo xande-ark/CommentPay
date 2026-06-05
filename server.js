@@ -835,7 +835,7 @@ app.get('/api/v1/admin/withdrawals/pending', adminAuthMiddleware, async (req, re
     const rawWithdrawals = await dbAll(`
       SELECT pt.id, pt.amount, pt.requested_at, pt.pix_key_type,
              pt.ip_encrypted, pt.ip_iv, pt.ip_auth_tag,
-             u.name as user_name, u.email as user_email, u.cpf_encrypted, u.cpf_iv, u.cpf_auth_tag
+             u.id as user_id, u.name as user_name, u.email as user_email, u.cpf_encrypted, u.cpf_iv, u.cpf_auth_tag
       FROM payout_transactions pt
       JOIN wallets w ON pt.wallet_id = w.id
       JOIN users u ON w.user_id = u.id
@@ -854,6 +854,24 @@ app.get('/api/v1/admin/withdrawals/pending', adminAuthMiddleware, async (req, re
       delete w.cpf_encrypted; delete w.cpf_iv; delete w.cpf_auth_tag;
       return { ...w, user_ip: ip, user_cpf: cpf };
     });
+    
+    // Varredura de Segurança (Anti-Fraude): Verifica se este IP já foi usado por mais de 1 usuário (Multi-accounting)
+    for (let w of withdrawals) {
+      w.is_suspicious_ip = false;
+      if (w.user_ip !== 'Desconhecido') {
+        const ipHash = hashSHA256(w.user_ip);
+        // Conta quantos usuários diferentes usaram esse IP para comentar (comments_log já possui ip_hash)
+        const countRes = await dbGet("SELECT COUNT(DISTINCT user_id) as c FROM comments_log WHERE ip_hash = ?", [ipHash]);
+        
+        // Verifica também nas próprias transações em memória (caso ambos não tenham comentado ainda, mas tentaram sacar)
+        const usersWithThisIpInPending = new Set(withdrawals.filter(x => x.user_ip === w.user_ip).map(x => x.user_id));
+        
+        if ((countRes && countRes.c > 1) || usersWithThisIpInPending.size > 1) {
+          w.is_suspicious_ip = true;
+        }
+      }
+    }
+
     
     res.json({ status: 'success', data: withdrawals });
   } catch (err) {

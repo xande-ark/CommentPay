@@ -446,7 +446,10 @@
           <tr>
             <td><strong>${w.user_name}</strong><br><small style="color: var(--text-secondary);">${w.user_email}</small></td>
             <td><span class="badge" style="font-family: monospace; background: #fef08a;">${w.user_cpf}</span></td>
-            <td><span class="badge" style="color: var(--purple); font-family: monospace;">${w.user_ip}</span></td>
+            <td>
+              <span class="badge" style="color: var(--purple); font-family: monospace;">${w.user_ip}</span>
+              ${w.is_suspicious_ip ? '<br><span style="color: var(--red); font-size: 0.7rem; font-weight: bold; margin-top: 4px; display: inline-block; background: #fee2e2; padding: 2px 4px; border-radius: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> MÚLTIPLAS CONTAS</span>' : ''}
+            </td>
             <td><strong style="color: var(--green); font-size: 1.1rem;">R$ ${w.amount.toFixed(2).replace('.',',')}</strong></td>
             <td>${new Date(w.requested_at).toLocaleString('pt-BR')}</td>
             <td>
