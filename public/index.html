@@ -104,7 +104,7 @@
         </nav>
 
         <div class="user-profile">
-          <span class="user-badge"><i class="fa-solid fa-circle text-green animate-pulse"></i> Conta Ativa</span>
+          <span class="user-badge"><i class="fa-solid fa-star text-yellow animate-pulse"></i> Nível 1 - Iniciante</span>
           <span id="user-display-name" class="user-name">Alexandre</span>
           <button id="btn-logout" class="btn btn-icon-only" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -118,13 +118,13 @@
         <!-- Cartão da Carteira (Saldos) -->
         <div class="card wallet-card">
           <div class="card-header">
-            <h3><i class="fa-solid fa-wallet"></i> Carteira Virtual</h3>
+            <h3><i class="fa-solid fa-trophy" style="color: var(--yellow);"></i> Suas Recompensas</h3>
             <button id="btn-refresh" class="btn-refresh" title="Atualizar saldos"><i class="fa-solid fa-rotate"></i></button>
           </div>
           
           <div class="balances-container">
             <div class="balance-box available">
-              <span class="balance-label">Disponível para Saque</span>
+              <span class="balance-label">Saldo Liberado</span>
               <span class="balance-value" id="val-available">R$ 0,00</span>
             </div>
             
@@ -135,7 +135,15 @@
           </div>
           
           <div class="withdraw-section">
-            <p class="limit-warning">Limite mínimo para saque: <strong>R$ 20,00</strong>. Chave PIX: CPF cadastrado.</p>
+            <div class="progress-container">
+              <div class="progress-info">
+                <span id="progress-text" class="progress-text">Carregando progresso...</span>
+                <span id="progress-percent" class="progress-percent">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
             <div class="withdraw-form">
               <div class="input-group-inline">
                 <span class="currency-prefix">R$</span>
@@ -151,8 +159,8 @@
 
         <!-- Cartão Blogs de Comentário (Resumo) -->
         <div class="card blogs-card">
-          <h3><i class="fa-solid fa-square-rss text-blue"></i> Explorar Sites Parceiros</h3>
-          <p class="subtitle" style="margin-bottom: 16px;">Temos diversos sites e blogs parceiros onde você pode comentar e ganhar. Acesse a aba de sites para escolher o seu favorito.</p>
+          <h3><i class="fa-solid fa-bullseye text-blue"></i> Missões e Oportunidades</h3>
+          <p class="subtitle" style="margin-bottom: 16px;">Temos diversas missões em sites parceiros onde você pode comentar e ganhar. Cumpra objetivos para resgatar saldos maiores.</p>
           
           <div class="blogs-list">
             <!-- Call to action para a aba de sites -->
@@ -160,7 +168,7 @@
               <div class="blog-info" style="align-items: center;">
                 <i class="fa-solid fa-globe text-blue" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.8;"></i>
                 <span class="blog-name" style="font-size: 1.1rem;">Muitos sites disponíveis</span>
-                <p class="blog-desc">Explore nosso catálogo completo de parceiros integrados.</p>
+                <p class="blog-desc">Explore nosso catálogo completo de missões integradas.</p>
                 <button id="btn-go-to-sites" class="btn btn-primary" style="margin-top: 16px;">
                   <i class="fa-solid fa-list"></i> Ver Lista de Sites
                 </button>
@@ -175,7 +183,7 @@
         
         <!-- Tabela de Comentários -->
         <div class="card history-card">
-          <h3><i class="fa-solid fa-comments"></i> Histórico de Comentários</h3>
+          <h3><i class="fa-solid fa-scroll"></i> Registro de Missões</h3>
           <div class="table-container">
             <table>
               <thead>
@@ -227,12 +235,12 @@
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--card-border); padding-bottom: 16px; flex-wrap: wrap; gap: 16px;">
             <div>
-              <h3 style="margin-bottom: 4px;"><i class="fa-solid fa-globe text-blue"></i> Sites e Blogs Parceiros Habilitados</h3>
-              <p class="subtitle" style="margin-bottom: 0; font-size: 0.85rem; color: var(--text-secondary);">Escolha um dos blogs parceiros integrados com o CommentPay para comentar e receber saldo.</p>
+              <h3 style="margin-bottom: 4px;"><i class="fa-solid fa-bullseye text-blue"></i> Central de Missões</h3>
+              <p class="subtitle" style="margin-bottom: 0; font-size: 0.85rem; color: var(--text-secondary);">Escolha uma das missões integradas com o CommentPay para comentar e receber saldo.</p>
             </div>
             <div style="position: relative;">
               <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
-              <input type="text" id="sites-search-input" placeholder="Pesquisar site..." style="background: #f8fafc; border: 1px solid var(--card-border); padding: 10px 16px 10px 38px; border-radius: 8px; color: var(--text-primary); font-size: 0.85rem; outline: none; width: 220px; transition: var(--transition-smooth);">
+              <input type="text" id="sites-search-input" placeholder="Pesquisar missão..." style="background: #f8fafc; border: 1px solid var(--card-border); padding: 10px 16px 10px 38px; border-radius: 8px; color: var(--text-primary); font-size: 0.85rem; outline: none; width: 220px; transition: var(--transition-smooth);">
             </div>
           </div>
           

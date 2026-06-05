@@ -43,6 +43,11 @@ const withdrawStatus = document.getElementById('withdraw-status');
 const commentsTableBody = document.getElementById('comments-table-body');
 const withdrawalsTableBody = document.getElementById('withdrawals-table-body');
 
+// Gamification Progress Elements
+const progressText = document.getElementById('progress-text');
+const progressPercent = document.getElementById('progress-percent');
+const progressBarFill = document.getElementById('progress-bar-fill');
+
 // --- FORMATADOR DE CPF (MÁSCARA DINÂMICA) ---
 regCpfInput.addEventListener('input', (e) => {
   let value = e.target.value.replace(/\D/g, '');
@@ -209,12 +214,26 @@ async function fetchWalletData() {
         renderSitesList(cachedSites);
       }
       
-      // Habilita saque se tiver saldo disponível suficiente (>= 20)
-      if (wallet.balance_available >= 20.00) {
+      // Lógica de Gamificação / Barra de Progresso
+      const goal = 20.00;
+      const current = wallet.balance_available;
+      let percent = (current / goal) * 100;
+      if (percent > 100) percent = 100;
+      
+      // Anima a barra e os textos
+      progressBarFill.style.width = `${percent}%`;
+      progressPercent.textContent = `${Math.floor(percent)}%`;
+      
+      if (current >= goal) {
+        progressText.textContent = "Parabéns! Saque liberado.";
+        progressText.style.color = "var(--green)";
         btnWithdraw.disabled = false;
         withdrawAmountInput.disabled = false;
-        withdrawAmountInput.max = wallet.balance_available;
+        withdrawAmountInput.max = current;
       } else {
+        const missing = (goal - current).toFixed(2).replace('.', ',');
+        progressText.textContent = `Faltam R$ ${missing} para liberar o resgate`;
+        progressText.style.color = "var(--text-secondary)";
         btnWithdraw.disabled = true;
         withdrawAmountInput.disabled = true;
       }
