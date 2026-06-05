@@ -296,10 +296,10 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     }
     
     // 2. Valida Assinatura HMAC-SHA256
-    const payloadStr = req.rawBody || JSON.stringify(req.body);
-    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+    const signatureBase = siteId + external_comment_id;
+    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
     if (computedSignature !== signature) {
-      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: `Assinatura HMAC inválida. Debug: Secret=${site.api_key_secret} | rawBody=${payloadStr}` });
+      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
     }
     
     // 3. Valida Token do Usuário
@@ -436,10 +436,10 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
     }
     
     // 2. Valida Assinatura HMAC
-    const payloadStr = req.rawBody || JSON.stringify(req.body);
-    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+    const signatureBase = siteId + external_comment_id + status;
+    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
     if (computedSignature !== signature) {
-      return res.status(401).json({ status: 'error', message: 'Assinatura HMAC inválida.' });
+      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
     }
     
     // 3. Busca o Log do Comentário
@@ -835,8 +835,9 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
         external_comment_id: external_comment_id,
         status: status
       };
+      const signatureBase = site.id + payload.external_comment_id + payload.status;
+      const signature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
       const payloadStr = JSON.stringify(payload);
-      const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
       
       const wpUrl = `https://${site.domain}/wp-json/commentpay/v1/sync-status`;
       
