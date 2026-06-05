@@ -344,7 +344,7 @@ btnWithdraw.addEventListener('click', async () => {
     
     if (res.status === 201 && data.status === 'success') {
       withdrawStatus.className = "alert success";
-      withdrawStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> Solicitação criada! PIX será enviado em alguns segundos.`;
+      withdrawStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> Solicitação criada! O PIX será enviado em até 24 horas.`;
       withdrawStatus.classList.remove('hidden');
       withdrawAmountInput.value = '';
       
