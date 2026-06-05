@@ -28,6 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir arquivos estáticos do dashboard e demo-site
 app.use(express.static('public'));
+
+app.get('/api/debug-hmac', (req, res) => {
+  res.json(global.lastHmacError || { message: 'No error yet' });
+});
 app.use('/demo-site', express.static('demo-site'));
 
 // --- GERENCIAMENTO DE TOKENS (JWT MOCK SEGURO) ---
@@ -300,10 +304,16 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signaturePayload).digest('hex');
     
     if (computedSignature !== signature) {
+      global.lastHmacError = {
+        time: new Date(),
+        siteId: site.id,
+        receivedSig: signature,
+        computedSig: computedSignature,
+        signaturePayload,
+        rawBody: req.rawBody,
+        secret: site.api_key_secret
+      };
       console.error(`[HMAC ERROR] Site: ${site.id}`);
-      console.error(`[HMAC ERROR] Recebido: ${signature}`);
-      console.error(`[HMAC ERROR] Calculado: ${computedSignature}`);
-      console.error(`[HMAC ERROR] Payload:`, signaturePayload);
       return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
     }
     
