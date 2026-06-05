@@ -431,16 +431,20 @@ h1, h2, h3, h4, .logo {
 
   .hub-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: var(--card-bg);
-    border-top: 1px solid var(--card-border);
-    padding: 10px 16px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    padding: 8px 16px;
     justify-content: space-around;
-    z-index: 1000;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
-    border-radius: 20px 20px 0 0;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-radius: 40px;
+    transition: var(--transition-smooth);
   }
 
   .nav-item {
@@ -456,6 +460,13 @@ h1, h2, h3, h4, .logo {
 
   .dashboard-layout {
     padding-bottom: 90px;
+  }
+}
+
+/* Esconde a nav bar flutuante quando o teclado do celular abrir (telas muito curtas) */
+@media (max-height: 500px) and (max-width: 768px) {
+  .hub-nav {
+    display: none !important;
   }
 }
 
