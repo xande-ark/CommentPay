@@ -299,7 +299,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     const payloadStr = req.rawBody || JSON.stringify(req.body);
     const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
     if (computedSignature !== signature) {
-      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
+      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: `Assinatura HMAC inválida. Debug: Secret=${site.api_key_secret} | rawBody=${payloadStr}` });
     }
     
     // 3. Valida Token do Usuário
