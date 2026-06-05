@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -95,12 +95,6 @@
           <i class="fa-solid fa-comments-dollar logo-icon"></i>
           <h2>Comment<span>Pay</span></h2>
         </div>
-        
-        <!-- Menu de Navegação Centralizado -->
-        <nav class="hub-nav">
-          <a href="#" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-          <a href="#" id="nav-sites" class="nav-item"><i class="fa-solid fa-globe"></i> Sites Parceiros</a>
-        </nav>
 
         <div class="user-profile">
           <span class="user-badge"><i class="fa-solid fa-star text-yellow animate-pulse"></i> Nível 1 - Iniciante</span>
@@ -108,6 +102,12 @@
           <button id="btn-logout" class="btn btn-icon-only" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </header>
+
+      <!-- Menu de Navegação (Bottom Bar no Mobile / Top Bar no Desktop) -->
+      <nav class="hub-nav" id="main-nav">
+        <a href="#" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="#" id="nav-sites" class="nav-item"><i class="fa-solid fa-globe"></i> Sites Parceiros</a>
+      </nav>
 
       <!-- Conteúdo da Aba Dashboard -->
       <div id="tab-dashboard-content" class="tab-content fade-in">
@@ -251,6 +251,6 @@
 
     </div> <!-- Fechamento de dashboard-view -->
   </div>
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
