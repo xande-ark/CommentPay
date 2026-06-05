@@ -846,10 +846,10 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
       await dbRun("COMMIT");
       
       // Sincroniza o status de volta para o WordPress (Webhook 3)
-      if (site.blog_url) {
+      if (site.domain) {
         const payloadStr = `${external_comment_id}|${status}`;
         const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
-        const baseUrl = site.blog_url.replace(/\/$/, '');
+        const baseUrl = site.domain.startsWith('http') ? site.domain : `https://${site.domain}`;
         const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
         
         try {
