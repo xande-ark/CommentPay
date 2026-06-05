@@ -36,13 +36,13 @@
   style.innerHTML = `
     .commentpay-wp-box {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, rgba(30, 27, 75, 0.95), rgba(15, 23, 42, 0.95));
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 20px;
-      color: #f1f5f9;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      color: #0f172a;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     .commentpay-wp-box a, .commentpay-wp-box button {
       transition: all 0.2s ease;
@@ -50,7 +50,7 @@
     .commentpay-wp-title {
       font-size: 0.95rem;
       font-weight: 700;
-      color: #a78bfa;
+      color: #2563eb;
       margin-top: 0;
       margin-bottom: 8px;
       display: flex;
@@ -59,12 +59,12 @@
     }
     .commentpay-wp-desc {
       font-size: 0.85rem;
-      color: #94a3b8;
+      color: #475569;
       margin-bottom: 12px;
       line-height: 1.4;
     }
     .commentpay-wp-btn {
-      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      background: #2563eb;
       border: none;
       color: white;
       padding: 8px 16px;
@@ -79,8 +79,8 @@
     }
     .commentpay-wp-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      background: #1d4ed8;
     }
     .commentpay-wp-connected {
       display: flex;
@@ -94,8 +94,8 @@
       align-items: center;
       gap: 8px;
       font-size: 0.85rem;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.25);
+      background: rgba(37, 99, 235, 0.05);
+      border: 1px solid rgba(37, 99, 235, 0.15);
       padding: 6px 12px;
       border-radius: 20px;
     }
@@ -104,7 +104,7 @@
     }
     .commentpay-wp-logout {
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: #64748b;
       background: transparent;
       border: none;
       text-decoration: underline;
@@ -118,12 +118,12 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: linear-gradient(135deg, #1e1b4b, #0f172a);
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
       padding: 10px 16px;
       border-radius: 30px;
-      color: #fff;
+      color: #0f172a;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
@@ -135,8 +135,8 @@
     }
     .commentpay-wp-floating-badge:hover {
       transform: scale(1.05) translateY(-2px);
-      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
-      border-color: #8b5cf6;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      border-color: #cbd5e1;
     }
     .commentpay-wp-floating-badge.connected i {
       color: #10b981;
