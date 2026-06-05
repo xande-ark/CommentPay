@@ -1115,3 +1115,64 @@ tr:last-child td {
     padding: 20px 0;
   }
 }
+
+/* --- MOBILE OPTIMIZATIONS (CARDS & FONTS) --- */
+@media (max-width: 768px) {
+  /* Reduce currency font size slightly to prevent wrapping */
+  .balance-value {
+    font-size: 1.5rem !important;
+  }
+  
+  /* Convert tables to cards */
+  table {
+    border: 0;
+  }
+  
+  table caption {
+    font-size: 1.3em;
+  }
+  
+  table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  
+  table tr {
+    border-bottom: 2px solid var(--card-border);
+    display: block;
+    margin-bottom: 1rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  table td {
+    border-bottom: 1px solid var(--bg-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85em;
+    text-align: right;
+    padding: 10px 5px;
+  }
+  
+  table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-right: 15px;
+  }
+  
+  table td:last-child {
+    border-bottom: 0;
+  }
+}

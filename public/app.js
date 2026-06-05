@@ -272,11 +272,11 @@ function renderComments(comments) {
     
     return `
       <tr>
-        <td><strong>${escapeHTML(c.site_name)}</strong></td>
-        <td><code>${escapeHTML(c.external_comment_id)}</code></td>
-        <td>R$ ${c.reward_amount.toFixed(2).replace('.', ',')}</td>
-        <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
-        <td>${formattedDate}</td>
+        <td data-label="Site"><strong>${escapeHTML(c.site_name)}</strong></td>
+        <td data-label="ID"><code>${escapeHTML(c.external_comment_id)}</code></td>
+        <td data-label="Valor">R$ ${c.reward_amount.toFixed(2).replace('.', ',')}</td>
+        <td data-label="Status"><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+        <td data-label="Data">${formattedDate}</td>
       </tr>
     `;
   }).join('');
@@ -309,10 +309,10 @@ function renderWithdrawals(withdrawals) {
     
     return `
       <tr>
-        <td><strong>R$ ${w.amount.toFixed(2).replace('.', ',')}</strong></td>
-        <td><span class="badge ${badgeClass}" title="${w.error_message || ''}">${badgeLabel}</span></td>
-        <td>${gatewayTx}</td>
-        <td>${formattedDate}</td>
+        <td data-label="Valor"><strong>R$ ${w.amount.toFixed(2).replace('.', ',')}</strong></td>
+        <td data-label="Status"><span class="badge ${badgeClass}" title="${w.error_message || ''}">${badgeLabel}</span></td>
+        <td data-label="Gateway TX">${gatewayTx}</td>
+        <td data-label="Data">${formattedDate}</td>
       </tr>
     `;
   }).join('');
