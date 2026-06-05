@@ -177,10 +177,6 @@ add_action('rest_api_init', function () {
 });
 
 function commentpay_receive_sync_status($request) {
-    // 1. FORÇA A CLOUDFLARE A NÃO FAZER CACHE DESTA RESPOSTA
-    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-    header('Cache-Control: post-check=0, pre-check=0', false);
-    header('Pragma: no-cache');
     
     $payload_raw = $request->get_body();
     $signature = $request->get_header('X-API-Signature');
