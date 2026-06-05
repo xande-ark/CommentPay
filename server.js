@@ -821,34 +821,43 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
       await dbRun("COMMIT");
     } catch (e) { await dbRun("ROLLBACK"); throw e; }
     
-    // Dispara Webhook 3 assincronamente para atualizar no WordPress
-    (async () => {
-      try {
-        const payload = {
-          external_comment_id: external_comment_id,
-          status: status
-        };
-        const payloadStr = JSON.stringify(payload);
-        const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
-        
-        // Protocolo HTTPS obrigatório, tentaremos no domínio do site
-        const wpUrl = `https://${site.domain}/wp-json/commentpay/v1/sync-status`;
-        
-        await fetch(wpUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-Signature': signature
-          },
-          body: payloadStr
+    // Dispara Webhook 3 Sincronamente para capturar erros e exibir pro usuário
+    try {
+      const payload = {
+        external_comment_id: external_comment_id,
+        status: status
+      };
+      const payloadStr = JSON.stringify(payload);
+      const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+      
+      const wpUrl = `https://${site.domain}/wp-json/commentpay/v1/sync-status`;
+      
+      const wpResponse = await fetch(wpUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Signature': signature
+        },
+        body: payloadStr
+      });
+      
+      const wpData = await wpResponse.json();
+      
+      if (!wpResponse.ok) {
+        return res.status(400).json({ 
+          status: 'error', 
+          message: `Aprovado no painel, mas o WordPress recusou: ${wpData.message || wpResponse.statusText}` 
         });
-        console.log(`[Webhook 3] Sync enviado para ${site.domain} - Comentário ${external_comment_id} - Status: ${status}`);
-      } catch (webhookErr) {
-        console.error(`[Webhook 3] Falha ao sincronizar com ${site.domain}:`, webhookErr.message);
       }
-    })();
+      
+    } catch (webhookErr) {
+      return res.status(500).json({ 
+        status: 'error', 
+        message: `Aprovado no painel, mas houve falha de conexão com o WordPress: ${webhookErr.message}` 
+      });
+    }
     
-    return res.json({ status: 'success', message: `Comentário processado como '${status}'.` });
+    return res.json({ status: 'success', message: `Comentário processado como '${status}' com sucesso nos dois sistemas!` });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ status: 'error', message: 'Erro ao moderar comentário.' });
