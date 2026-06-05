@@ -427,6 +427,13 @@ if (btnGoToSites) {
 }
 
 // --- BUSCA DE SITES PARCEIROS DA API ---
+// Atualiza o painel instantaneamente quando o usuário volta para a aba
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && sessionToken) {
+    fetchWalletData();
+  }
+});
+
 async function fetchSitesList() {
   try {
     const res = await fetch('/api/v1/sites/list');
@@ -470,7 +477,7 @@ function renderSitesList(sites) {
     if (hasCommented) {
       actionButton = `
         <button disabled class="btn btn-primary btn-sm-card" style="background: #334155; color: #94a3b8; cursor: not-allowed; border: 1px solid #475569;">
-          <i class="fa-solid fa-lock"></i> Limite Atingido
+          <i class="fa-solid fa-lock"></i> Já Comentado
         </button>
       `;
     } else {

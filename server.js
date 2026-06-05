@@ -506,7 +506,7 @@ app.get('/api/v1/wallet/status', authMiddleware, async (req, res) => {
     
     // Busca logs de comentários
     const comments = await dbAll(`
-      SELECT cl.id, cl.external_comment_id, cl.status, cl.created_at, cl.validated_at, ps.name as site_name, ps.reward_amount
+      SELECT cl.id, cl.site_id, cl.external_comment_id, cl.status, cl.created_at, cl.validated_at, ps.name as site_name, ps.reward_amount
       FROM comments_log cl 
       JOIN peripheral_sites ps ON cl.site_id = ps.id
       WHERE cl.user_id = ?
