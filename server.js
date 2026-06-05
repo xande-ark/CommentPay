@@ -329,54 +329,53 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     }
     
     // Camada C: Unicidade do Usuário no Site
-    // [DESATIVADO PARA TESTES]
-    /*
-    const existingUserComment = await dbGet(`
-      SELECT id FROM comments_log 
-      WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
-    `, [userId, siteId]);
-    if (existingUserComment) {
-      return res.status(400).json({ 
-        status: 'error', 
-        code: 'LIMIT_EXCEEDED', 
-        message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
-      });
+    const isWhitelistedIp = (user_ip === '177.85.201.42'); // IP do Alexandre para testes ilimitados
+    
+    if (!isWhitelistedIp) {
+      const existingUserComment = await dbGet(`
+        SELECT id FROM comments_log 
+        WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
+      `, [userId, siteId]);
+      if (existingUserComment) {
+        return res.status(400).json({ 
+          status: 'error', 
+          code: 'LIMIT_EXCEEDED', 
+          message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
+        });
+      }
     }
-    */
     
     // Camada D: Unicidade do IP no Site
-    // [DESATIVADO PARA TESTES]
-    /*
-    const ipHash = hashSHA256(user_ip);
-    const existingIpComment = await dbGet(`
-      SELECT id FROM comments_log 
-      WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
-    `, [ipHash, siteId]);
-    if (existingIpComment) {
-      return res.status(400).json({ 
-        status: 'error', 
-        code: 'LIMIT_EXCEEDED', 
-        message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
-      });
+    if (!isWhitelistedIp) {
+      const ipHash = hashSHA256(user_ip);
+      const existingIpComment = await dbGet(`
+        SELECT id FROM comments_log 
+        WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
+      `, [ipHash, siteId]);
+      if (existingIpComment) {
+        return res.status(400).json({ 
+          status: 'error', 
+          code: 'LIMIT_EXCEEDED', 
+          message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
+        });
+      }
     }
-    */
     
     // Camada E: Similaridade Semântica e Duplicidade de Conteúdo
-    // [DESATIVADO PARA TESTES]
-    /*
-    const commentTextHash = hashSHA256(comment_text.trim().toLowerCase());
-    const existingTextComment = await dbGet(`
-      SELECT id FROM comments_log 
-      WHERE user_id = ? AND comment_text_hash = ?
-    `, [userId, commentTextHash]);
-    if (existingTextComment) {
-      return res.status(400).json({ 
-        status: 'error', 
-        code: 'DUPLICATE_CONTENT', 
-        message: 'Você já submeteu um comentário idêntico na plataforma.' 
-      });
+    if (!isWhitelistedIp) {
+      const commentTextHash = hashSHA256(comment_text.trim().toLowerCase());
+      const existingTextComment = await dbGet(`
+        SELECT id FROM comments_log 
+        WHERE user_id = ? AND comment_text_hash = ?
+      `, [userId, commentTextHash]);
+      if (existingTextComment) {
+        return res.status(400).json({ 
+          status: 'error', 
+          code: 'DUPLICATE_CONTENT', 
+          message: 'Você já submeteu um comentário idêntico na plataforma.' 
+        });
+      }
     }
-    */
     
     // 5. Criptografa o IP para auditoria segura (LGPD)
     const ipEnc = encrypt(user_ip);
