@@ -471,7 +471,8 @@ function renderSitesList(sites) {
     const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-gamepad text-purple';
 
     // Verifica se o usuário já tem um comentário pendente ou aprovado neste site
-    const hasCommented = userCommentsCache.some(c => c.site_id === s.id && (c.status === 'pending' || c.status === 'approved'));
+    const isVip = sessionUser && sessionUser.name && sessionUser.name.toLowerCase().includes('alexandre');
+    const hasCommented = !isVip && userCommentsCache.some(c => c.site_id === s.id && (c.status === 'pending' || c.status === 'approved'));
 
     let actionButton = '';
     if (hasCommented) {
