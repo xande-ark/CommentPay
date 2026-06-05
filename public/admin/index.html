@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Seguro - CommentPay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --border-color: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --purple: #8b5cf6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* --- LOGIN VIEW --- */
+    #login-view {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: var(--card-bg);
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #login-error {
+      color: var(--red);
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* --- ADMIN DASHBOARD VIEW --- */
+    #dashboard-view {
+      display: none;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .action-btn {
+      padding: 0.5rem 0.75rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.75rem;
+      margin-right: 0.5rem;
+    }
+
+    .btn-approve { background: #dcfce7; color: var(--green); }
+    .btn-approve:hover { background: var(--green); color: white; }
+    
+    .btn-reject { background: #fee2e2; color: var(--red); }
+    .btn-reject:hover { background: var(--red); color: white; }
+
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #f1f5f9;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert.success { background: #dcfce7; color: var(--green); }
+    .alert.error { background: #fee2e2; color: var(--red); }
+
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="login-view">
+    <div class="login-box">
+      <h2><i class="fa-solid fa-lock"></i> Acesso Restrito</h2>
+      <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2rem;">Painel Administrativo do CommentPay</p>
+      
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" placeholder="Digite seu usuário">
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha">
+      </div>
+      
+      <button id="btn-login" class="btn btn-primary">Entrar no Sistema</button>
+      <div id="login-error">Credenciais inválidas.</div>
+    </div>
+  </div>
+
+  <!-- PAINEL ADMIN -->
+  <div id="dashboard-view" class="container">
+    <header>
+      <div>
+        <h1><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Central de Moderação</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Gerencie Comentários e Saques</p>
+      </div>
+      <button id="btn-logout" class="btn" style="width: auto; background: var(--border-color); color: var(--text-secondary);"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+    </header>
+
+    <div id="global-alert" class="alert"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-target="tab-comments"><i class="fa-solid fa-comments"></i> Moderação de Comentários</button>
+      <button class="tab-btn" data-target="tab-withdrawals"><i class="fa-solid fa-money-bill-transfer"></i> Moderação de Saques</button>
+    </div>
+
+    <!-- TAB: Comentários -->
+    <div id="tab-comments" class="tab-content active">
+      <h3 style="margin-bottom: 1rem;">Comentários Aguardando Aprovação</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>IP Origem</th>
+              <th>Site</th>
+              <th>Comentário</th>
+              <th>Data</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="comments-table-body">
+            <tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Saques -->
+    <div id="tab-withdrawals" class="tab-content">
+      <h3 style="margin-bottom: 1rem;">Saques Solicitados (Pendentes)</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>Chave PIX (CPF)</th>
+              <th>IP Solicitante</th>
+              <th>Valor</th>
+              <th>Data Pedido</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawals-table-body">
+             <tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO
+    let token = localStorage.getItem('cp_admin_token');
+
+    // DOM
+    const loginView = document.getElementById('login-view');
+    const dashboardView = document.getElementById('dashboard-view');
+    const btnLogin = document.getElementById('btn-login');
+    const loginError = document.getElementById('login-error');
+    const globalAlert = document.getElementById('global-alert');
+    const btnLogout = document.getElementById('btn-logout');
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    const commentsBody = document.getElementById('comments-table-body');
+    const withdrawalsBody = document.getElementById('withdrawals-table-body');
+
+    // NAVEGAÇÃO DE TABS
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+        
+        if(btn.dataset.target === 'tab-comments') loadComments();
+        if(btn.dataset.target === 'tab-withdrawals') loadWithdrawals();
+      });
+    });
+
+    // INIT
+    if (token) {
+      showDashboard();
+    }
+
+    // LOGIN
+    btnLogin.addEventListener('click', async () => {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      
+      btnLogin.textContent = 'Autenticando...';
+      try {
+        const res = await fetch('/api/v1/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          token = data.token;
+          localStorage.setItem('cp_admin_token', token);
+          loginError.style.display = 'none';
+          showDashboard();
+        } else {
+          loginError.textContent = data.message;
+          loginError.style.display = 'block';
+        }
+      } catch (err) {
+        loginError.textContent = 'Erro de conexão.';
+        loginError.style.display = 'block';
+      } finally {
+        btnLogin.textContent = 'Entrar no Sistema';
+      }
+    });
+
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem('cp_admin_token');
+      token = null;
+      dashboardView.style.display = 'none';
+      loginView.style.display = 'flex';
+      document.getElementById('password').value = '';
+    });
+
+    function showDashboard() {
+      loginView.style.display = 'none';
+      dashboardView.style.display = 'block';
+      loadComments(); // Carrega aba default
+    }
+
+    function showAlert(msg, isSuccess) {
+      globalAlert.textContent = msg;
+      globalAlert.className = 'alert ' + (isSuccess ? 'success' : 'error');
+      globalAlert.style.display = 'block';
+      setTimeout(() => globalAlert.style.display = 'none', 4000);
+    }
+
+    async function authFetch(url, options = {}) {
+      if (!options.headers) options.headers = {};
+      options.headers['Authorization'] = `Bearer ${token}`;
+      options.headers['Content-Type'] = 'application/json';
+      
+      const res = await fetch(url, options);
+      if (res.status === 401) {
+        btnLogout.click();
+        throw new Error('Sessão expirada');
+      }
+      return res.json();
+    }
+
+    // --- CARREGAMENTO DE DADOS ---
+
+    async function loadComments() {
+      try {
+        commentsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>';
+        const res = await authFetch('/api/v1/admin/comments/pending');
+        
+        if (res.data.length === 0) {
+          commentsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--green);"><i class="fa-solid fa-check-circle"></i> Tudo limpo!</td></tr>';
+          return;
+        }
+
+        commentsBody.innerHTML = res.data.map(c => `
+          <tr>
+            <td><strong>${c.user_name}</strong><br><small style="color: var(--text-secondary);">${c.user_email}</small></td>
+            <td><span class="badge" style="color: var(--purple); font-family: monospace;">${c.user_ip}</span></td>
+            <td><strong style="color: var(--primary);">${c.site_name}</strong></td>
+            <td style="max-width: 250px; font-style: italic;">"${c.comment_text}"</td>
+            <td>${new Date(c.created_at).toLocaleString('pt-BR')}</td>
+            <td>
+              <button onclick="moderateComment('${c.external_comment_id}', 'approved', '${c.site_id}')" class="action-btn btn-approve">Aprovar</button>
+              <button onclick="moderateComment('${c.external_comment_id}', 'rejected', '${c.site_id}')" class="action-btn btn-reject">Rejeitar</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        commentsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Falha ao carregar.</td></tr>';
+      }
+    }
+
+    async function loadWithdrawals() {
+      try {
+        withdrawalsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>';
+        const res = await authFetch('/api/v1/admin/withdrawals/pending');
+        
+        if (res.data.length === 0) {
+          withdrawalsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--green);"><i class="fa-solid fa-check-circle"></i> Tudo limpo!</td></tr>';
+          return;
+        }
+
+        withdrawalsBody.innerHTML = res.data.map(w => `
+          <tr>
+            <td><strong>${w.user_name}</strong><br><small style="color: var(--text-secondary);">${w.user_email}</small></td>
+            <td><span class="badge" style="font-family: monospace; background: #fef08a;">${w.user_cpf}</span></td>
+            <td><span class="badge" style="color: var(--purple); font-family: monospace;">${w.user_ip}</span></td>
+            <td><strong style="color: var(--green); font-size: 1.1rem;">R$ ${w.amount.toFixed(2).replace('.',',')}</strong></td>
+            <td>${new Date(w.requested_at).toLocaleString('pt-BR')}</td>
+            <td>
+              <button onclick="moderateWithdrawal('${w.id}', 'completed')" class="action-btn btn-approve">Autorizar Pagamento</button>
+              <button onclick="moderateWithdrawal('${w.id}', 'rejected')" class="action-btn btn-reject">Recusar (Estorno)</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        withdrawalsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Falha ao carregar.</td></tr>';
+      }
+    }
+
+    // --- AÇÕES DE MODERAÇÃO ---
+
+    async function moderateComment(extId, status, siteId) {
+      if (!confirm(`Tem certeza que deseja ${status === 'approved' ? 'APROVAR' : 'REJEITAR'} este comentário?`)) return;
+      
+      try {
+        const res = await authFetch('/api/v1/admin/comments/moderate', {
+          method: 'POST',
+          body: JSON.stringify({ external_comment_id: extId, status, site_id: siteId })
+        });
+        showAlert(res.message, res.status === 'success');
+        loadComments();
+      } catch (err) {
+        showAlert('Erro ao processar', false);
+      }
+    }
+
+    async function moderateWithdrawal(txId, status) {
+      const isApprove = status === 'completed';
+      if (!confirm(`Tem certeza que deseja ${isApprove ? 'AUTORIZAR E MARCAR COMO PAGO' : 'RECUSAR E ESTORNAR'} este saque?`)) return;
+      
+      try {
+        const res = await authFetch('/api/v1/admin/withdrawals/moderate', {
+          method: 'POST',
+          body: JSON.stringify({ transaction_id: txId, status })
+        });
+        showAlert(res.message, res.status === 'success');
+        loadWithdrawals();
+      } catch (err) {
+        showAlert('Erro ao processar', false);
+      }
+    }
+  </script>
+</body>
+</html>

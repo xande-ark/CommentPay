@@ -157,6 +157,9 @@ async function initDb() {
       status TEXT DEFAULT 'pending',
       gateway_tx_id TEXT,
       pix_key_type TEXT DEFAULT 'CPF',
+      ip_encrypted TEXT,
+      ip_iv TEXT,
+      ip_auth_tag TEXT,
       error_message TEXT,
       requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       processed_at TIMESTAMP
@@ -165,6 +168,15 @@ async function initDb() {
 
   try {
     await pool.query(schema);
+    
+    // Assegura as colunas na tabela existente (migration em tempo de execução)
+    await pool.query(`
+      ALTER TABLE payout_transactions 
+      ADD COLUMN IF NOT EXISTS ip_encrypted TEXT,
+      ADD COLUMN IF NOT EXISTS ip_iv TEXT,
+      ADD COLUMN IF NOT EXISTS ip_auth_tag TEXT;
+    `);
+
     console.log("[DB] Schema do PostgreSQL verificado com sucesso.");
 
     // Semeando os sites de teste

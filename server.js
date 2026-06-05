@@ -72,6 +72,23 @@ function authMiddleware(req, res, next) {
   next();
 }
 
+// Middleware de Autenticação do Admin
+function adminAuthMiddleware(req, res, next) {
+  let token = req.headers.authorization;
+  if (token && token.startsWith('Bearer ')) {
+    token = token.slice(7);
+  }
+  
+  if (!token || token !== process.env.ADMIN_PASSWORD) { // Usando password real em hash/jwt seria ideal, mas token=senha para simplificar ou geramos um token fixo.
+    // Melhor: Criaremos um JWT para o admin.
+    const adminId = verifyUserToken(token);
+    if (adminId !== 'admin_root') {
+      return res.status(401).json({ status: 'error', message: 'Acesso Administrativo Negado.' });
+    }
+  }
+  next();
+}
+
 // Validador de CPF Simplificado
 function validateCPF(cpf) {
   cpf = cpf.replace(/[^\d]/g, '');
@@ -91,6 +108,16 @@ function validateCPF(cpf) {
 }
 
 // --- ROTAS DA API ---
+
+// 0. Autenticação Admin
+app.post('/api/v1/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+    const adminToken = generateUserToken('admin_root');
+    return res.json({ status: 'success', token: adminToken });
+  }
+  return res.status(401).json({ status: 'error', message: 'Credenciais inválidas.' });
+});
 
 // Cliente OAuth2 do Google
 const googleClient = new OAuth2Client("1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com");
@@ -575,6 +602,13 @@ app.post('/api/v1/wallet/withdraw', authMiddleware, async (req, res) => {
     
     const transactionId = crypto.randomUUID();
     
+    // Captura e criptografa IP
+    let userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    if (userIp.includes(',')) userIp = userIp.split(',')[0].trim();
+    if (userIp === '::1') userIp = '127.0.0.1';
+    
+    const ipEnc = encrypt(userIp);
+    
     // Transação ACID: Deduz saldo disponível imediatamente e gera saque pendente (Evita gasto duplo)
     await dbRun("BEGIN TRANSACTION");
     try {
@@ -586,9 +620,9 @@ app.post('/api/v1/wallet/withdraw', authMiddleware, async (req, res) => {
       `, [amount, wallet.id]);
       
       await dbRun(`
-        INSERT INTO payout_transactions (id, wallet_id, amount, status, pix_key_type)
-        VALUES (?, ?, ?, 'pending', 'CPF')
-      `, [transactionId, wallet.id, amount]);
+        INSERT INTO payout_transactions (id, wallet_id, amount, status, pix_key_type, ip_encrypted, ip_iv, ip_auth_tag)
+        VALUES (?, ?, ?, 'pending', 'CPF', ?, ?, ?)
+      `, [transactionId, wallet.id, amount, ipEnc.encryptedData, ipEnc.iv, ipEnc.authTag]);
       
       await dbRun("COMMIT");
     } catch (e) {
@@ -782,9 +816,12 @@ app.post('/api/blog/moderate', async (req, res) => {
   }
 });
 
-// 7. Endpoint auxiliar para o Painel Admin do Blog Parceiro
-// Retorna os comentários pendentes locais para serem moderados
-app.get('/api/v1/comments/pending-local', async (req, res) => {
+// ==========================================
+// ROTAS DO PAINEL ADMIN SEGURO
+// ==========================================
+
+// 1. Listar Comentários Pendentes (Admin)
+app.get('/api/v1/admin/comments/pending', adminAuthMiddleware, async (req, res) => {
   try {
     const rawComments = await dbAll(`
       SELECT cl.id, cl.external_comment_id, cl.comment_text, cl.status, cl.created_at, cl.site_id, 
@@ -797,22 +834,12 @@ app.get('/api/v1/comments/pending-local', async (req, res) => {
       ORDER BY cl.created_at ASC
     `);
     
-    // Descriptografa o IP para o Administrador do Blog
     const comments = rawComments.map(c => {
       let user_ip = 'Desconhecido';
       if (c.ip_encrypted && c.ip_iv && c.ip_auth_tag) {
-        try {
-          user_ip = decrypt(c.ip_encrypted, c.ip_iv, c.ip_auth_tag);
-        } catch (e) {
-          console.error("Erro ao descriptografar IP do comentário:", c.id);
-        }
+        try { user_ip = decrypt(c.ip_encrypted, c.ip_iv, c.ip_auth_tag); } catch (e) {}
       }
-      
-      // Remove campos sensíveis antes de enviar ao frontend
-      delete c.ip_encrypted;
-      delete c.ip_iv;
-      delete c.ip_auth_tag;
-      
+      delete c.ip_encrypted; delete c.ip_iv; delete c.ip_auth_tag;
       return { ...c, user_ip };
     });
     
@@ -820,6 +847,100 @@ app.get('/api/v1/comments/pending-local', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'error', message: 'Erro ao buscar comentários pendentes.' });
+  }
+});
+
+// 2. Moderar Comentários (Admin)
+app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res) => {
+  const { external_comment_id, status, site_id } = req.body;
+  if (!external_comment_id || !status || !site_id) return res.status(400).json({ status: 'error', message: 'Campos ausentes.' });
+
+  try {
+    const site = await dbGet("SELECT * FROM peripheral_sites WHERE id = ?", [site_id]);
+    if (!site) return res.status(404).json({ status: 'error', message: 'Site parceiro não encontrado.' });
+    
+    const comment = await dbGet("SELECT * FROM comments_log WHERE external_comment_id = ? AND site_id = ?", [external_comment_id, site_id]);
+    if (!comment || comment.status !== 'pending') return res.status(400).json({ status: 'error', message: 'Comentário não encontrado ou já processado.' });
+    
+    const rewardAmount = site.reward_amount;
+    
+    await dbRun("BEGIN TRANSACTION");
+    try {
+      if (status === 'approved') {
+        await dbRun(`UPDATE wallets SET balance_pending = balance_pending - ?, balance_available = balance_available + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?`, [rewardAmount, rewardAmount, comment.user_id]);
+        await dbRun(`UPDATE comments_log SET status = 'approved', validated_at = CURRENT_TIMESTAMP WHERE id = ?`, [comment.id]);
+      } else {
+        await dbRun(`UPDATE wallets SET balance_pending = balance_pending - ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?`, [rewardAmount, comment.user_id]);
+        await dbRun(`UPDATE comments_log SET status = ?, validated_at = CURRENT_TIMESTAMP WHERE id = ?`, [status, comment.id]);
+      }
+      await dbRun("COMMIT");
+    } catch (e) { await dbRun("ROLLBACK"); throw e; }
+    
+    return res.json({ status: 'success', message: `Comentário processado como '${status}'.` });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ status: 'error', message: 'Erro ao moderar comentário.' });
+  }
+});
+
+// 3. Listar Saques Pendentes (Admin)
+app.get('/api/v1/admin/withdrawals/pending', adminAuthMiddleware, async (req, res) => {
+  try {
+    const rawWithdrawals = await dbAll(`
+      SELECT pt.id, pt.amount, pt.requested_at, pt.pix_key_type,
+             pt.ip_encrypted, pt.ip_iv, pt.ip_auth_tag,
+             u.name as user_name, u.email as user_email, u.cpf_encrypted, u.cpf_iv, u.cpf_auth_tag
+      FROM payout_transactions pt
+      JOIN wallets w ON pt.wallet_id = w.id
+      JOIN users u ON w.user_id = u.id
+      WHERE pt.status = 'pending'
+      ORDER BY pt.requested_at ASC
+    `);
+    
+    const withdrawals = rawWithdrawals.map(w => {
+      let ip = 'Desconhecido';
+      let cpf = 'Desconhecido';
+      try {
+        if (w.ip_encrypted && w.ip_iv && w.ip_auth_tag) ip = decrypt(w.ip_encrypted, w.ip_iv, w.ip_auth_tag);
+        if (w.cpf_encrypted && w.cpf_iv && w.cpf_auth_tag) cpf = decrypt(w.cpf_encrypted, w.cpf_iv, w.cpf_auth_tag);
+      } catch (e) {}
+      delete w.ip_encrypted; delete w.ip_iv; delete w.ip_auth_tag;
+      delete w.cpf_encrypted; delete w.cpf_iv; delete w.cpf_auth_tag;
+      return { ...w, user_ip: ip, user_cpf: cpf };
+    });
+    
+    res.json({ status: 'success', data: withdrawals });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Erro ao buscar saques pendentes.' });
+  }
+});
+
+// 4. Moderar Saques (Admin)
+app.post('/api/v1/admin/withdrawals/moderate', adminAuthMiddleware, async (req, res) => {
+  const { transaction_id, status } = req.body;
+  if (!transaction_id || !status) return res.status(400).json({ status: 'error', message: 'Campos ausentes.' });
+
+  try {
+    const tx = await dbGet("SELECT * FROM payout_transactions WHERE id = ?", [transaction_id]);
+    if (!tx || tx.status !== 'pending') return res.status(404).json({ status: 'error', message: 'Transação não encontrada ou já processada.' });
+
+    await dbRun("BEGIN TRANSACTION");
+    try {
+      if (status === 'completed') {
+        const gatewayTxId = 'admin_' + crypto.randomBytes(4).toString('hex');
+        await dbRun(`UPDATE payout_transactions SET status = 'completed', gateway_tx_id = ?, processed_at = CURRENT_TIMESTAMP WHERE id = ?`, [gatewayTxId, transaction_id]);
+      } else if (status === 'rejected') {
+        await dbRun(`UPDATE wallets SET balance_available = balance_available + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, [tx.amount, tx.wallet_id]);
+        await dbRun(`UPDATE payout_transactions SET status = 'failed', error_message = 'Rejeitado pelo Administrador', processed_at = CURRENT_TIMESTAMP WHERE id = ?`, [transaction_id]);
+      }
+      await dbRun("COMMIT");
+    } catch (e) { await dbRun("ROLLBACK"); throw e; }
+
+    res.json({ status: 'success', message: `Saque processado como ${status}.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Erro ao processar saque.' });
   }
 });
 
