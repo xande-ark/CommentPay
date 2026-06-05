@@ -852,18 +852,22 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
         const baseUrl = site.blog_url.replace(/\/$/, '');
         const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
         
-        fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-Signature': signature,
-            'x-cf-bypass': 'LagguBypass#5202*'
-          },
-          body: JSON.stringify({
-            external_comment_id: String(external_comment_id),
-            status: status
-          })
-        }).catch(err => console.error(`[WP SYNC] Falha ao sincronizar site ${site.id}:`, err));
+        try {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-Signature': signature,
+              'x-cf-bypass': 'LagguBypass#5202*'
+            },
+            body: JSON.stringify({
+              external_comment_id: String(external_comment_id),
+              status: status
+            })
+          });
+        } catch (err) {
+          console.error(`[WP SYNC] Falha ao sincronizar site ${site.id}:`, err);
+        }
       }
       
     } catch (e) { await dbRun("ROLLBACK"); throw e; }
