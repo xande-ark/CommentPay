@@ -12,7 +12,7 @@
 // =========================================================================
 define('COMMENTPAY_HUB_URL', 'https://comment-pay.vercel.app');
 define('COMMENTPAY_SITE_ID', 'site-lovepg-123');
-define('COMMENTPAY_API_SECRET', 'Laggu#5202*');
+define('COMMENTPAY_API_SECRET', 'api_secret_key_lovepg_789');
 
 // =========================================================================
 // 2. FUNÇÃO AUXILIAR PARA PEGAR O IP REAL DO VISITANTE (EVITA PROXIES/CDNs)
