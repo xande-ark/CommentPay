@@ -351,30 +351,33 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     if (!isVip) {
       const existingUserComment = await dbGet(`
         SELECT id FROM comments_log 
-      WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
-    `, [userId, siteId]);
-    if (existingUserComment) {
-      return res.status(400).json({ 
-        status: 'error', 
-        code: 'LIMIT_EXCEEDED', 
-        message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
-      });
+        WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
+      `, [userId, siteId]);
+      
+      if (existingUserComment) {
+        return res.status(400).json({ 
+          status: 'error', 
+          code: 'LIMIT_EXCEEDED', 
+          message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
+        });
+      }
     }
     
     // Camada D: Unicidade do IP no Site (Ignorado para VIP)
     const ipHash = hashSHA256(user_ip);
     if (!isVip) {
       const existingIpComment = await dbGet(`
-      SELECT id FROM comments_log 
-      WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
-    `, [ipHash, siteId]);
-    if (existingIpComment) {
-      return res.status(400).json({ 
-        status: 'error', 
-        code: 'LIMIT_EXCEEDED', 
-        message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
-      });
-    }
+        SELECT id FROM comments_log 
+        WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
+      `, [ipHash, siteId]);
+      
+      if (existingIpComment) {
+        return res.status(400).json({ 
+          status: 'error', 
+          code: 'LIMIT_EXCEEDED', 
+          message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
+        });
+      }
     }
     
     // Camada E: Similaridade Semântica e Duplicidade de Conteúdo
