@@ -130,14 +130,9 @@ async function initDb() {
       validated_at TIMESTAMP
     );
 
-    -- Índices Parciais Únicos (Sintaxe suportada pelo PostgreSQL)
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_user_site_active 
-    ON comments_log(user_id, site_id) 
-    WHERE status IN ('pending', 'approved');
-
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_ip_site_active 
-    ON comments_log(ip_hash, site_id) 
-    WHERE status IN ('pending', 'approved');
+    -- Índices Parciais Removidos para permitir o Bypass VIP do Admin
+    DROP INDEX IF EXISTS idx_unique_user_site_active;
+    DROP INDEX IF EXISTS idx_unique_ip_site_active;
 
     CREATE INDEX IF NOT EXISTS idx_comments_log_lookup 
     ON comments_log(site_id, external_comment_id);
