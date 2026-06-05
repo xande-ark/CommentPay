@@ -821,6 +821,33 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
       await dbRun("COMMIT");
     } catch (e) { await dbRun("ROLLBACK"); throw e; }
     
+    // Dispara Webhook 3 assincronamente para atualizar no WordPress
+    (async () => {
+      try {
+        const payload = {
+          external_comment_id: external_comment_id,
+          status: status
+        };
+        const payloadStr = JSON.stringify(payload);
+        const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+        
+        // Protocolo HTTPS obrigatório, tentaremos no domínio do site
+        const wpUrl = `https://${site.domain}/wp-json/commentpay/v1/sync-status`;
+        
+        await fetch(wpUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Signature': signature
+          },
+          body: payloadStr
+        });
+        console.log(`[Webhook 3] Sync enviado para ${site.domain} - Comentário ${external_comment_id} - Status: ${status}`);
+      } catch (webhookErr) {
+        console.error(`[Webhook 3] Falha ao sincronizar com ${site.domain}:`, webhookErr.message);
+      }
+    })();
+    
     return res.json({ status: 'success', message: `Comentário processado como '${status}'.` });
   } catch (err) {
     console.error(err);

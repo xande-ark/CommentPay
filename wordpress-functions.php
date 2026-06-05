@@ -164,3 +164,55 @@ function commentpay_inject_integration_script() {
     <script src="<?php echo esc_url($script_url); ?>" defer></script>
     <?php
 }
+
+// =========================================================================
+// 6. ROTA DA API: RECEBER APROVAÇÃO/REJEIÇÃO DO COMMENTPAY (WEBHOOK 3)
+// =========================================================================
+add_action('rest_api_init', function () {
+    register_rest_route('commentpay/v1', '/sync-status', array(
+        'methods' => 'POST',
+        'callback' => 'commentpay_receive_sync_status',
+        'permission_callback' => '__return_true', // Segurança gerida via HMAC
+    ));
+});
+
+function commentpay_receive_sync_status($request) {
+    // 1. FORÇA A CLOUDFLARE A NÃO FAZER CACHE DESTA RESPOSTA
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Pragma: no-cache');
+    
+    $payload_raw = $request->get_body();
+    $signature = $request->get_header('X-API-Signature');
+    
+    // Validação da assinatura digital
+    $expected_signature = hash_hmac('sha256', $payload_raw, COMMENTPAY_API_SECRET);
+    
+    if (!hash_equals($expected_signature, $signature)) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Assinatura digital inválida.'), 403);
+    }
+    
+    $params = json_decode($payload_raw, true);
+    $comment_id = isset($params['external_comment_id']) ? intval($params['external_comment_id']) : 0;
+    $status = isset($params['status']) ? sanitize_text_field($params['status']) : '';
+    
+    if ($comment_id <= 0 || !in_array($status, array('approved', 'rejected'))) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Parâmetros inválidos.'), 400);
+    }
+    
+    $wp_status = ($status === 'approved') ? 'approve' : 'trash';
+    
+    // Removemos nosso próprio hook de sincronização para evitar loop infinito
+    remove_action('transition_comment_status', 'commentpay_sync_moderation_status', 10);
+    
+    $result = wp_set_comment_status($comment_id, $wp_status);
+    
+    // Readiciona o hook caso outras coisas ocorram depois
+    add_action('transition_comment_status', 'commentpay_sync_moderation_status', 10, 3);
+    
+    if (is_wp_error($result)) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Erro ao atualizar comentário no WordPress.'), 500);
+    }
+    
+    return new WP_REST_Response(array('status' => 'success', 'message' => 'Status do comentário atualizado com sucesso.'), 200);
+}
