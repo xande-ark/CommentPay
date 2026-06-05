@@ -134,8 +134,9 @@ function commentpay_sync_moderation_status($new_status, $old_status, $comment) {
 
     $payload_json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     
-    // Assinatura digital HMAC
-    $signature = hash_hmac('sha256', $payload_json, COMMENTPAY_API_SECRET);
+    // Assinatura digital HMAC robusta
+    $signature_payload = strval($comment->comment_ID) . '|' . $status_to_send;
+    $signature = hash_hmac('sha256', $signature_payload, COMMENTPAY_API_SECRET);
 
     // Dispara a requisição de moderação de forma assíncrona (não bloqueia o painel WP)
     wp_remote_post(COMMENTPAY_HUB_URL . '/api/v1/comments/status-update', array(
@@ -182,8 +183,13 @@ function commentpay_receive_sync_status($request) {
     $payload_raw = $request->get_body();
     $signature = $request->get_header('X-API-Signature');
     
-    // Validação da assinatura digital
-    $expected_signature = hash_hmac('sha256', $payload_raw, COMMENTPAY_API_SECRET);
+    $params = json_decode($payload_raw, true);
+    $comment_id = isset($params['external_comment_id']) ? intval($params['external_comment_id']) : 0;
+    $status = isset($params['status']) ? sanitize_text_field($params['status']) : '';
+    
+    // Validação da assinatura digital robusta
+    $expected_signature_payload = strval($comment_id) . '|' . $status;
+    $expected_signature = hash_hmac('sha256', $expected_signature_payload, COMMENTPAY_API_SECRET);
     
     if (!hash_equals($expected_signature, $signature)) {
         return new WP_REST_Response(array('status' => 'error', 'message' => 'Assinatura digital inválida.'), 403);

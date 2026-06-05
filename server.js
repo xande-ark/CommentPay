@@ -433,8 +433,8 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
     }
     
     // 2. Valida Assinatura HMAC
-    const payloadStr = req.rawBody || JSON.stringify(req.body);
-    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+    const signaturePayload = `${external_comment_id}|${status}`;
+    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signaturePayload).digest('hex');
     if (computedSignature !== signature) {
       return res.status(401).json({ status: 'error', message: 'Assinatura HMAC inválida.' });
     }
