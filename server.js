@@ -30,7 +30,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/api/debug-hmac', (req, res) => {
-  res.json(global.lastHmacError || { message: 'No error yet' });
+  res.json({
+    hmacError: global.lastHmacError || { message: 'No HMAC error yet' },
+    webhookError: global.lastWebhookError || { message: 'No Webhook error yet' }
+  });
 });
 app.use('/demo-site', express.static('demo-site'));
 
@@ -853,7 +856,7 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
         const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
         
         try {
-          await fetch(webhookUrl, {
+          const wpRes = await fetch(webhookUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -865,8 +868,16 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
               status: status
             })
           });
+          const wpText = await wpRes.text();
+          if (!wpRes.ok) {
+            console.error(`[WP SYNC ERROR] HTTP ${wpRes.status}:`, wpText);
+            global.lastWebhookError = { status: wpRes.status, body: wpText, url: webhookUrl };
+          } else {
+             global.lastWebhookError = { status: wpRes.status, body: wpText, success: true };
+          }
         } catch (err) {
-          console.error(`[WP SYNC] Falha ao sincronizar site ${site.id}:`, err);
+          console.error(`[WP SYNC] Network failure no site ${site.id}:`, err);
+          global.lastWebhookError = { error: err.message, url: webhookUrl };
         }
       }
       
