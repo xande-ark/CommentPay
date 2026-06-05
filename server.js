@@ -343,9 +343,14 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       });
     }
     
-    // Camada C: Unicidade do Usuário no Site
-    const existingUserComment = await dbGet(`
-      SELECT id FROM comments_log 
+    // Verifica se é o admin (Alexandre) para liberar comentários infinitos
+    const userRow = await dbGet("SELECT name FROM users WHERE id = ?", [userId]);
+    const isVip = userRow && userRow.name && userRow.name.toLowerCase().includes('alexandre');
+
+    // Camada C: Unicidade do Usuário no Site (Ignorado para VIP)
+    if (!isVip) {
+      const existingUserComment = await dbGet(`
+        SELECT id FROM comments_log 
       WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
     `, [userId, siteId]);
     if (existingUserComment) {
@@ -356,9 +361,10 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       });
     }
     
-    // Camada D: Unicidade do IP no Site
+    // Camada D: Unicidade do IP no Site (Ignorado para VIP)
     const ipHash = hashSHA256(user_ip);
-    const existingIpComment = await dbGet(`
+    if (!isVip) {
+      const existingIpComment = await dbGet(`
       SELECT id FROM comments_log 
       WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
     `, [ipHash, siteId]);
@@ -368,6 +374,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
         code: 'LIMIT_EXCEEDED', 
         message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
       });
+    }
     }
     
     // Camada E: Similaridade Semântica e Duplicidade de Conteúdo
