@@ -630,65 +630,11 @@ app.post('/api/v1/wallet/withdraw', authMiddleware, async (req, res) => {
       throw e;
     }
     
-    // --- SIMULAÇÃO DO WORKER DE PROCESSAMENTO VIA REDIS/BULLMQ ---
-    // O worker irá rodar de forma assíncrona (setTimeout de 4 segundos)
-    setTimeout(async () => {
-      try {
-        // 1. Busca os dados de criptografia do CPF do usuário
-        const user = await dbGet("SELECT cpf_encrypted, cpf_iv, cpf_auth_tag FROM users WHERE id = ?", [userId]);
-        
-        // 2. Descriptografa o CPF em memória (segurança do worker)
-        const userCpf = decrypt(user.cpf_encrypted, user.cpf_iv, user.cpf_auth_tag);
-        
-        // 3. Dispara a API do PIX do Gateway com a chave de Idempotência (transactionId)
-        // Simulamos sucesso de 90%, mas se o saque for no valor de R$ 999.00 ele sempre falha para testar o estorno (Refund)
-        const isSuccess = (amount !== 999.00 && Math.random() < 0.95);
-        
-        if (isSuccess) {
-          // Liquidado com sucesso
-          const gatewayTxId = 'gwy_pix_' + crypto.randomBytes(8).toString('hex');
-          await dbRun(`
-            UPDATE payout_transactions
-            SET status = 'completed', gateway_tx_id = ?, processed_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-          `, [gatewayTxId, transactionId]);
-          console.log(`[Worker PIX] Saque ${transactionId} de R$ ${amount} liquidado com sucesso para a chave CPF ${userCpf}.`);
-        } else {
-          // Falha na transferência (ex: Chave PIX não registrada na conta destino)
-          const errorMsg = amount === 999.00 ? 'Simulação de falha do Gateway de Pagamento.' : 'Chave PIX (CPF) inválida ou não encontrada no banco central.';
-          
-          await dbRun("BEGIN TRANSACTION");
-          try {
-            // Estorna o valor de volta para a carteira do usuário
-            await dbRun(`
-              UPDATE wallets 
-              SET balance_available = balance_available + ?,
-                  updated_at = CURRENT_TIMESTAMP
-              WHERE id = ?
-            `, [amount, wallet.id]);
-            
-            // Marca a transação de saque como falha
-            await dbRun(`
-              UPDATE payout_transactions
-              SET status = 'failed', error_message = ?, processed_at = CURRENT_TIMESTAMP
-              WHERE id = ?
-            `, [errorMsg, transactionId]);
-            
-            await dbRun("COMMIT");
-          } catch (errTx) {
-            await dbRun("ROLLBACK");
-            throw errTx;
-          }
-          console.log(`[Worker PIX] Falha no saque ${transactionId} de R$ ${amount}: ${errorMsg}. Valor estornado.`);
-        }
-      } catch (errWorker) {
-        console.error("[Worker PIX Error]:", errWorker);
-      }
-    }, 4000);
+    // O worker automático foi removido. Os saques ficarão com status 'pending' até o admin aprovar manualmente.
     
     return res.status(201).json({
       status: 'success',
-      message: 'Saque solicitado com sucesso. Processamento PIX enfileirado.',
+      message: 'Saque em processamento. O pagamento será efetuado em até 24 horas úteis (pagamentos não ocorrem em finais de semana).',
       transaction_id: transactionId,
       amount
     });

@@ -351,14 +351,6 @@ btnWithdraw.addEventListener('click', async () => {
       // Atualiza a tela imediatamente
       await fetchWalletData();
       
-      // Executa polling rápido a cada 1.5s por 4 vezes para mostrar a transição da fila do PIX
-      let pollCount = 0;
-      const quickPoll = setInterval(async () => {
-        pollCount++;
-        await fetchWalletData();
-        if (pollCount >= 4) clearInterval(quickPoll);
-      }, 1500);
-      
     } else {
       withdrawStatus.className = "alert error";
       withdrawStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${data.message}`;
