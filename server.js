@@ -295,10 +295,15 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       return res.status(401).json({ status: 'error', code: 'INVALID_SITE', message: 'Site parceiro inválido ou inativo.' });
     }
     
-    // 2. Valida Assinatura HMAC-SHA256
-    const signatureBase = siteId + external_comment_id;
-    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
+    // 2. Valida Assinatura HMAC-SHA256 (Robust validation using concatenated fields)
+    const signaturePayload = `${user_token}|${external_comment_id}|${user_ip}`;
+    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signaturePayload).digest('hex');
+    
     if (computedSignature !== signature) {
+      console.error(`[HMAC ERROR] Site: ${site.id}`);
+      console.error(`[HMAC ERROR] Recebido: ${signature}`);
+      console.error(`[HMAC ERROR] Calculado: ${computedSignature}`);
+      console.error(`[HMAC ERROR] Payload:`, signaturePayload);
       return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
     }
     
@@ -329,52 +334,44 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     }
     
     // Camada C: Unicidade do Usuário no Site
-    const isWhitelistedIp = (user_ip === '177.85.201.42'); // IP do Alexandre para testes ilimitados
-    
-    if (!isWhitelistedIp) {
-      const existingUserComment = await dbGet(`
-        SELECT id FROM comments_log 
-        WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
-      `, [userId, siteId]);
-      if (existingUserComment) {
-        return res.status(400).json({ 
-          status: 'error', 
-          code: 'LIMIT_EXCEEDED', 
-          message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
-        });
-      }
+    const existingUserComment = await dbGet(`
+      SELECT id FROM comments_log 
+      WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
+    `, [userId, siteId]);
+    if (existingUserComment) {
+      return res.status(400).json({ 
+        status: 'error', 
+        code: 'LIMIT_EXCEEDED', 
+        message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
+      });
     }
     
     // Camada D: Unicidade do IP no Site
-    if (!isWhitelistedIp) {
-      const ipHash = hashSHA256(user_ip);
-      const existingIpComment = await dbGet(`
-        SELECT id FROM comments_log 
-        WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
-      `, [ipHash, siteId]);
-      if (existingIpComment) {
-        return res.status(400).json({ 
-          status: 'error', 
-          code: 'LIMIT_EXCEEDED', 
-          message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
-        });
-      }
+    const ipHash = hashSHA256(user_ip);
+    const existingIpComment = await dbGet(`
+      SELECT id FROM comments_log 
+      WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
+    `, [ipHash, siteId]);
+    if (existingIpComment) {
+      return res.status(400).json({ 
+        status: 'error', 
+        code: 'LIMIT_EXCEEDED', 
+        message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
+      });
     }
     
     // Camada E: Similaridade Semântica e Duplicidade de Conteúdo
-    if (!isWhitelistedIp) {
-      const commentTextHash = hashSHA256(comment_text.trim().toLowerCase());
-      const existingTextComment = await dbGet(`
-        SELECT id FROM comments_log 
-        WHERE user_id = ? AND comment_text_hash = ?
-      `, [userId, commentTextHash]);
-      if (existingTextComment) {
-        return res.status(400).json({ 
-          status: 'error', 
-          code: 'DUPLICATE_CONTENT', 
-          message: 'Você já submeteu um comentário idêntico na plataforma.' 
-        });
-      }
+    const commentTextHash = hashSHA256(comment_text.trim().toLowerCase());
+    const existingTextComment = await dbGet(`
+      SELECT id FROM comments_log 
+      WHERE user_id = ? AND comment_text_hash = ?
+    `, [userId, commentTextHash]);
+    if (existingTextComment) {
+      return res.status(400).json({ 
+        status: 'error', 
+        code: 'DUPLICATE_CONTENT', 
+        message: 'Você já submeteu um comentário idêntico na plataforma.' 
+      });
     }
     
     // 5. Criptografa o IP para auditoria segura (LGPD)
@@ -436,10 +433,10 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
     }
     
     // 2. Valida Assinatura HMAC
-    const signatureBase = siteId + external_comment_id + status;
-    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
+    const payloadStr = req.rawBody || JSON.stringify(req.body);
+    const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
     if (computedSignature !== signature) {
-      return res.status(401).json({ status: 'error', code: 'INVALID_SIGNATURE', message: 'Assinatura HMAC inválida.' });
+      return res.status(401).json({ status: 'error', message: 'Assinatura HMAC inválida.' });
     }
     
     // 3. Busca o Log do Comentário
@@ -829,44 +826,7 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
       await dbRun("COMMIT");
     } catch (e) { await dbRun("ROLLBACK"); throw e; }
     
-    // Dispara Webhook 3 Sincronamente para capturar erros e exibir pro usuário
-    try {
-      const payload = {
-        external_comment_id: external_comment_id,
-        status: status
-      };
-      const signatureBase = site.id + payload.external_comment_id + payload.status;
-      const signature = crypto.createHmac('sha256', site.api_key_secret).update(signatureBase).digest('hex');
-      const payloadStr = JSON.stringify(payload);
-      
-      const wpUrl = `https://${site.domain}/wp-json/commentpay/v1/sync-status`;
-      
-      const wpResponse = await fetch(wpUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Signature': signature
-        },
-        body: payloadStr
-      });
-      
-      const wpData = await wpResponse.json();
-      
-      if (!wpResponse.ok) {
-        return res.status(400).json({ 
-          status: 'error', 
-          message: `Aprovado no painel, mas o WordPress recusou: ${wpData.message || wpResponse.statusText}` 
-        });
-      }
-      
-    } catch (webhookErr) {
-      return res.status(500).json({ 
-        status: 'error', 
-        message: `Aprovado no painel, mas houve falha de conexão com o WordPress: ${webhookErr.message}` 
-      });
-    }
-    
-    return res.json({ status: 'success', message: `Comentário processado como '${status}' com sucesso nos dois sistemas!` });
+    return res.json({ status: 'success', message: `Comentário processado como '${status}'.` });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ status: 'error', message: 'Erro ao moderar comentário.' });

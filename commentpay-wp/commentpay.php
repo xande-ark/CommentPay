@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: CommentPay Integration
- * Plugin URI: https://comment-pay.vercel.app
+ * Plugin URI: https://commentpay.vercel.app
  * Description: Integração oficial do CommentPay com o seu site WordPress. Este plugin cria uma API segura para verificar comentários remunerados e instrui automaticamente a Cloudflare a não usar cache nesta rota.
  * Version: 1.0.0
  * Author: CommentPay
