@@ -10,7 +10,7 @@
 // =========================================================================
 // 1. CONFIGURAÇÕES DA INTEGRAÇÃO
 // =========================================================================
-define('COMMENTPAY_HUB_URL', 'https://8283eba5b1a8c5fe-138-219-202-201.serveousercontent.com');
+define('COMMENTPAY_HUB_URL', 'https://comment-pay.vercel.app');
 define('COMMENTPAY_SITE_ID', 'site-lovepg-123');
 define('COMMENTPAY_API_SECRET', 'Laggu#5202*');
 
