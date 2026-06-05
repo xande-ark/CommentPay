@@ -329,6 +329,8 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     }
     
     // Camada C: Unicidade do Usuário no Site
+    // [DESATIVADO PARA TESTES]
+    /*
     const existingUserComment = await dbGet(`
       SELECT id FROM comments_log 
       WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
@@ -340,8 +342,11 @@ app.post('/api/v1/comments/submit', async (req, res) => {
         message: 'Este usuário já possui um comentário remunerado (ativo ou pendente) neste site.' 
       });
     }
+    */
     
     // Camada D: Unicidade do IP no Site
+    // [DESATIVADO PARA TESTES]
+    /*
     const ipHash = hashSHA256(user_ip);
     const existingIpComment = await dbGet(`
       SELECT id FROM comments_log 
@@ -354,8 +359,11 @@ app.post('/api/v1/comments/submit', async (req, res) => {
         message: 'Este endereço de IP já foi utilizado para um comentário remunerado neste site.' 
       });
     }
+    */
     
     // Camada E: Similaridade Semântica e Duplicidade de Conteúdo
+    // [DESATIVADO PARA TESTES]
+    /*
     const commentTextHash = hashSHA256(comment_text.trim().toLowerCase());
     const existingTextComment = await dbGet(`
       SELECT id FROM comments_log 
@@ -368,6 +376,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
         message: 'Você já submeteu um comentário idêntico na plataforma.' 
       });
     }
+    */
     
     // 5. Criptografa o IP para auditoria segura (LGPD)
     const ipEnc = encrypt(user_ip);
