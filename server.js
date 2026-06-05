@@ -844,6 +844,28 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
         await dbRun(`UPDATE comments_log SET status = ?, validated_at = CURRENT_TIMESTAMP WHERE id = ?`, [status, comment.id]);
       }
       await dbRun("COMMIT");
+      
+      // Sincroniza o status de volta para o WordPress (Webhook 3)
+      if (site.blog_url) {
+        const payloadStr = `${external_comment_id}|${status}`;
+        const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+        const baseUrl = site.blog_url.replace(/\/$/, '');
+        const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
+        
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Signature': signature,
+            'x-cf-bypass': 'LagguBypass#5202*'
+          },
+          body: JSON.stringify({
+            external_comment_id: String(external_comment_id),
+            status: status
+          })
+        }).catch(err => console.error(`[WP SYNC] Falha ao sincronizar site ${site.id}:`, err));
+      }
+      
     } catch (e) { await dbRun("ROLLBACK"); throw e; }
     
     return res.json({ status: 'success', message: `Comentário processado como '${status}'.` });
