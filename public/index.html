@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -87,10 +87,10 @@
     </div>
 
     <!-- 3. PAINEL PRINCIPAL (DASHBOARD) -->
-    <div id="dashboard-view" class="dashboard-layout fade-in hidden">
+    <div id="dashboard-wrapper" class="hidden" style="display: flex; flex-direction: column; gap: 24px;">
       
       <!-- Topo / Navbar -->
-      <header class="dashboard-header card">
+      <header class="dashboard-header card fade-in">
         <div class="logo-sm">
           <i class="fa-solid fa-comments-dollar logo-icon"></i>
           <h2>Comment<span>Pay</span></h2>
@@ -104,7 +104,7 @@
       </header>
 
       <!-- Menu de Navegação (Bottom Bar no Mobile / Top Bar no Desktop) -->
-      <nav class="hub-nav" id="main-nav">
+      <nav class="hub-nav fade-in" id="main-nav">
         <a href="#" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
         <a href="#" id="nav-sites" class="nav-item"><i class="fa-solid fa-globe"></i> Sites Parceiros</a>
       </nav>
@@ -249,8 +249,8 @@
         </div>
       </div>
 
-    </div> <!-- Fechamento de dashboard-view -->
+    </div> <!-- Fechamento de dashboard-wrapper -->
   </div>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

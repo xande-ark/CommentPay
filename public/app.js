@@ -7,7 +7,7 @@ let userCommentsCache = []; // Cache global de comentários do usuário
 // --- DOM ELEMENTS ---
 const authView = document.getElementById('auth-view');
 const registerView = document.getElementById('register-view');
-const dashboardView = document.getElementById('dashboard-view');
+const dashboardView = document.getElementById('dashboard-wrapper');
 
 // Tab Navigation Elements
 const navDashboard = document.getElementById('nav-dashboard');
