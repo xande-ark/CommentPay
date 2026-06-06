@@ -856,14 +856,23 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
         const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
         
         try {
-          const wpRes = await fetch(webhookUrl, {
+          const proxyUrl = process.env.CF_WORKER_PROXY_URL;
+          let fetchUrl = webhookUrl;
+          const headers = {
+            'Content-Type': 'application/json',
+            'X-API-Signature': signature,
+            'x-cf-bypass': 'LagguBypass#5202*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          };
+
+          if (proxyUrl) {
+            fetchUrl = proxyUrl;
+            headers['X-Target-Url'] = webhookUrl;
+          }
+
+          const wpRes = await fetch(fetchUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-API-Signature': signature,
-              'x-cf-bypass': 'LagguBypass#5202*',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            },
+            headers,
             body: JSON.stringify({
               external_comment_id: String(external_comment_id),
               status: status
