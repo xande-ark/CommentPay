@@ -39,6 +39,16 @@ function commentpay_get_real_ip() {
 }
 
 // =========================================================================
+// 2.5. FUNÇÃO PARA EXCLUIR COMENTÁRIO FORÇADO BYPASSANDO CACHES
+// =========================================================================
+function commentpay_delete_comment_safely($comment_ID) {
+    global $wpdb;
+    $wpdb->delete($wpdb->comments, array('comment_ID' => $comment_ID));
+    $wpdb->delete($wpdb->commentmeta, array('comment_id' => $comment_ID));
+    clean_comment_cache($comment_ID);
+}
+
+// =========================================================================
 // 3. HOOK: INTERCEPTAR ENVIO E VALIDAR NO CENTRAL HUB (WEBHOOK 1)
 // =========================================================================
 add_action('comment_post', 'commentpay_intercept_comment_submission', 10, 3);
@@ -82,7 +92,7 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
 
     // Trata falhas na requisição ou rejeição de regras (VPN, limites, tamanho de texto)
     if (is_wp_error($response)) {
-        wp_delete_comment($comment_ID, true); // Apaga o comentário do WordPress
+        commentpay_delete_comment_safely($comment_ID); // Apaga o comentário do WordPress com bypass de cache
         wp_die(
             '<strong>Erro de Comunicação com a CommentPay:</strong> Não foi possível validar o seu saldo. Tente novamente mais tarde.',
             'Erro de Integração',
@@ -98,7 +108,7 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
         $error_msg = isset($body['message']) ? $body['message'] : 'Seu comentário não atende às regras de remuneração.';
         
         // Apaga o comentário para evitar spam
-        wp_delete_comment($comment_ID, true);
+        commentpay_delete_comment_safely($comment_ID);
         
         // Retorna o erro na tela do usuário de forma legível
         wp_die(

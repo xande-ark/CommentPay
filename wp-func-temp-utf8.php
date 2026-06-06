@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * INTEGRA├ç├âO NATIVA COMMENTPAY - COPIE E COLE NO FUNCTIONS.PHP DO SEU TEMA ATIVO
  * 
@@ -36,6 +36,16 @@ function commentpay_get_real_ip() {
     }
     
     return $ip;
+}
+
+// =========================================================================
+// 2.5. FUNÇÃO PARA EXCLUIR COMENTÁRIO FORÇADO BYPASSANDO CACHES
+// =========================================================================
+function commentpay_delete_comment_safely($comment_ID) {
+    global $wpdb;
+    $wpdb->delete($wpdb->comments, array('comment_ID' => $comment_ID));
+    $wpdb->delete($wpdb->commentmeta, array('comment_id' => $comment_ID));
+    clean_comment_cache($comment_ID);
 }
 
 // =========================================================================
@@ -81,7 +91,7 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
 
     // Trata falhas na requisi├º├úo ou rejei├º├úo de regras (VPN, limites, tamanho de texto)
     if (is_wp_error($response)) {
-        wp_delete_comment($comment_ID, true); // Apaga o coment├írio do WordPress
+        commentpay_delete_comment_safely($comment_ID); // Apaga o coment├írio do WordPress com bypass de cache
         wp_die(
             '<strong>Erro de Comunica├º├úo com a CommentPay:</strong> N├úo foi poss├¡vel validar o seu saldo. Tente novamente mais tarde.',
             'Erro de Integra├º├úo',
@@ -97,12 +107,12 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
         $error_msg = isset($body['message']) ? $body['message'] : 'Seu coment├írio n├úo atende ├ás regras de remunera├º├úo.';
         
         // Apaga o coment├írio para evitar spam
-        wp_delete_comment($comment_ID, true);
+        commentpay_delete_comment_safely($comment_ID);
         
         // Retorna o erro na tela do usu├írio de forma leg├¡vel
         wp_die(
-            '<h3>ÔÜá´©Å Coment├írio N├úo Eleg├¡vel</h3><p>' . esc_html($error_msg) . '</p>',
-            'Valida├º├úo CommentPay',
+            '<h3>⚠️ Comentário Não Elegível</h3><p>' . esc_html($error_msg) . '</p>',
+            'Validação CommentPay',
             array('response' => 400, 'back_link' => true)
         );
     }
