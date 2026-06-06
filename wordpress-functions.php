@@ -203,17 +203,23 @@ function commentpay_receive_sync_status($request) {
         return new WP_REST_Response(array('status' => 'error', 'message' => 'Parâmetros inválidos.'), 400);
     }
     
-    $wp_status = ($status === 'approved') ? 'approve' : 'trash';
+    // Convertemos para o formato que wp_update_comment aceita (1 = aprovado, 'trash' = lixeira)
+    $wp_status = ($status === 'approved') ? 1 : 'trash';
     
     // Removemos nosso próprio hook de sincronização para evitar loop infinito
     remove_action('transition_comment_status', 'commentpay_sync_moderation_status', 10);
     
-    $result = wp_set_comment_status($comment_id, $wp_status);
+    // Usamos wp_update_comment ao invés de wp_set_comment_status para contornar 
+    // um bug de "clone non-object" causado por plugins de Cache (ex: Redis/WP Rocket)
+    $result = wp_update_comment(array(
+        'comment_ID'       => $comment_id,
+        'comment_approved' => $wp_status
+    ), true);
     
     // Readiciona o hook caso outras coisas ocorram depois
     add_action('transition_comment_status', 'commentpay_sync_moderation_status', 10, 3);
     
-    if (is_wp_error($result)) {
+    if (is_wp_error($result) || $result === 0 || $result === false) {
         return new WP_REST_Response(array('status' => 'error', 'message' => 'Erro ao atualizar comentário no WordPress.'), 500);
     }
     

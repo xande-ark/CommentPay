@@ -861,7 +861,8 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
             headers: {
               'Content-Type': 'application/json',
               'X-API-Signature': signature,
-              'x-cf-bypass': 'LagguBypass#5202*'
+              'x-cf-bypass': 'LagguBypass#5202*',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             },
             body: JSON.stringify({
               external_comment_id: String(external_comment_id),
