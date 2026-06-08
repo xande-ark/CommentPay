@@ -458,52 +458,99 @@ function renderSitesList(sites) {
     return;
   }
 
-  sitesListGrid.innerHTML = sites.map(s => {
-    // Se tiver blog_url definida no banco usa ela, senão monta a url base do domínio
-    let targetUrl = s.blog_url || (s.domain.startsWith('http') ? s.domain : `https://${s.domain}`);
-    if (targetUrl) {
-      const separator = targetUrl.includes('?') ? '&' : '?';
-      targetUrl += separator + 'cp=1';
+  // Agrupa os sites pelo domínio principal
+  const grouped = {};
+  for (const s of sites) {
+    if (!grouped[s.domain]) {
+      grouped[s.domain] = {
+        domain: s.domain,
+        pages: []
+      };
     }
-    const isDemo = s.id === 'site-demo-id-123';
-    const badgeColor = isDemo ? 'var(--purple)' : 'var(--green-text)';
-    const badgeText = isDemo ? 'Ambiente de Teste' : 'Remuneração Ativa';
+    grouped[s.domain].pages.push(s);
+  }
+
+  // Renderiza a lista de cartões agrupados
+  sitesListGrid.innerHTML = Object.values(grouped).map(group => {
+    const isDemo = group.domain === 'localhost:3000';
     const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-gamepad text-purple';
+    
+    // Gera o HTML para cada subpágina do domínio
+    const pagesHtml = group.pages.map(p => {
+      let pageLabel = 'Página Principal';
+      if (p.blog_url && p.blog_url !== '/' && p.blog_url !== '') {
+        // Converte slugs como /apostas-esportivas/ em rótulos bonitos "Apostas Esportivas"
+        pageLabel = p.blog_url
+          .replace(/^\/+|\/+$/g, '')
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+          
+        if (pageLabel.toLowerCase() === 'e confiavel') {
+          pageLabel = 'É Confiável';
+        } else if (pageLabel.toLowerCase() === 'cassino online') {
+          pageLabel = 'Cassino Online';
+        }
+      }
 
-    // Verifica se o usuário já tem um comentário pendente ou aprovado neste site
-    const isVip = sessionUser && sessionUser.name && sessionUser.name.toLowerCase().includes('alexandre');
-    const hasCommented = !isVip && userCommentsCache.some(c => c.site_id === s.id && (c.status === 'pending' || c.status === 'approved'));
+      let targetUrl = p.blog_url || '';
+      if (!targetUrl.startsWith('http') && p.blog_url) {
+        const domainBase = group.domain.startsWith('http') ? group.domain : `https://${group.domain}`;
+        targetUrl = domainBase + (p.blog_url.startsWith('/') ? p.blog_url : `/${p.blog_url}`);
+      }
+      
+      // Se for local demo-site, mantém relativo
+      if (isDemo) {
+        targetUrl = p.blog_url;
+      }
 
-    let actionButton = '';
-    if (hasCommented) {
-      actionButton = `
-        <button disabled class="btn btn-primary btn-sm-card" style="background: #334155; color: #94a3b8; cursor: not-allowed; border: 1px solid #475569;">
-          <i class="fa-solid fa-lock"></i> Já Comentado
-        </button>
+      if (targetUrl) {
+        const separator = targetUrl.includes('?') ? '&' : '?';
+        targetUrl += separator + 'cp=1';
+      }
+
+      const isVip = sessionUser && sessionUser.name && sessionUser.name.toLowerCase().includes('alexandre');
+      const hasCommented = !isVip && userCommentsCache.some(c => c.site_id === p.id && (c.status === 'pending' || c.status === 'approved'));
+
+      let actionBtn = '';
+      if (hasCommented) {
+        actionBtn = `
+          <button disabled class="btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted); cursor: not-allowed; border: 1px solid rgba(255, 255, 255, 0.1); padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;">
+            <i class="fa-solid fa-lock"></i> Já Comentado
+          </button>
+        `;
+      } else {
+        actionBtn = `
+          <a href="${targetUrl}" target="_blank" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Acessar
+          </a>
+        `;
+      }
+
+      return `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; margin-top: 8px; width: 100%;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">${escapeHTML(pageLabel)}</span>
+            <span style="font-size: 0.75rem; color: var(--green-text); font-weight: 700;">R$ ${p.reward_amount.toFixed(2).replace('.', ',')}</span>
+          </div>
+          ${actionBtn}
+        </div>
       `;
-    } else {
-      actionButton = `
-        <a href="${targetUrl}" target="_blank" class="btn btn-primary btn-sm-card" style="${isDemo ? 'background: linear-gradient(135deg, var(--cyan), #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);' : ''}">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Acessar Blog
-        </a>
-      `;
-    }
+    }).join('');
 
     return `
-      <div class="site-card-item">
-        <div class="site-card-logo">
-          <i class="fa-solid ${iconClass}"></i>
-        </div>
-        <div class="site-card-details">
-          <h4>${escapeHTML(s.name)}</h4>
-          <span class="site-card-domain">${escapeHTML(s.domain)}</span>
-          <span class="blog-badge" style="color: ${badgeColor};">
-            <i class="fa-solid ${isDemo ? 'fa-microchip' : 'fa-check-double'}"></i> ${badgeText}
-          </span>
-          <div class="site-card-footer">
-            <span class="site-card-reward">R$ ${s.reward_amount.toFixed(2).replace('.', ',')}</span>
-            ${actionButton}
+      <div class="site-card-item" style="flex-direction: column; align-items: stretch; gap: 12px; min-width: 0; width: 100%;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <div class="site-card-logo">
+            <i class="fa-solid ${iconClass}"></i>
           </div>
+          <div style="display: flex; flex-direction: column; min-width: 0;">
+            <h4 style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; font-family: 'Outfit', sans-serif; color: var(--text-primary);">${escapeHTML(group.domain)}</h4>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">${group.pages.length} ${group.pages.length === 1 ? 'página disponível' : 'páginas disponíveis'}</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; width: 100%;">
+          ${pagesHtml}
         </div>
       </div>
     `;
