@@ -473,7 +473,7 @@ function renderSitesList(sites) {
   // Renderiza a lista de cartões agrupados
   sitesListGrid.innerHTML = Object.values(grouped).map(group => {
     const isDemo = group.domain === 'localhost:3000';
-    const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-gamepad text-purple';
+    const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-globe text-purple';
     
     // Gera o HTML para cada subpágina do domínio
     const pagesHtml = group.pages.map(p => {
@@ -491,6 +491,16 @@ function renderSitesList(sites) {
         } else if (pageLabel.toLowerCase() === 'cassino online') {
           pageLabel = 'Cassino Online';
         }
+      }
+
+      // Escolha do ícone específico com base na subpágina
+      let pageIcon = '<i class="fa-solid fa-house" style="color: var(--purple); font-size: 0.9rem;"></i>';
+      if (pageLabel.toLowerCase().includes('esportivas') || pageLabel.toLowerCase().includes('esportes')) {
+        pageIcon = '<i class="fa-solid fa-trophy" style="color: #f59e0b; font-size: 0.9rem;"></i>';
+      } else if (pageLabel.toLowerCase().includes('cassino') || pageLabel.toLowerCase().includes('online')) {
+        pageIcon = '<i class="fa-solid fa-dice" style="color: #8b5cf6; font-size: 0.9rem;"></i>';
+      } else if (pageLabel.toLowerCase().includes('confiável') || pageLabel.toLowerCase().includes('confiavel')) {
+        pageIcon = '<i class="fa-solid fa-shield-halved" style="color: #10b981; font-size: 0.9rem;"></i>';
       }
 
       let targetUrl = p.blog_url || '';
@@ -515,41 +525,48 @@ function renderSitesList(sites) {
       let actionBtn = '';
       if (hasCommented) {
         actionBtn = `
-          <button disabled class="btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted); cursor: not-allowed; border: 1px solid rgba(255, 255, 255, 0.1); padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;">
-            <i class="fa-solid fa-lock"></i> Já Comentado
+          <button disabled class="btn" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-lock" style="font-size: 0.75rem;"></i> Bloqueado
           </button>
         `;
       } else {
         actionBtn = `
-          <a href="${targetUrl}" target="_blank" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Acessar
+          <a href="${targetUrl}" target="_blank" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem;"></i> Acessar
           </a>
         `;
       }
 
       return `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; margin-top: 8px; width: 100%;">
-          <div style="display: flex; flex-direction: column; gap: 2px;">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">${escapeHTML(pageLabel)}</span>
-            <span style="font-size: 0.75rem; color: var(--green-text); font-weight: 700;">R$ ${p.reward_amount.toFixed(2).replace('.', ',')}</span>
+        <div class="subpage-row" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; gap: 12px; margin-top: 8px; transition: var(--transition-smooth);">
+          <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm);">
+              ${pageIcon}
+            </div>
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(pageLabel)}</span>
+              <span style="font-size: 0.75rem; color: var(--green-text); font-weight: 700; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-wallet" style="font-size: 0.7rem;"></i> R$ ${p.reward_amount.toFixed(2).replace('.', ',')}</span>
+            </div>
           </div>
-          ${actionBtn}
+          <div style="flex-shrink: 0;">
+            ${actionBtn}
+          </div>
         </div>
       `;
     }).join('');
 
     return `
-      <div class="site-card-item" style="flex-direction: column; align-items: stretch; gap: 12px; min-width: 0; width: 100%;">
-        <div style="display: flex; gap: 16px; align-items: center;">
-          <div class="site-card-logo">
+      <div class="site-card-item" style="flex-direction: column; align-items: stretch; gap: 16px; min-width: 0; width: 100%;">
+        <div style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px; width: 100%;">
+          <div class="site-card-logo" style="box-shadow: var(--shadow-sm);">
             <i class="fa-solid ${iconClass}"></i>
           </div>
-          <div style="display: flex; flex-direction: column; min-width: 0;">
-            <h4 style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; font-family: 'Outfit', sans-serif; color: var(--text-primary);">${escapeHTML(group.domain)}</h4>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">${group.pages.length} ${group.pages.length === 1 ? 'página disponível' : 'páginas disponíveis'}</span>
+          <div style="display: flex; flex-direction: column; min-width: 0; flex: 1;">
+            <h4 style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.1rem; font-family: 'Outfit', sans-serif; color: var(--text-primary); font-weight: 700;">${escapeHTML(group.domain)}</h4>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${group.pages.length} ${group.pages.length === 1 ? 'página disponível' : 'páginas disponíveis'}</span>
           </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; width: 100%;">
+        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
           ${pagesHtml}
         </div>
       </div>
