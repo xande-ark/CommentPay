@@ -69,7 +69,8 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
         'external_comment_id' => strval($comment_ID),
         'comment_text'        => $comment_text,
         'user_ip'             => $user_ip,
-        'user_agent'          => $user_agent
+        'user_agent'          => $user_agent,
+        'page_path'           => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
     );
 
     $payload_json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

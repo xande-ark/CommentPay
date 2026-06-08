@@ -302,8 +302,7 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
   }
 });
 
-// 3. Webhook 1: Registro Inicial de Comentário (Fase Escrow)
-app.post('/api/v1/comments/submit', async (req, res) => {
+// 3. Webhook 1: Registrapp.post('/api/v1/comments/submit', async (req, res) => {
   const siteId = req.headers['x-site-id'];
   const signature = req.headers['x-api-signature'];
   
@@ -311,13 +310,13 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     return res.status(401).json({ status: 'error', code: 'UNAUTHORIZED', message: 'Faltam cabeçalhos de autenticação.' });
   }
   
-  const { user_token, external_comment_id, comment_text, user_ip, user_agent } = req.body;
+  const { user_token, external_comment_id, comment_text, user_ip, user_agent, page_path } = req.body;
   if (!user_token || !external_comment_id || !comment_text || !user_ip) {
     return res.status(400).json({ status: 'error', message: 'Campos obrigatórios do payload ausentes.' });
   }
   
   try {
-    // 1. Busca dados do Site Periférico
+    // 1. Busca dados do Site Periférico (site cadastrado original)
     const site = await dbGet("SELECT * FROM peripheral_sites WHERE id = ?", [siteId]);
     if (!site || site.is_active !== 1) {
       return res.status(401).json({ status: 'error', code: 'INVALID_SITE', message: 'Site parceiro inválido ou inativo.' });
@@ -348,11 +347,29 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     if (!userId) {
       return res.status(401).json({ status: 'error', code: 'INVALID_USER_TOKEN', message: 'Token de usuário expirado ou inválido.' });
     }
+
+    // 3.5 Resolvendo o site específico (subpágina) se aplicável para suporte a Código Unificado
+    let targetSite = site;
+    if (page_path && page_path !== '/' && page_path !== '') {
+      const normalizedPath = '/' + page_path.replace(/^\/+|\/+$/g, '') + '/';
+      const subpage = await dbGet(`
+        SELECT * FROM peripheral_sites 
+        WHERE domain = ? 
+          AND (
+            blog_url = ? 
+            OR blog_url = ? 
+            OR REPLACE(blog_url, '/', '') = REPLACE(?, '/', '')
+          )
+      `, [site.domain, page_path, normalizedPath, page_path]);
+      
+      if (subpage) {
+        targetSite = subpage;
+      }
+    }
     
     // 4. PIPELINE ANTIFRAUDE & REGRAS DE NEGÓCIO
     
     // Camada A: Detecção de VPN/Proxy (Simulação com IPs bloqueados de teste)
-    // IPs do tipo 1.1.1.1 ou que terminem em .99 serão bloqueados para fins de demonstração
     if (user_ip === '1.1.1.1' || user_ip.endsWith('.99')) {
       return res.status(400).json({ 
         status: 'error', 
@@ -372,13 +389,13 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     // Verifica se é o admin (Alexandre) para liberar comentários infinitos
     const userRow = await dbGet("SELECT name FROM users WHERE id = ?", [userId]);
     const isVip = userRow && userRow.name && userRow.name.toLowerCase().includes('alexandre');
-
+ 
     // Camada C: Unicidade do Usuário no Site (Ignorado para VIP)
     if (!isVip) {
       const existingUserComment = await dbGet(`
         SELECT id FROM comments_log 
         WHERE user_id = ? AND site_id = ? AND status IN ('pending', 'approved')
-      `, [userId, siteId]);
+      `, [userId, targetSite.id]);
       
       if (existingUserComment) {
         return res.status(400).json({ 
@@ -395,7 +412,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       const existingIpComment = await dbGet(`
         SELECT id FROM comments_log 
         WHERE ip_hash = ? AND site_id = ? AND status IN ('pending', 'approved')
-      `, [ipHash, siteId]);
+      `, [ipHash, targetSite.id]);
       
       if (existingIpComment) {
         return res.status(400).json({ 
@@ -430,14 +447,14 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       await dbRun(`
         INSERT INTO comments_log (id, user_id, site_id, external_comment_id, ip_hash, ip_encrypted, ip_iv, ip_auth_tag, comment_text_hash, comment_text, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-      `, [commentLogId, userId, siteId, external_comment_id, ipHash, ipEnc.encryptedData, ipEnc.iv, ipEnc.authTag, commentTextHash, comment_text]);
+      `, [commentLogId, userId, targetSite.id, external_comment_id, ipHash, ipEnc.encryptedData, ipEnc.iv, ipEnc.authTag, commentTextHash, comment_text]);
       
       await dbRun(`
         UPDATE wallets 
         SET balance_pending = balance_pending + ?,
             updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
-      `, [site.reward_amount, userId]);
+      `, [targetSite.reward_amount, userId]);
       
       await dbRun("COMMIT");
     } catch (e) {
@@ -449,7 +466,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       status: 'success',
       message: 'Comentário registrado com sucesso. Saldo pendente alocado.',
       comment_id: commentLogId,
-      escrow_amount: site.reward_amount
+      escrow_amount: targetSite.reward_amount
     });
   } catch (err) {
     console.error(err);
@@ -487,8 +504,12 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
       return res.status(401).json({ status: 'error', message: 'Assinatura HMAC inválida.' });
     }
     
-    // 3. Busca o Log do Comentário
-    const comment = await dbGet("SELECT * FROM comments_log WHERE external_comment_id = ? AND site_id = ?", [external_comment_id, siteId]);
+    // 3. Busca o Log do Comentário (permite correspondência pelo site_id da subpágina ou pelo domínio do site do webhook)
+    const comment = await dbGet(`
+      SELECT cl.* FROM comments_log cl
+      JOIN peripheral_sites ps ON cl.site_id = ps.id
+      WHERE cl.external_comment_id = ? AND (cl.site_id = ? OR ps.domain = ?)
+    `, [external_comment_id, siteId, site.domain]);
     if (!comment) {
       return res.status(404).json({ status: 'error', code: 'COMMENT_NOT_FOUND', message: 'Log do comentário não encontrado.' });
     }
@@ -497,7 +518,8 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Este comentário já foi processado anteriormente.' });
     }
     
-    const rewardAmount = site.reward_amount;
+    const commentSite = await dbGet("SELECT * FROM peripheral_sites WHERE id = ?", [comment.site_id]);
+    const rewardAmount = commentSite ? commentSite.reward_amount : site.reward_amount;
     
     // 4. Transação ACID de atualização de saldos
     await dbRun("BEGIN TRANSACTION");
@@ -892,8 +914,17 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
       
       // Sincroniza o status de volta para o WordPress (Webhook 3)
       if (site.domain) {
+        let parentSite = site;
+        if (site.blog_url && site.blog_url !== '/' && site.blog_url !== '') {
+          // Busca o site principal/parent deste domínio
+          const parent = await dbGet("SELECT * FROM peripheral_sites WHERE domain = ? AND (blog_url = '/' OR blog_url IS NULL OR blog_url = '')", [site.domain]);
+          if (parent) {
+            parentSite = parent;
+          }
+        }
+        
         const payloadStr = `${external_comment_id}|${status}`;
-        const signature = crypto.createHmac('sha256', site.api_key_secret).update(payloadStr).digest('hex');
+        const signature = crypto.createHmac('sha256', parentSite.api_key_secret).update(payloadStr).digest('hex');
         const baseUrl = site.domain.startsWith('http') ? site.domain : `https://${site.domain}`;
         const webhookUrl = `${baseUrl}/wp-json/commentpay/v1/sync-status`;
         

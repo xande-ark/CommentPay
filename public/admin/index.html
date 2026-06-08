@@ -528,37 +528,45 @@
       }
     }
 
-    // --- INTEGRAÇÃO WP CODE ---
-    let integrationSites = [];
-    let selectedSite = null;
+    // --- INTEGRAÇÃO WP CODE (CÓDIGO UNIFICADO POR DOMÍNIO) ---
+    let integrationGroups = {};
+    let selectedDomain = null;
 
     async function loadIntegrationSites() {
       const listContainer = document.getElementById('integration-sites-list');
       const placeholder = document.getElementById('no-site-selected-placeholder');
       const viewer = document.getElementById('code-viewer-container');
       
-      listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Carregando sites...</li>';
+      listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Carregando domínios...</li>';
       viewer.style.display = 'none';
       placeholder.style.display = 'flex';
       
       try {
         const res = await authFetch('/api/v1/admin/sites');
         if (res.status === 'success') {
-          integrationSites = res.data;
+          // Agrupa sites por domínio principal
+          integrationGroups = {};
+          res.data.forEach(site => {
+            if (!integrationGroups[site.domain]) {
+              integrationGroups[site.domain] = [];
+            }
+            integrationGroups[site.domain].push(site);
+          });
           
-          if (integrationSites.length === 0) {
-            listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Nenhum site cadastrado.</li>';
+          const sortedDomains = Object.keys(integrationGroups).sort();
+          
+          if (sortedDomains.length === 0) {
+            listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Nenhum domínio cadastrado.</li>';
             return;
           }
           
-          listContainer.innerHTML = integrationSites.map(site => {
-            const pathLabel = site.blog_url && site.blog_url !== '/' ? site.blog_url : 'Página Principal';
+          listContainer.innerHTML = sortedDomains.map(domain => {
+            const domainSites = integrationGroups[domain];
             return `
               <li>
-                <button onclick="selectIntegrationSite('${site.id}')" id="btn-site-${site.id}" class="btn" style="text-align: left; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 12px; font-size: 0.85rem; font-weight: 500; display: flex; flex-direction: column; gap: 4px; width: 100%; border-radius: 8px;">
-                  <strong style="color: var(--primary); font-size: 0.9rem;">${site.domain}</strong>
-                  <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-solid fa-link"></i> ${pathLabel}</span>
-                  <span style="font-size: 0.7rem; color: var(--text-secondary); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">ID: ${site.id}</span>
+                <button onclick="selectIntegrationDomain('${domain}')" id="btn-domain-${domain.replace(/\./g, '_')}" class="btn" style="text-align: left; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 12px; font-size: 0.85rem; font-weight: 500; display: flex; flex-direction: column; gap: 4px; width: 100%; border-radius: 8px;">
+                  <strong style="color: var(--primary); font-size: 0.9rem;">${domain}</strong>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-solid fa-folder-open"></i> ${domainSites.length} ${domainSites.length === 1 ? 'página' : 'páginas'}</span>
                 </button>
               </li>
             `;
@@ -571,15 +579,18 @@
       }
     }
 
-    function selectIntegrationSite(siteId) {
-      selectedSite = integrationSites.find(s => s.id === siteId);
-      if (!selectedSite) return;
+    function selectIntegrationDomain(domain) {
+      selectedDomain = domain;
+      const domainSites = integrationGroups[domain];
+      if (!domainSites || domainSites.length === 0) return;
+      
+      const primarySite = domainSites.find(s => !s.blog_url || s.blog_url === '/') || domainSites[0];
       
       // Update UI active states
-      integrationSites.forEach(s => {
-        const btn = document.getElementById(`btn-site-${s.id}`);
+      Object.keys(integrationGroups).forEach(d => {
+        const btn = document.getElementById(`btn-domain-${d.replace(/\./g, '_')}`);
         if (btn) {
-          if (s.id === siteId) {
+          if (d === domain) {
             btn.style.borderColor = 'var(--primary)';
             btn.style.background = '#eff6ff';
           } else {
@@ -593,24 +604,24 @@
       const viewer = document.getElementById('code-viewer-container');
       viewer.style.display = 'block';
       
-      document.getElementById('selected-site-title').innerHTML = `<i class="fa-solid fa-code"></i> Código para: ${selectedSite.domain} (${selectedSite.name})`;
+      document.getElementById('selected-site-title').innerHTML = `<i class="fa-solid fa-code"></i> Código de Integração Único: ${domain}`;
       
       const hubUrl = window.location.origin;
       const phpCode = `<?php
 /**
- * INTEGRAÇÃO NATIVA COMMENTPAY - COPIE E COLE NO FUNCTIONS.PHP DO SEU TEMA ATIVO
+ * INTEGRAÇÃO NATIVA UNIFICADA COMMENTPAY - COPIE E COLE NO FUNCTIONS.PHP DO SEU TEMA ATIVO
  * 
- * Este script intercepta os comentários enviados pelo formulário nativo do WordPress,
- * captura o IP real do visitante, valida as regras do Central Hub via Webhook seguro
- * e sincroniza o status de aprovação/moderação.
+ * Este script único intercepta os comentários enviados de qualquer página/subpágina
+ * do seu site, captura o IP real do visitante, envia o caminho da página para 
+ * validação dinâmica de regras no Central Hub e sincroniza o status de moderação.
  */
 
 // =========================================================================
 // 1. CONFIGURAÇÕES DA INTEGRAÇÃO
 // =========================================================================
 define('COMMENTPAY_HUB_URL', '${hubUrl}');
-define('COMMENTPAY_SITE_ID', '${selectedSite.id}');
-define('COMMENTPAY_API_SECRET', '${selectedSite.api_key_secret}');
+define('COMMENTPAY_SITE_ID', '${primarySite.id}');
+define('COMMENTPAY_API_SECRET', '${primarySite.api_key_secret}');
 
 // =========================================================================
 // 2. FUNÇÃO AUXILIAR PARA PEGAR O IP REAL DO VISITANTE (EVITA PROXIES/CDNs)
@@ -661,13 +672,14 @@ function commentpay_intercept_comment_submission($comment_ID, $comment_approved,
     $user_ip = commentpay_get_real_ip();
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'WordPress';
 
-    // Monta o payload do Webhook 1
+    // Monta o payload do Webhook 1 com o caminho da página (page_path)
     $payload = array(
         'user_token'          => $token,
         'external_comment_id' => strval($comment_ID),
         'comment_text'        => $comment_text,
         'user_ip'             => $user_ip,
-        'user_agent'          => $user_agent
+        'user_agent'          => $user_agent,
+        'page_path'           => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
     );
 
     $payload_json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
