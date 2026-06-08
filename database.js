@@ -187,15 +187,15 @@ async function initDb() {
 
     console.log("[DB] Schema do PostgreSQL verificado com sucesso.");
 
+    // Remove o site demo local se existir
+    try {
+      await dbRun("DELETE FROM peripheral_sites WHERE id = 'site-demo-id-123' OR domain = 'localhost:3000'");
+    } catch (e) {
+      console.log("[DB Migration] Erro ao deletar site demo:", e.message);
+    }
+
     // Semeando os sites de teste
     const sitesToSeed = [
-      {
-        id: 'site-demo-id-123',
-        name: 'Blog de Finanças do Alexandre',
-        domain: 'localhost:3000',
-        blog_url: '/demo-site/index.html',
-        secret: 'api_secret_key_demo_456'
-      },
       {
         id: 'site-lovepg-123',
         name: 'Love PG',
