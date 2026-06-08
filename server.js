@@ -302,7 +302,8 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
   }
 });
 
-// 3. Webhook 1: Registrapp.post('/api/v1/comments/submit', async (req, res) => {
+// 3. Webhook 1: Registro Inicial de Comentário (Fase Escrow)
+app.post('/api/v1/comments/submit', async (req, res) => {
   const siteId = req.headers['x-site-id'];
   const signature = req.headers['x-api-signature'];
   
