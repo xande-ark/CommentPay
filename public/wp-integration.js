@@ -307,9 +307,53 @@
         R$ 0,50 Ativo
       `;
       floatingBadge.onclick = function() {
-        // Rola até o formulário de comentário
         commentForm.scrollIntoView({ behavior: 'smooth' });
       };
+    }
+
+    // 5. Contador de Caracteres Qualificados para Recompensa
+    const commentTextarea = commentForm.querySelector('textarea[name="comment"]') || commentForm.querySelector('textarea');
+    if (commentTextarea) {
+      let counterDiv = document.getElementById('commentpay-char-counter');
+      if (!counterDiv) {
+        counterDiv = document.createElement('div');
+        counterDiv.id = 'commentpay-char-counter';
+        commentTextarea.parentNode.insertBefore(counterDiv, commentTextarea.nextSibling);
+      }
+      
+      const updateCounter = () => {
+        const len = commentTextarea.value.trim().length;
+        if (!token) {
+          counterDiv.style.display = 'none';
+          return;
+        }
+        
+        counterDiv.style.display = 'block';
+        counterDiv.style.marginTop = '8px';
+        counterDiv.style.marginBottom = '12px';
+        counterDiv.style.fontSize = '0.825rem';
+        counterDiv.style.fontWeight = '600';
+        counterDiv.style.padding = '8px 12px';
+        counterDiv.style.borderRadius = '8px';
+        counterDiv.style.transition = 'all 0.2s ease';
+        counterDiv.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        
+        if (len < 50) {
+          const diff = 50 - len;
+          counterDiv.style.background = '#fffbeb';
+          counterDiv.style.border = '1px solid #fef3c7';
+          counterDiv.style.color = '#d97706';
+          counterDiv.innerHTML = `⚠️ Digite mais <strong>${diff}</strong> caracteres para receber a recompensa (Digitados: ${len}/50)`;
+        } else {
+          counterDiv.style.background = '#f0fdf4';
+          counterDiv.style.border = '1px solid #dcfce7';
+          counterDiv.style.color = '#16a34a';
+          counterDiv.innerHTML = `✅ Limite atingido! Elegível para recompensa de R$ 0,50 (Digitados: ${len}/50)`;
+        }
+      };
+      
+      commentTextarea.addEventListener('input', updateCounter);
+      updateCounter();
     }
   }
 
