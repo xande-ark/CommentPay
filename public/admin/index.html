@@ -253,6 +253,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-target="tab-comments"><i class="fa-solid fa-comments"></i> Moderação de Comentários</button>
       <button class="tab-btn" data-target="tab-withdrawals"><i class="fa-solid fa-money-bill-transfer"></i> Moderação de Saques</button>
+      <button class="tab-btn" data-target="tab-integration"><i class="fa-solid fa-code"></i> Códigos WP Code</button>
     </div>
 
     <!-- TAB: Comentários -->
@@ -298,6 +299,36 @@
         </table>
       </div>
     </div>
+
+    <!-- TAB: Códigos WP Code -->
+    <div id="tab-integration" class="tab-content">
+      <h3 style="margin-bottom: 1rem;">Códigos de Integração para WP Code</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Selecione um site para gerar e copiar o código de integração PHP para colar no plugin <strong>WP Code</strong> ou no <code>functions.php</code> do tema WordPress correspondente.</p>
+      
+      <div style="display: grid; grid-template-columns: 320px 1fr; gap: 24px;">
+        <!-- Lista de Sites -->
+        <div style="border-right: 1px solid var(--border-color); padding-right: 20px; max-height: 500px; overflow-y: auto;">
+          <ul id="integration-sites-list" style="list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0;">
+            <!-- Sites renderizados via JS -->
+          </ul>
+        </div>
+        
+        <!-- Visualizador do Código -->
+        <div style="position: relative; flex: 1; min-width: 0;">
+          <div id="code-viewer-container" style="display: none;">
+            <h4 id="selected-site-title" style="margin-bottom: 12px; color: var(--primary);"></h4>
+            <div style="position: relative;">
+              <button onclick="copyWpCode()" class="action-btn" style="position: absolute; right: 10px; top: 10px; background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;"><i class="fa-solid fa-copy"></i> Copiar Código</button>
+              <pre id="wp-code-block" style="background: #0f172a; color: #e2e8f0; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; max-height: 500px; white-space: pre-wrap; word-break: break-all; margin: 0;"></pre>
+            </div>
+          </div>
+          
+          <div id="no-site-selected-placeholder" style="display: flex; height: 200px; align-items: center; justify-content: center; color: var(--text-secondary); font-style: italic; border: 1px dashed var(--border-color); border-radius: 8px;">
+            Selecione um site na lista ao lado para ver o código de integração correspondente.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -329,6 +360,7 @@
         
         if(btn.dataset.target === 'tab-comments') loadComments();
         if(btn.dataset.target === 'tab-withdrawals') loadWithdrawals();
+        if(btn.dataset.target === 'tab-integration') loadIntegrationSites();
       });
     });
 
@@ -493,6 +525,336 @@
         loadWithdrawals();
       } catch (err) {
         showAlert('Erro ao processar', false);
+      }
+    }
+
+    // --- INTEGRAÇÃO WP CODE ---
+    let integrationSites = [];
+    let selectedSite = null;
+
+    async function loadIntegrationSites() {
+      const listContainer = document.getElementById('integration-sites-list');
+      const placeholder = document.getElementById('no-site-selected-placeholder');
+      const viewer = document.getElementById('code-viewer-container');
+      
+      listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Carregando sites...</li>';
+      viewer.style.display = 'none';
+      placeholder.style.display = 'flex';
+      
+      try {
+        const res = await authFetch('/api/v1/admin/sites');
+        if (res.status === 'success') {
+          integrationSites = res.data;
+          
+          if (integrationSites.length === 0) {
+            listContainer.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 10px;">Nenhum site cadastrado.</li>';
+            return;
+          }
+          
+          listContainer.innerHTML = integrationSites.map(site => {
+            const pathLabel = site.blog_url && site.blog_url !== '/' ? site.blog_url : 'Página Principal';
+            return `
+              <li>
+                <button onclick="selectIntegrationSite('${site.id}')" id="btn-site-${site.id}" class="btn" style="text-align: left; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 12px; font-size: 0.85rem; font-weight: 500; display: flex; flex-direction: column; gap: 4px; width: 100%; border-radius: 8px;">
+                  <strong style="color: var(--primary); font-size: 0.9rem;">${site.domain}</strong>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-solid fa-link"></i> ${pathLabel}</span>
+                  <span style="font-size: 0.7rem; color: var(--text-secondary); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">ID: ${site.id}</span>
+                </button>
+              </li>
+            `;
+          }).join('');
+        } else {
+          listContainer.innerHTML = '<li style="text-align: center; color: var(--red); padding: 10px;">Erro ao carregar sites.</li>';
+        }
+      } catch (err) {
+        listContainer.innerHTML = '<li style="text-align: center; color: var(--red); padding: 10px;">Falha na conexão.</li>';
+      }
+    }
+
+    function selectIntegrationSite(siteId) {
+      selectedSite = integrationSites.find(s => s.id === siteId);
+      if (!selectedSite) return;
+      
+      // Update UI active states
+      integrationSites.forEach(s => {
+        const btn = document.getElementById(`btn-site-${s.id}`);
+        if (btn) {
+          if (s.id === siteId) {
+            btn.style.borderColor = 'var(--primary)';
+            btn.style.background = '#eff6ff';
+          } else {
+            btn.style.borderColor = 'var(--border-color)';
+            btn.style.background = 'var(--card-bg)';
+          }
+        }
+      });
+      
+      document.getElementById('no-site-selected-placeholder').style.display = 'none';
+      const viewer = document.getElementById('code-viewer-container');
+      viewer.style.display = 'block';
+      
+      document.getElementById('selected-site-title').innerHTML = `<i class="fa-solid fa-code"></i> Código para: ${selectedSite.domain} (${selectedSite.name})`;
+      
+      const hubUrl = window.location.origin;
+      const phpCode = `<?php
+/**
+ * INTEGRAÇÃO NATIVA COMMENTPAY - COPIE E COLE NO FUNCTIONS.PHP DO SEU TEMA ATIVO
+ * 
+ * Este script intercepta os comentários enviados pelo formulário nativo do WordPress,
+ * captura o IP real do visitante, valida as regras do Central Hub via Webhook seguro
+ * e sincroniza o status de aprovação/moderação.
+ */
+
+// =========================================================================
+// 1. CONFIGURAÇÕES DA INTEGRAÇÃO
+// =========================================================================
+define('COMMENTPAY_HUB_URL', '${hubUrl}');
+define('COMMENTPAY_SITE_ID', '${selectedSite.id}');
+define('COMMENTPAY_API_SECRET', '${selectedSite.api_key_secret}');
+
+// =========================================================================
+// 2. FUNÇÃO AUXILIAR PARA PEGAR O IP REAL DO VISITANTE (EVITA PROXIES/CDNs)
+// =========================================================================
+function commentpay_get_real_ip() {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    
+    // Verifica cabeçalho do Cloudflare se ativo
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } 
+    // Verifica proxies reversos padrão
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($ips[0]);
+    }
+    
+    // Se for localhost (IPv6 ou IPv4), simula um IP para testes locais
+    if ($ip === '127.0.0.1' || $ip === '::1') {
+        $ip = '177.85.201.42'; // IP de teste padrão brasileiro
+    }
+    
+    return $ip;
+}
+
+// =========================================================================
+// 2.5. FUNÇÃO PARA EXCLUIR COMENTÁRIO FORÇADO BYPASSANDO CACHES
+// =========================================================================
+function commentpay_delete_comment_safely($comment_ID) {
+    global $wpdb;
+    $wpdb->delete($wpdb->comments, array('comment_ID' => $comment_ID));
+    $wpdb->delete($wpdb->commentmeta, array('comment_id' => $comment_ID));
+    clean_comment_cache($comment_ID);
+}
+
+// =========================================================================
+// 3. HOOK: INTERCEPTAR ENVIO E VALIDAR NO CENTRAL HUB (WEBHOOK 1)
+// =========================================================================
+add_action('comment_post', 'commentpay_intercept_comment_submission', 10, 3);
+function commentpay_intercept_comment_submission($comment_ID, $comment_approved, $commentdata) {
+    // Se não houver token da CommentPay enviado pelo formulário, é um comentário comum
+    if (empty($_POST['commentpay_token'])) {
+        return;
+    }
+
+    $token = sanitize_text_field($_POST['commentpay_token']);
+    $comment_text = $commentdata['comment_content'];
+    $user_ip = commentpay_get_real_ip();
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'WordPress';
+
+    // Monta o payload do Webhook 1
+    $payload = array(
+        'user_token'          => $token,
+        'external_comment_id' => strval($comment_ID),
+        'comment_text'        => $comment_text,
+        'user_ip'             => $user_ip,
+        'user_agent'          => $user_agent
+    );
+
+    $payload_json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    
+    // Assinatura digital HMAC robusta baseada apenas em campos-chave (evita problemas com formatação JSON)
+    $signature_payload = $token . '|' . strval($comment_ID) . '|' . $user_ip;
+    $signature = hash_hmac('sha256', $signature_payload, COMMENTPAY_API_SECRET);
+
+    // Envia a requisição HTTP POST para o Central Hub
+    $response = wp_remote_post(COMMENTPAY_HUB_URL . '/api/v1/comments/submit', array(
+        'headers'     => array(
+            'Content-Type'     => 'application/json',
+            'X-Site-ID'        => COMMENTPAY_SITE_ID,
+            'X-API-Signature'  => $signature,
+        ),
+        'body'        => $payload_json,
+        'data_format' => 'body',
+        'timeout'     => 15,
+    ));
+
+    // Trata falhas na requisição ou rejeição de regras (VPN, limites, tamanho de texto)
+    if (is_wp_error($response)) {
+        commentpay_delete_comment_safely($comment_ID); // Apaga o comentário do WordPress com bypass de cache
+        wp_die(
+            '<strong>Erro de Comunicação com a CommentPay:</strong> Não foi possível validar o seu saldo. Tente novamente mais tarde.',
+            'Erro de Integração',
+            array('response' => 500, 'back_link' => true)
+        );
+    }
+
+    $status_code = wp_remote_retrieve_response_code($response);
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if ($status_code !== 202) {
+        // Se o Central Hub recusou o comentário por quebra de regra
+        $error_msg = isset($body['message']) ? $body['message'] : 'Seu comentário não atende às regras de remuneração.';
+        
+        // Apaga o comentário para evitar spam
+        commentpay_delete_comment_safely($comment_ID);
+        
+        // Retorna o erro na tela do usuário de forma legível
+        wp_die(
+            '<h3>⚠️ Comentário Não Elegível</h3><p>' . esc_html($error_msg) . '</p>',
+            'Validação CommentPay',
+            array('response' => 400, 'back_link' => true)
+        );
+    }
+}
+
+// =========================================================================
+// 4. HOOK: SINCRONIZAR A MODERAÇÃO (APROVAÇÃO/REJEIÇÃO DO ADMIN) (WEBHOOK 2)
+// =========================================================================
+add_action('transition_comment_status', 'commentpay_sync_moderation_status', 10, 3);
+function commentpay_sync_moderation_status($new_status, $old_status, $comment) {
+    // Sincroniza apenas quando houver mudança de status relevante
+    // Aprovado: 'approved'
+    // Rejeitado/Spam: 'spam', 'trash', 'unapproved' (caso já estivesse aprovado/pendente)
+    
+    if ($new_status === 'approved') {
+        $status_to_send = 'approved';
+    } elseif (in_array($new_status, array('spam', 'trash', 'unapproved'))) {
+        $status_to_send = 'rejected';
+    } else {
+        return; // Outros status intermediários não importam
+    }
+
+    // Monta o payload do Webhook 2
+    $payload = array(
+        'external_comment_id' => strval($comment->comment_ID),
+        'status'              => $status_to_send
+    );
+
+    $payload_json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    
+    // Assinatura digital HMAC robusta
+    $signature_payload = strval($comment->comment_ID) . '|' . $status_to_send;
+    $signature = hash_hmac('sha256', $signature_payload, COMMENTPAY_API_SECRET);
+
+    // Dispara a requisição de moderação de forma assíncrona (não bloqueia o painel WP)
+    wp_remote_post(COMMENTPAY_HUB_URL . '/api/v1/comments/status-update', array(
+        'headers'     => array(
+            'Content-Type'     => 'application/json',
+            'X-Site-ID'        => COMMENTPAY_SITE_ID,
+            'X-API-Signature'  => $signature,
+        ),
+        'body'        => $payload_json,
+        'data_format' => 'body',
+        'timeout'     => 10,
+        'blocking'    => false, // Não bloqueia o carregamento do admin do WordPress
+    ));
+}
+
+// =========================================================================
+// 5. INJETAR O SCRIPT WP-INTEGRATION NO RODAPÉ DO SEU SITE
+// =========================================================================
+add_action('wp_footer', 'commentpay_inject_integration_script');
+function commentpay_inject_integration_script() {
+    // Carrega o script JavaScript que ativa o SSO e o banner de login
+    $script_url = COMMENTPAY_HUB_URL . '/wp-integration.js';
+    ?>
+    <script>
+        window.commentpayHubUrl = "<?php echo esc_url(COMMENTPAY_HUB_URL); ?>";
+    </script>
+    <script src="<?php echo esc_url($script_url); ?>" defer></script>
+    <?php
+}
+
+// =========================================================================
+// 6. ROTA DA API: RECEBER APROVAÇÃO/REJEIÇÃO DO COMMENTPAY (WEBHOOK 3)
+// =========================================================================
+add_action('rest_api_init', function () {
+    register_rest_route('commentpay/v1', '/sync-status', array(
+        'methods' => 'POST',
+        'callback' => 'commentpay_receive_sync_status',
+        'permission_callback' => '__return_true', // Segurança gerida via HMAC
+    ));
+});
+
+function commentpay_receive_sync_status($request) {
+    
+    $payload_raw = $request->get_body();
+    $signature = $request->get_header('X-API-Signature');
+    
+    $params = json_decode($payload_raw, true);
+    $comment_id = isset($params['external_comment_id']) ? intval($params['external_comment_id']) : 0;
+    $status = isset($params['status']) ? sanitize_text_field($params['status']) : '';
+    
+    // Validação da assinatura digital robusta
+    $expected_signature_payload = strval($comment_id) . '|' . $status;
+    $expected_signature = hash_hmac('sha256', $expected_signature_payload, COMMENTPAY_API_SECRET);
+    
+    if (!hash_equals($expected_signature, $signature)) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Assinatura digital inválida.'), 403);
+    }
+    
+    $params = json_decode($payload_raw, true);
+    $comment_id = isset($params['external_comment_id']) ? intval($params['external_comment_id']) : 0;
+    $status = isset($params['status']) ? sanitize_text_field($params['status']) : '';
+    
+    if ($comment_id <= 0 || !in_array($status, array('approved', 'rejected'))) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Parâmetros inválidos.'), 400);
+    }
+    
+    // Convertemos para o formato que wp_update_comment aceita (1 = aprovado, 'trash' = lixeira)
+    $wp_status = ($status === 'approved') ? 1 : 'trash';
+    
+    // Removemos nosso próprio hook de sincronização para evitar loop infinito
+    remove_action('transition_comment_status', 'commentpay_sync_moderation_status', 10);
+    
+    // Usamos wp_update_comment ao invés de wp_set_comment_status para contornar 
+    // um bug de "clone non-object" causado por plugins de Cache (ex: Redis/WP Rocket)
+    $result = wp_update_comment(array(
+        'comment_ID'       => $comment_id,
+        'comment_approved' => $wp_status
+    ), true);
+    
+    // Readiciona o hook caso outras coisas ocorram depois
+    add_action('transition_comment_status', 'commentpay_sync_moderation_status', 10, 3);
+    
+    if (is_wp_error($result) || $result === 0 || $result === false) {
+        return new WP_REST_Response(array('status' => 'error', 'message' => 'Erro ao atualizar comentário no WordPress.'), 500);
+    }
+    
+    return new WP_REST_Response(array('status' => 'success', 'message' => 'Status do comentário atualizado com sucesso.'), 200);
+}
+`;
+      
+      const codeBlock = document.getElementById('wp-code-block');
+      codeBlock.textContent = phpCode;
+    }
+
+    async function copyWpCode() {
+      const codeText = document.getElementById('wp-code-block').textContent;
+      if (!codeText) return;
+      
+      try {
+        await navigator.clipboard.writeText(codeText);
+        const copyBtn = document.querySelector('#code-viewer-container button');
+        const origText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+        copyBtn.style.background = 'var(--green)';
+        setTimeout(() => {
+          copyBtn.innerHTML = origText;
+          copyBtn.style.background = 'var(--primary)';
+        }, 2000);
+      } catch (err) {
+        showAlert('Erro ao copiar código', false);
       }
     }
   </script>

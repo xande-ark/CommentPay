@@ -713,10 +713,10 @@ app.post('/api/v1/wallet/withdraw', authMiddleware, async (req, res) => {
   }
 });
 
-// 6.1. Listar Sites Parceiros
+// 6.1. Listar Sites Parceiros (Ordenados por domínio/caminho)
 app.get('/api/v1/sites/list', async (req, res) => {
   try {
-    const sites = await dbAll("SELECT id, name, domain, blog_url, reward_amount FROM peripheral_sites WHERE is_active = 1");
+    const sites = await dbAll("SELECT id, name, domain, blog_url, reward_amount FROM peripheral_sites WHERE is_active = 1 ORDER BY domain ASC, blog_url ASC");
     res.json({ status: 'success', data: sites });
   } catch (err) {
     console.error(err);
@@ -939,6 +939,17 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
   } catch (err) {
     console.error(err);
     return res.status(500).json({ status: 'error', message: 'Erro ao moderar comentário.' });
+  }
+});
+
+// 2.5 Listar todos os sites parceiros com segredos de API (Admin)
+app.get('/api/v1/admin/sites', adminAuthMiddleware, async (req, res) => {
+  try {
+    const sites = await dbAll("SELECT * FROM peripheral_sites ORDER BY domain ASC, blog_url ASC");
+    res.json({ status: 'success', data: sites });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Erro ao buscar sites parceiros.' });
   }
 });
 

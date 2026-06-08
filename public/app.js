@@ -471,13 +471,24 @@ function renderSitesList(sites) {
   }
 
   // Renderiza a lista de cartões agrupados
-  sitesListGrid.innerHTML = Object.values(grouped).map(group => {
-    const isDemo = group.domain === 'localhost:3000';
-    const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-globe text-purple';
-    
-    // Gera o HTML para cada subpágina do domínio
-    const pagesHtml = group.pages.map(p => {
-      let pageLabel = 'Página Principal';
+  sitesListGrid.innerHTML = Object.values(grouped)
+    .sort((a, b) => a.domain.localeCompare(b.domain))
+    .map(group => {
+      const isDemo = group.domain === 'localhost:3000';
+      const iconClass = isDemo ? 'fa-graduation-cap text-cyan' : 'fa-globe text-purple';
+      
+      // Ordena as páginas: Página Principal primeiro, depois por ordem alfabética da URL
+      group.pages.sort((x, y) => {
+        const xUrl = x.blog_url || '';
+        const yUrl = y.blog_url || '';
+        if (!xUrl || xUrl === '/') return -1;
+        if (!yUrl || yUrl === '/') return 1;
+        return xUrl.localeCompare(yUrl);
+      });
+
+      // Gera o HTML para cada subpágina do domínio
+      const pagesHtml = group.pages.map(p => {
+        let pageLabel = 'Página Principal';
       if (p.blog_url && p.blog_url !== '/' && p.blog_url !== '') {
         // Converte slugs como /apostas-esportivas/ em rótulos bonitos "Apostas Esportivas"
         pageLabel = p.blog_url
