@@ -768,10 +768,10 @@ function commentpay_inject_integration_script() {
     // Carrega o script JavaScript que ativa o SSO e o banner de login
     $script_url = COMMENTPAY_HUB_URL . '/wp-integration.js';
     ?>
-    <script>
+    <` + `script>
         window.commentpayHubUrl = "<?php echo esc_url(COMMENTPAY_HUB_URL); ?>";
-    </script>
-    <script src="<?php echo esc_url($script_url); ?>" defer></script>
+    </` + `script>
+    <` + `script src="<?php echo esc_url($script_url); ?>" defer></` + `script>
     <?php
 }
 
