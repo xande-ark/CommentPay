@@ -596,19 +596,36 @@ app.get('/api/v1/wallet/status', authMiddleware, async (req, res) => {
 app.get('/api/v1/user/site-status', authMiddleware, async (req, res) => {
   const userId = req.userId;
   const domain = req.query.domain;
+  const path = req.query.path || '/';
 
   if (!domain) {
     return res.status(400).json({ status: 'error', message: 'Domínio não fornecido.' });
   }
 
   try {
-    const site = await dbGet("SELECT id FROM peripheral_sites WHERE domain = ?", [domain]);
+    // Normalizar caminhos para checagem exata (com ou sem barra final)
+    const stdPath = path.endsWith('/') ? path : `${path}/`;
+    const altPath = path.endsWith('/') ? path.slice(0, -1) : path;
+
+    let site = await dbGet(
+      "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = ? OR blog_url = ?)", 
+      [domain, stdPath, altPath]
+    );
+
+    // Se não encontrou o caminho específico, tenta o fallback para a Página Principal do domínio (onde blog_url é '/' ou vazio ou null)
+    if (!site) {
+      site = await dbGet(
+        "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = '/' OR blog_url = '' OR blog_url IS NULL)",
+        [domain]
+      );
+    }
+
     if (!site) {
       return res.json({ status: 'error', message: 'Site não encontrado.' });
     }
 
     const existingComment = await dbGet(`
-      SELECT status FROM comments 
+      SELECT status FROM comments_log 
       WHERE user_id = ? AND site_id = ? AND (status = 'pending' OR status = 'approved')
       LIMIT 1
     `, [userId, site.id]);

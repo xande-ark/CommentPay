@@ -105,12 +105,13 @@ async function initDb() {
     CREATE TABLE IF NOT EXISTS peripheral_sites (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      domain TEXT UNIQUE NOT NULL,
+      domain TEXT NOT NULL,
       blog_url TEXT,
       api_key_secret TEXT UNIQUE NOT NULL,
       reward_amount REAL DEFAULT 0.50,
       is_active INTEGER DEFAULT 1,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT unique_domain_blog_url UNIQUE (domain, blog_url)
     );
 
     CREATE TABLE IF NOT EXISTS comments_log (
@@ -162,6 +163,18 @@ async function initDb() {
   `;
 
   try {
+    // Migrações no PostgreSQL para remover unicidade antiga de domain e criar nova de domain + blog_url
+    try {
+      await pool.query("ALTER TABLE peripheral_sites DROP CONSTRAINT IF EXISTS peripheral_sites_domain_key;");
+    } catch (e) {
+      console.log("[DB Migration] Drop domain constraint log:", e.message);
+    }
+    try {
+      await pool.query("ALTER TABLE peripheral_sites ADD CONSTRAINT unique_domain_blog_url UNIQUE (domain, blog_url);");
+    } catch (e) {
+      console.log("[DB Migration] Add unique constraint log:", e.message);
+    }
+
     await pool.query(schema);
     
     // Assegura as colunas na tabela existente (migration em tempo de execução)
@@ -194,24 +207,157 @@ async function initDb() {
         id: 'site-amorpg-123',
         name: 'Amor PG',
         domain: 'amorpg.com.br',
-        blog_url: 'https://amorpg.com.br/',
+        blog_url: '/',
         secret: 'api_secret_key_amorpg_abc'
+      },
+      {
+        id: 'site-095bet-apostas',
+        name: '095 Bet - Apostas Esportivas',
+        domain: '095bet.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_095bet_apostas'
+      },
+      {
+        id: 'site-939bet-home',
+        name: '939 Bet',
+        domain: '939bet.com.br',
+        blog_url: '/',
+        secret: 'api_secret_key_939bet_home'
+      },
+      {
+        id: 'site-amorpg-e-confiavel',
+        name: 'Amor PG - É Confiável',
+        domain: 'amorpg.com.br',
+        blog_url: '/e-confiavel/',
+        secret: 'api_secret_key_amorpg_e_confiavel'
+      },
+      {
+        id: 'site-bettigre-home',
+        name: 'Bet Tigre',
+        domain: 'bettigre.com.br',
+        blog_url: '/',
+        secret: 'api_secret_key_bettigre_home'
+      },
+      {
+        id: 'site-brababet-home',
+        name: 'Brababet',
+        domain: 'brababet.com.br',
+        blog_url: '/',
+        secret: 'api_secret_key_brababet_home'
+      },
+      {
+        id: 'site-brwin-home',
+        name: 'Brwin',
+        domain: 'brwin.com.br',
+        blog_url: '/',
+        secret: 'api_secret_key_brwin_home'
+      },
+      {
+        id: 'site-brwin-e-confiavel',
+        name: 'Brwin - É Confiável',
+        domain: 'brwin.com.br',
+        blog_url: '/e-confiavel/',
+        secret: 'api_secret_key_brwin_e_confiavel'
+      },
+      {
+        id: 'site-coroarbet-apostas',
+        name: 'Coroarbet - Apostas Esportivas',
+        domain: 'coroarbet.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_coroarbet_apostas'
+      },
+      {
+        id: 'site-dobrowin-cassino',
+        name: 'Dobrowin - Cassino Online',
+        domain: 'dobrowin.com.br',
+        blog_url: '/cassino-online/',
+        secret: 'api_secret_key_dobrowin_cassino'
+      },
+      {
+        id: 'site-hot777-apostas',
+        name: 'Hot777 - Apostas Esportivas',
+        domain: 'hot777.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_hot777_apostas'
+      },
+      {
+        id: 'site-hubet-apostas',
+        name: 'Hubet - Apostas Esportivas',
+        domain: 'hubet.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_hubet_apostas'
+      },
+      {
+        id: 'site-kfbet-e-confiavel',
+        name: 'Kfbet - É Confiável',
+        domain: 'kfbet.com.br',
+        blog_url: '/e-confiavel/',
+        secret: 'api_secret_key_kfbet_e_confiavel'
+      },
+      {
+        id: 'site-lazerpg-apostas',
+        name: 'Lazerpg - Apostas Esportivas',
+        domain: 'lazerpg.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_lazerpg_apostas'
+      },
+      {
+        id: 'site-r7bet-apostas',
+        name: 'R7bet - Apostas Esportivas',
+        domain: 'r7bet.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_r7bet_apostas'
+      },
+      {
+        id: 'site-svbet-apostas',
+        name: 'Svbet - Apostas Esportivas',
+        domain: 'svbet.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_svbet_apostas'
+      },
+      {
+        id: 'site-umcassino-apostas',
+        name: 'Umcassino - Apostas Esportivas',
+        domain: 'umcassino.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_umcassino_apostas'
+      },
+      {
+        id: 'site-wingdas-home',
+        name: 'Wingdas',
+        domain: 'wingdas.com.br',
+        blog_url: '/',
+        secret: 'api_secret_key_wingdas_home'
+      },
+      {
+        id: 'site-wingdas-cassino',
+        name: 'Wingdas - Cassino Online',
+        domain: 'wingdas.com.br',
+        blog_url: '/cassino-online/',
+        secret: 'api_secret_key_wingdas_cassino'
+      },
+      {
+        id: 'site-wingdas6-apostas',
+        name: 'Wingdas6 - Apostas Esportivas',
+        domain: 'wingdas6.com.br',
+        blog_url: '/apostas-esportivas/',
+        secret: 'api_secret_key_wingdas6_apostas'
       }
     ];
 
     for (const site of sitesToSeed) {
-      const existing = await dbGet("SELECT id, blog_url FROM peripheral_sites WHERE id = $1", [site.id]);
+      const existing = await dbGet("SELECT id, domain, blog_url FROM peripheral_sites WHERE id = $1", [site.id]);
       if (!existing) {
         await dbRun(`
           INSERT INTO peripheral_sites (id, name, domain, blog_url, api_key_secret, reward_amount)
           VALUES ($1, $2, $3, $4, $5, 0.50)
         `, [site.id, site.name, site.domain, site.blog_url, site.secret]);
-      } else if (!existing.blog_url) {
+      } else if (existing.blog_url !== site.blog_url || existing.domain !== site.domain) {
         await dbRun(`
           UPDATE peripheral_sites 
-          SET blog_url = $1 
-          WHERE id = $2
-        `, [site.blog_url, site.id]);
+          SET blog_url = $1, domain = $2 
+          WHERE id = $3
+        `, [site.blog_url, site.domain, site.id]);
       }
     }
   } catch (err) {

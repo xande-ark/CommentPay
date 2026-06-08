@@ -205,7 +205,8 @@
     if (token) {
       try {
         const domain = window.location.hostname;
-        const res = await fetch(`${HUB_URL}/api/v1/user/site-status?domain=${encodeURIComponent(domain)}`, {
+        const path = window.location.pathname;
+        const res = await fetch(`${HUB_URL}/api/v1/user/site-status?domain=${encodeURIComponent(domain)}&path=${encodeURIComponent(path)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
