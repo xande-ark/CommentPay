@@ -39,7 +39,11 @@ app.use('/demo-site', express.static('demo-site'));
 
 // --- GERENCIAMENTO DE TOKENS (JWT MOCK SEGURO) ---
 
-const JWT_SECRET = process.env.DB_ENCRYPTION_KEY || 'default_jwt_secret_key_123456';
+const JWT_SECRET = process.env.DB_ENCRYPTION_KEY;
+if (!JWT_SECRET || JWT_SECRET.length === 0) {
+  console.error("ERRO CRÍTICO: A variável de ambiente DB_ENCRYPTION_KEY é obrigatória para assinar e validar tokens.");
+  process.exit(1);
+}
 
 function generateUserToken(userId) {
   const payload = JSON.stringify({ userId, exp: Date.now() + 24 * 60 * 60 * 1000 });
@@ -53,7 +57,13 @@ function verifyUserToken(token) {
     const [payloadB64, signature] = token.split('.');
     const payload = Buffer.from(payloadB64, 'base64').toString('utf8');
     const computedSignature = crypto.createHmac('sha256', JWT_SECRET).update(payload).digest('hex');
-    if (computedSignature !== signature) return null;
+    
+    const sigBuffer = Buffer.from(signature, 'hex');
+    const computedBuffer = Buffer.from(computedSignature, 'hex');
+    if (sigBuffer.length !== computedBuffer.length || !crypto.timingSafeEqual(sigBuffer, computedBuffer)) {
+      return null;
+    }
+    
     const data = JSON.parse(payload);
     if (data.exp < Date.now()) return null; // Expirado
     return data.userId;
@@ -86,12 +96,9 @@ function adminAuthMiddleware(req, res, next) {
     token = token.slice(7);
   }
   
-  if (!token || token !== process.env.ADMIN_PASSWORD) { // Usando password real em hash/jwt seria ideal, mas token=senha para simplificar ou geramos um token fixo.
-    // Melhor: Criaremos um JWT para o admin.
-    const adminId = verifyUserToken(token);
-    if (adminId !== 'admin_root') {
-      return res.status(401).json({ status: 'error', message: 'Acesso Administrativo Negado.' });
-    }
+  const adminId = verifyUserToken(token);
+  if (adminId !== 'admin_root') {
+    return res.status(401).json({ status: 'error', message: 'Acesso Administrativo Negado.' });
   }
   next();
 }
@@ -112,6 +119,17 @@ function validateCPF(cpf) {
   if (rev === 10 || rev === 11) rev = 0;
   if (rev !== parseInt(cpf.charAt(10))) return false;
   return true;
+}
+
+// Escapa strings para uso seguro dentro de blocos de script inline delimitados por plicas (XSS)
+function escapeForSingleQuotes(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/<\/script>/ig, '<\\/script>')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
 }
 
 // --- ROTAS DA API ---
@@ -191,18 +209,21 @@ app.post('/api/v1/auth/google/callback', async (req, res) => {
     if (user && user.status === 'active') {
       const token = generateUserToken(user.id);
       const safeUser = JSON.stringify({ id: user.id, email: user.email, name: user.name, status: user.status });
+      const escapedToken = escapeForSingleQuotes(token);
+      const escapedSafeUser = escapeForSingleQuotes(safeUser);
       htmlResponse = `
         <script>
-          localStorage.setItem('cp_session_token', '${token}');
-          localStorage.setItem('cp_session_user', '${safeUser}');
+          localStorage.setItem('cp_session_token', '${escapedToken}');
+          localStorage.setItem('cp_session_user', '${escapedSafeUser}');
           window.location.href = '/index.html';
         </script>
       `;
     } else {
       const pendingData = JSON.stringify({ email, name, google_sub });
+      const escapedPendingData = escapeForSingleQuotes(pendingData);
       htmlResponse = `
         <script>
-          localStorage.setItem('cp_pending_google_data', '${pendingData}');
+          localStorage.setItem('cp_pending_google_data', '${escapedPendingData}');
           window.location.href = '/index.html?action=register';
         </script>
       `;
@@ -264,7 +285,7 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
       
       await dbRun(`
         INSERT INTO wallets (id, user_id, balance_available, balance_pending)
-        VALUES (?, ?, 25.00, 0.00)
+        VALUES (?, ?, 0.00, 0.00)
       `, [walletId, userId]);
       
       await dbRun("COMMIT");
@@ -306,7 +327,9 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     const signaturePayload = `${user_token}|${external_comment_id}|${user_ip}`;
     const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signaturePayload).digest('hex');
     
-    if (computedSignature !== signature) {
+    const sigBuf = Buffer.from(signature, 'hex');
+    const compBuf = Buffer.from(computedSignature, 'hex');
+    if (sigBuf.length !== compBuf.length || !crypto.timingSafeEqual(sigBuf, compBuf)) {
       global.lastHmacError = {
         time: new Date(),
         siteId: site.id,
@@ -458,7 +481,9 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
     // 2. Valida Assinatura HMAC
     const signaturePayload = `${external_comment_id}|${status}`;
     const computedSignature = crypto.createHmac('sha256', site.api_key_secret).update(signaturePayload).digest('hex');
-    if (computedSignature !== signature) {
+    const sigBuf = Buffer.from(signature, 'hex');
+    const compBuf = Buffer.from(computedSignature, 'hex');
+    if (sigBuf.length !== compBuf.length || !crypto.timingSafeEqual(sigBuf, compBuf)) {
       return res.status(401).json({ status: 'error', message: 'Assinatura HMAC inválida.' });
     }
     
@@ -861,7 +886,7 @@ app.post('/api/v1/admin/comments/moderate', adminAuthMiddleware, async (req, res
           const headers = {
             'Content-Type': 'application/json',
             'X-API-Signature': signature,
-            'x-cf-bypass': 'LagguBypass#5202*',
+            'x-cf-bypass': process.env.CF_BYPASS_TOKEN || 'LagguBypass#5202*',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
           };
 
