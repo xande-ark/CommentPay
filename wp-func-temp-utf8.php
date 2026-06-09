@@ -10,7 +10,7 @@
 // =========================================================================
 // 1. CONFIGURA├ç├òES DA INTEGRA├ç├âO
 // =========================================================================
-define('COMMENTPAY_HUB_URL', 'https://comment-pay.vercel.app');
+define('COMMENTPAY_HUB_URL', 'https://comentarioslucrativos.com');
 define('COMMENTPAY_SITE_ID', 'site-lovepg-123');
 define('COMMENTPAY_API_SECRET', 'Laggu#5202*');
 
