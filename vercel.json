@@ -28,6 +28,14 @@
       "dest": "/server.js"
     },
     {
+      "src": "/dashboard",
+      "dest": "/public/dashboard.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/public/admin/index.html"
+    },
+    {
       "src": "/demo-site/(.*)",
       "dest": "/demo-site/$1"
     },
