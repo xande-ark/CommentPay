@@ -3,6 +3,9 @@ let sessionUser = JSON.parse(localStorage.getItem('cp_session_user')) || null;
 let tempGoogleData = null; // Para guardar temporariamente dados do Google antes do CPF
 let pollingInterval = null;
 let userCommentsCache = []; // Cache global de comentários do usuário
+let userWithdrawalsCache = [];
+let showAllComments = false;
+let showAllWithdrawals = false;
 
 // --- DOM ELEMENTS ---
 const authView = document.getElementById('auth-view');
@@ -208,6 +211,7 @@ async function fetchWalletData() {
       
       // Armazena no cache global e renderiza
       userCommentsCache = comments;
+      userWithdrawalsCache = withdrawals;
       
       // Atualiza a lista de sites se a aba de sites estiver ativa (para desativar botões)
       if (navSites.classList.contains('active') && cachedSites.length > 0) {
@@ -253,7 +257,10 @@ function renderComments(comments) {
     return;
   }
   
-  commentsTableBody.innerHTML = comments.map(c => {
+  const limit = 1;
+  const itemsToRender = showAllComments ? comments : comments.slice(0, limit);
+  
+  let html = itemsToRender.map(c => {
     let badgeClass = 'pending';
     let badgeLabel = 'Pendente';
     
@@ -280,7 +287,36 @@ function renderComments(comments) {
       </tr>
     `;
   }).join('');
+  
+  if (!showAllComments && comments.length > limit) {
+    html += `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 12px; background: transparent; border-bottom: none;">
+          <button class="btn" style="font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: 600; cursor: pointer; border: none;" onclick="toggleComments()">
+            Ver todos os ${comments.length} registros <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  } else if (showAllComments && comments.length > limit) {
+    html += `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 12px; background: transparent; border-bottom: none;">
+          <button class="btn" style="font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: 600; cursor: pointer; border: none;" onclick="toggleComments()">
+            Ver menos <i class="fa-solid fa-chevron-up"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }
+  
+  commentsTableBody.innerHTML = html;
 }
+
+window.toggleComments = function() {
+  showAllComments = !showAllComments;
+  renderComments(userCommentsCache);
+};
 
 // --- DESENHA LOGS DE TRANSACÕES DE SAQUE ---
 function renderWithdrawals(withdrawals) {
@@ -289,7 +325,10 @@ function renderWithdrawals(withdrawals) {
     return;
   }
   
-  withdrawalsTableBody.innerHTML = withdrawals.map(w => {
+  const limit = 1;
+  const itemsToRender = showAllWithdrawals ? withdrawals : withdrawals.slice(0, limit);
+  
+  let html = itemsToRender.map(w => {
     let badgeClass = 'pending';
     let badgeLabel = 'Fila (PIX)';
     
@@ -316,7 +355,36 @@ function renderWithdrawals(withdrawals) {
       </tr>
     `;
   }).join('');
+  
+  if (!showAllWithdrawals && withdrawals.length > limit) {
+    html += `
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 12px; background: transparent; border-bottom: none;">
+          <button class="btn" style="font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: 600; cursor: pointer; border: none;" onclick="toggleWithdrawals()">
+            Ver todos os ${withdrawals.length} saques <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  } else if (showAllWithdrawals && withdrawals.length > limit) {
+    html += `
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 12px; background: transparent; border-bottom: none;">
+          <button class="btn" style="font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: 600; cursor: pointer; border: none;" onclick="toggleWithdrawals()">
+            Ver menos <i class="fa-solid fa-chevron-up"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }
+  
+  withdrawalsTableBody.innerHTML = html;
 }
+
+window.toggleWithdrawals = function() {
+  showAllWithdrawals = !showAllWithdrawals;
+  renderWithdrawals(userWithdrawalsCache);
+};
 
 // --- SOLICITAÇÃO DE SAQUE ---
 btnWithdraw.addEventListener('click', async () => {
