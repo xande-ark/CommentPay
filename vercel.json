@@ -14,6 +14,14 @@
       "use": "@vercel/static"
     }
   ],
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/dashboard",
+      "permanent": false
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",

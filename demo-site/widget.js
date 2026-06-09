@@ -188,7 +188,7 @@ function openSSOPopup() {
   const top = (window.innerHeight - height) / 2;
   
   const popup = window.open(
-    (API_BASE ? API_BASE : '') + '/index.html', 
+    (API_BASE ? API_BASE : '') + '/dashboard', 
     'CommentPaySSO', 
     `width=${width},height=${height},top=${top},left=${left},scrollbars=yes`
   );

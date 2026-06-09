@@ -215,7 +215,7 @@ app.post('/api/v1/auth/google/callback', async (req, res) => {
         <script>
           localStorage.setItem('cp_session_token', '${escapedToken}');
           localStorage.setItem('cp_session_user', '${escapedSafeUser}');
-          window.location.href = '/index.html';
+          window.location.href = '/dashboard';
         </script>
       `;
     } else {
@@ -224,7 +224,7 @@ app.post('/api/v1/auth/google/callback', async (req, res) => {
       htmlResponse = `
         <script>
           localStorage.setItem('cp_pending_google_data', '${escapedPendingData}');
-          window.location.href = '/index.html?action=register';
+          window.location.href = '/dashboard?action=register';
         </script>
       `;
     }
@@ -1112,7 +1112,7 @@ initDb()
       app.listen(PORT, () => {
         console.log(`====================================================`);
         console.log(`Servidor rodando com sucesso na porta ${PORT}`);
-        console.log(`Central Hub: http://localhost:${PORT}/index.html`);
+        console.log(`Central Hub: http://localhost:${PORT}/dashboard`);
         console.log(`Blog Parceiro: http://localhost:${PORT}/demo-site/index.html`);
         console.log(`====================================================`);
       });

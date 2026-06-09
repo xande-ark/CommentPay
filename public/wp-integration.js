@@ -153,7 +153,7 @@
     
     // Open Central Hub in a popup window
     const popup = window.open(
-      `${HUB_URL}/index.html`,
+      `${HUB_URL}/dashboard`,
       'CommentPaySSO',
       `width=${width},height=${height},top=${top},left=${left},scrollbars=yes`
     );
