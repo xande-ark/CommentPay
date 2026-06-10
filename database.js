@@ -127,8 +127,19 @@ async function initDb() {
       comment_text TEXT,
       status TEXT DEFAULT 'pending',
       fraud_score REAL DEFAULT 0.00,
+      reward_multiplier REAL DEFAULT 1.0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       validated_at TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS active_multipliers (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      site_id TEXT NOT NULL REFERENCES peripheral_sites(id) ON DELETE CASCADE,
+      multiplier REAL NOT NULL DEFAULT 1.0,
+      is_used INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT unique_user_site_multiplier UNIQUE (user_id, site_id, is_used)
     );
 
     -- Índices Parciais Removidos para permitir o Bypass VIP do Admin
@@ -183,6 +194,12 @@ async function initDb() {
       ADD COLUMN IF NOT EXISTS ip_encrypted TEXT,
       ADD COLUMN IF NOT EXISTS ip_iv TEXT,
       ADD COLUMN IF NOT EXISTS ip_auth_tag TEXT;
+    `);
+
+    // Migration para adicionar reward_multiplier na tabela comments_log caso já exista
+    await pool.query(`
+      ALTER TABLE comments_log 
+      ADD COLUMN IF NOT EXISTS reward_multiplier REAL DEFAULT 1.0;
     `);
 
     console.log("[DB] Schema do PostgreSQL verificado com sucesso.");

@@ -120,26 +120,62 @@
       right: 20px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      padding: 10px 16px;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
       border-radius: 30px;
-      color: #0f172a;
-      font-size: 0.8rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.9rem;
       font-weight: 600;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      z-index: 99999;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      z-index: 999999;
+      transition: all 0.3s ease;
     }
     .commentpay-wp-floating-badge:hover {
-      transform: scale(1.05) translateY(-2px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-    .commentpay-wp-floating-badge.connected i {
-      color: #10b981;
+    .commentpay-wp-floating-badge.connected {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+    }
+    .commentpay-minigame-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 9999999;
+      display: flex; justify-content: center; align-items: center;
+      backdrop-filter: blur(5px);
+    }
+    .commentpay-minigame-modal {
+      background: #fff; border-radius: 16px; padding: 24px;
+      text-align: center; max-width: 350px; width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      position: relative;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .commentpay-minigame-close {
+      position: absolute; top: 12px; right: 16px;
+      cursor: pointer; font-size: 24px; color: #94a3b8;
+    }
+    .commentpay-minigame-close:hover { color: #0f172a; }
+    .commentpay-roulette-container {
+      width: 200px; height: 200px; margin: 20px auto;
+      border-radius: 50%; border: 5px solid #2563eb;
+      position: relative; overflow: hidden;
+      background: conic-gradient(#fcd34d 0deg 18deg, #e2e8f0 18deg 360deg);
+      transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .commentpay-roulette-pointer {
+      position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 20px solid #ef4444;
+      z-index: 10;
     }
   `;
   document.head.appendChild(style);
@@ -178,7 +214,22 @@
       localStorage.setItem('commentpay_user', JSON.stringify(user));
       
       console.log('[CommentPay] Conectado com sucesso!', user.name);
-      initOrUpdateIntegration();
+      
+      // Se tivermos um overlay de minigame aberto pedindo login, fecha ele e recarrega integration
+      const overlay = document.getElementById('commentpay-minigame-overlay');
+      if (overlay) overlay.remove();
+      
+      if (sessionStorage.getItem('pending_anonymous_spin')) {
+         sessionStorage.removeItem('pending_anonymous_spin');
+         // Silent real spin
+         fetch(`${HUB_URL}/api/v1/minigame/spin`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+             body: JSON.stringify({ domain: window.location.hostname, path: window.location.pathname })
+         }).then(() => initOrUpdateIntegration());
+      } else {
+        initOrUpdateIntegration();
+      }
     }
   });
 
@@ -201,7 +252,8 @@
       return;
     }
 
-    // Se estiver logado, verifica se já comentou neste site
+    // Se estiver logado, verifica se já comentou neste site e traz status do minigame
+    let siteStatus = null;
     if (token) {
       try {
         const domain = window.location.hostname;
@@ -211,17 +263,31 @@
         });
         const data = await res.json();
         
-        if (data.status === 'success' && data.has_commented) {
-          console.log('[CommentPay] Usuário já comentou neste site. Ocultando widget.');
-          // Remove badge and banner if they exist
-          const banner = document.getElementById('commentpay-form-banner');
-          if (banner) banner.remove();
-          const floatingBadge = document.getElementById('commentpay-floating-badge');
-          if (floatingBadge) floatingBadge.remove();
-          return; // Para a execução, não exibe mais nada do CommentPay
+        if (data.status === 'success') {
+          siteStatus = data;
+          
+          if (data.has_commented) {
+            console.log('[CommentPay] Usuário já comentou neste site. Ocultando widget.');
+            // Remove badge and banner se existirem
+            const banner = document.getElementById('commentpay-form-banner');
+            if (banner) banner.remove();
+            const floatingBadge = document.getElementById('commentpay-floating-badge');
+            if (floatingBadge) floatingBadge.remove();
+            return; 
+          }
+          
+          // Se não comentou e NÃO jogou o minigame, exibe a roleta automaticamente
+          if (!data.has_played_minigame && !sessionStorage.getItem('commentpay_minigame_shown')) {
+            showMinigameModal(domain, path);
+          }
         }
       } catch (e) {
         console.error('[CommentPay] Erro ao verificar status do site:', e);
+      }
+    } else {
+      // Se não estiver logado, exibe a roleta para instigar o login
+      if (!sessionStorage.getItem('commentpay_minigame_shown')) {
+        showMinigameModal(window.location.hostname, window.location.pathname);
       }
     }
 
@@ -274,7 +340,9 @@
             <span>Identificado: <strong>${escapeHtml(user.name)}</strong></span>
           </div>
           <div>
-            <span style="font-size: 0.8rem; color: #10b981; font-weight:600; margin-right: 12px;">+ R$ 0,50 ao comentar</span>
+            <span style="font-size: 0.8rem; color: #10b981; font-weight:600; margin-right: 12px;">
+              ${siteStatus && siteStatus.active_bonus > 1.0 ? `🔥 + R$ ${(0.50 * siteStatus.active_bonus).toFixed(2).replace('.',',')} ao comentar (Bônus 2x)` : `+ R$ 0,50 ao comentar`}
+            </span>
             <button type="button" class="commentpay-wp-logout" id="commentpay-disconnect-btn">Desconectar</button>
           </div>
         </div>
@@ -374,6 +442,297 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  // Minigame Modal Logic
+  function showMinigameModal(domain, path) {
+    sessionStorage.setItem('commentpay_minigame_shown', '1');
+    let overlay = document.getElementById('commentpay-minigame-overlay');
+    if (overlay) return;
+
+    if (!document.getElementById('commentpay-minigame-styles')) {
+      const style = document.createElement('style');
+      style.id = 'commentpay-minigame-styles';
+      style.innerHTML = `
+        .commentpay-minigame-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.85); z-index: 9999999;
+          display: flex; justify-content: center; align-items: center;
+          backdrop-filter: blur(5px);
+        }
+        .commentpay-minigame-modal {
+          background: linear-gradient(180deg, #990000 0%, #4a0000 100%);
+          border-radius: 20px; padding: 30px 20px;
+          text-align: center; max-width: 380px; width: 90%;
+          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
+          position: relative; font-family: 'Outfit', 'Inter', sans-serif;
+          color: white;
+        }
+        .commentpay-minigame-close {
+          position: absolute; top: 12px; right: 16px;
+          cursor: pointer; font-size: 24px; color: rgba(255,255,255,0.6);
+          transition: color 0.2s;
+        }
+        .commentpay-minigame-close:hover { color: #fff; }
+        .commentpay-title {
+          font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800;
+          text-transform: uppercase; letter-spacing: 1px;
+          margin: 0 0 5px 0; color: #fff;
+          text-shadow: 2px 2px 0px #4a0000, 4px 4px 0px rgba(0,0,0,0.3);
+        }
+        .commentpay-subtitle {
+          font-size: 0.95rem; font-weight: 500; margin-bottom: 25px;
+          color: #ffcccc; font-family: 'Inter', sans-serif;
+        }
+        .commentpay-wheel-wrapper {
+          position: relative; width: 260px; height: 260px; margin: 0 auto 30px auto;
+          border-radius: 50%; background: #330000; padding: 8px;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .commentpay-wheel-wrapper::before {
+          content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+          border-radius: 50%; border: 3px dotted rgba(255,255,255,0.3); pointer-events: none;
+        }
+        .commentpay-roulette-container {
+          width: 100%; height: 100%; border-radius: 50%;
+          position: relative; overflow: hidden;
+          background: conic-gradient(
+            from -22.5deg,
+            #ffd700 0deg 45deg,
+            #990000 45deg 90deg,
+            #cc0000 90deg 135deg,
+            #990000 135deg 180deg,
+            #cc0000 180deg 225deg,
+            #990000 225deg 270deg,
+            #cc0000 270deg 315deg,
+            #990000 315deg 360deg
+          );
+          box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+          transition: transform 10s cubic-bezier(0.2, 0.8, 0.1, 1);
+        }
+        .commentpay-slice {
+          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+          display: flex; justify-content: center;
+        }
+        .commentpay-slice span {
+          margin-top: 15px; font-weight: 800; font-size: 0.75rem; color: white;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.8); letter-spacing: 0.5px;
+          width: 60px; text-align: center; line-height: 1.1;
+        }
+        .commentpay-slice.jackpot span { color: #451a03; text-shadow: none; font-size: 0.85rem; }
+        .commentpay-slice-line {
+          position: absolute; top: 0; left: 50%; width: 2px; height: 50%;
+          background: rgba(0,0,0,0.15); transform-origin: bottom center;
+        }
+        .commentpay-center-hub {
+          position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          width: 50px; height: 50px; border-radius: 50%;
+          background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+          border: 4px solid #e2e8f0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.3);
+          z-index: 10; display: flex; justify-content: center; align-items: center;
+        }
+        .commentpay-center-hub::after {
+          content: '↻'; color: white; font-size: 24px; font-weight: bold;
+        }
+        .commentpay-roulette-pointer {
+          position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+          width: 32px; height: 42px; z-index: 20;
+        }
+        .commentpay-roulette-pointer svg {
+          width: 100%; height: 100%; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+        }
+        .commentpay-spin-btn {
+          background: linear-gradient(180deg, #ffd700 0%, #f59e0b 100%);
+          color: #451a03; padding: 18px; width: 100%; border: none; border-radius: 30px;
+          font-weight: 800; font-size: 1.2rem; cursor: pointer; font-family: 'Outfit', sans-serif;
+          text-transform: uppercase; box-shadow: 0 6px 0 #b45309, 0 10px 15px rgba(0,0,0,0.3);
+          transition: transform 0.1s, box-shadow 0.1s; margin-top: 10px;
+        }
+        .commentpay-spin-btn:active {
+          transform: translateY(6px); box-shadow: 0 0 0 #b45309, 0 4px 5px rgba(0,0,0,0.3);
+        }
+        .commentpay-spin-btn:disabled {
+          opacity: 0.7; cursor: not-allowed; transform: translateY(6px); box-shadow: 0 0 0 #b45309;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    overlay = document.createElement('div');
+    overlay.id = 'commentpay-minigame-overlay';
+    overlay.className = 'commentpay-minigame-overlay';
+    overlay.innerHTML = `
+      <div class="commentpay-minigame-modal">
+        <div class="commentpay-minigame-close" id="commentpay-minigame-close">&times;</div>
+        <h2 class="commentpay-title">SUPERSPIN</h2>
+        <p class="commentpay-subtitle">Tente ganhar nosso super Jackpot! Gire agora!</p>
+        
+        <div class="commentpay-wheel-wrapper">
+          <div class="commentpay-roulette-pointer">
+            <svg viewBox="0 0 24 36" fill="white">
+              <path d="M12 36 L0 12 A12 12 0 0 1 24 12 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+              <circle cx="12" cy="12" r="5" fill="#ef4444"/>
+            </svg>
+          </div>
+          <div class="commentpay-roulette-container" id="commentpay-roulette-wheel">
+            <!-- Slices Lines (borders) -->
+            <div class="commentpay-slice-line" style="transform: rotate(22.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(67.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(112.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(157.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(202.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(247.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(292.5deg);"></div>
+            <div class="commentpay-slice-line" style="transform: rotate(337.5deg);"></div>
+            
+            <!-- Texts -->
+            <div class="commentpay-slice jackpot" style="transform: rotate(0deg);"><span>JACKPOT<br>2X</span></div>
+            <div class="commentpay-slice" style="transform: rotate(45deg);"><span>SEM BÔNUS</span></div>
+            <div class="commentpay-slice" style="transform: rotate(90deg);"><span>SUPER COINS</span></div>
+            <div class="commentpay-slice" style="transform: rotate(135deg);"><span>TENTE DE NOVO</span></div>
+            <div class="commentpay-slice" style="transform: rotate(180deg);"><span>NADA AQUI</span></div>
+            <div class="commentpay-slice" style="transform: rotate(225deg);"><span>BÔNUS GRÁTIS</span></div>
+            <div class="commentpay-slice" style="transform: rotate(270deg);"><span>QUASE LÁ</span></div>
+            <div class="commentpay-slice" style="transform: rotate(315deg);"><span>SEM PRÊMIO</span></div>
+            
+            <div class="commentpay-center-hub"></div>
+          </div>
+        </div>
+        
+        <button class="commentpay-spin-btn" id="commentpay-spin-btn">GIRE AGORA</button>
+        <p id="commentpay-spin-result" style="margin-top:15px; font-weight:800; min-height:20px; font-size:1.1rem; color:#ffd700;"></p>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById('commentpay-minigame-close').addEventListener('click', () => {
+      overlay.remove();
+    });
+
+    const spinBtn = document.getElementById('commentpay-spin-btn');
+    spinBtn.addEventListener('click', async () => {
+      spinBtn.disabled = true;
+      spinBtn.innerText = 'GIRANDO...';
+      
+      if (!token) {
+        // Mock gamification spin se deslogado
+        const wheel = document.getElementById('commentpay-roulette-wheel');
+        const resultText = document.getElementById('commentpay-spin-result');
+        
+        let chance = Math.random() * 100;
+        let mockMultiplier = 1.0;
+        if (chance <= 5) mockMultiplier = 2.0;
+        else if (chance <= 35) mockMultiplier = -1;
+
+        let targetDeg = 0;
+        if (mockMultiplier === 2.0) targetDeg = 360 * 10 + 0;
+        else if (mockMultiplier === -1) targetDeg = 360 * 10 + 135;
+        else targetDeg = 360 * 10 + 180;
+        
+        wheel.style.transform = `rotate(-${targetDeg}deg)`;
+        
+        setTimeout(() => {
+          if (mockMultiplier === 2.0) {
+            document.querySelector('.commentpay-minigame-modal').classList.add('victory');
+            resultText.style.color = '#10b981';
+            resultText.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.8)';
+            resultText.innerText = '🎉 VOCÊ GANHOU 2X! Conecte para resgatar!';
+            spinBtn.innerText = 'CONECTAR CARTEIRA';
+            spinBtn.disabled = false;
+            spinBtn.onclick = () => { 
+              sessionStorage.setItem('pending_anonymous_spin', '1');
+              openLoginPopup(); 
+            };
+          } else if (mockMultiplier === -1) {
+            resultText.style.color = '#ffd700';
+            resultText.innerText = 'QUASE! Você ganhou um giro extra!';
+            spinBtn.innerText = 'GIRAR NOVAMENTE';
+            spinBtn.disabled = false;
+            spinBtn.onclick = () => {
+               spinBtn.disabled = true;
+               spinBtn.innerText = 'GIRANDO...';
+               let newDeg = targetDeg + 360 * 10 + 45; // Vai para 180 (perda garantida)
+               wheel.style.transform = `rotate(-${newDeg}deg)`;
+               setTimeout(() => {
+                  resultText.style.color = '#ffcccc';
+                  resultText.innerText = 'NÃO FOI DESSA VEZ. Conecte-se e ganhe R$ 0,50!';
+                  spinBtn.innerText = 'CONECTAR CARTEIRA';
+                  spinBtn.disabled = false;
+                  spinBtn.onclick = () => { openLoginPopup(); };
+               }, 10100);
+            };
+          } else {
+            resultText.style.color = '#ffcccc';
+            resultText.innerText = 'NÃO FOI DESSA VEZ. Conecte-se e ganhe R$ 0,50!';
+            spinBtn.innerText = 'CONECTAR CARTEIRA';
+            spinBtn.disabled = false;
+            spinBtn.onclick = () => { openLoginPopup(); };
+          }
+        }, 10100);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${HUB_URL}/api/v1/minigame/spin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ domain, path })
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          const wheel = document.getElementById('commentpay-roulette-wheel');
+          const resultText = document.getElementById('commentpay-spin-result');
+          
+          let currentRotation = parseFloat(wheel.style.transform.replace(/[^0-9.-]/g, '')) || 0;
+          let baseTurns = Math.abs(currentRotation) + (360 * 10);
+          
+          let targetDeg = 0;
+          if (data.multiplier === 2.0) targetDeg = baseTurns + 0;
+          else if (data.multiplier === -1) targetDeg = baseTurns + 135;
+          else targetDeg = baseTurns + 180;
+          
+          wheel.style.transform = `rotate(-${targetDeg}deg)`;
+          
+          setTimeout(() => {
+            if (data.multiplier === 2.0) {
+              document.querySelector('.commentpay-minigame-modal').classList.add('victory');
+              resultText.style.color = '#10b981';
+              resultText.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.8)';
+              resultText.innerText = '🎉 VOCÊ GANHOU 2X!';
+              spinBtn.innerText = 'BÔNUS ATIVO!';
+              setTimeout(() => { overlay.remove(); initOrUpdateIntegration(); }, 3000);
+            } else if (data.multiplier === -1) {
+              resultText.style.color = '#ffd700';
+              resultText.innerText = 'QUASE! Você ganhou um giro extra!';
+              spinBtn.innerText = 'GIRAR NOVAMENTE';
+              spinBtn.disabled = false;
+            } else {
+              resultText.style.color = '#ffcccc';
+              resultText.innerText = 'NÃO FOI DESSA VEZ.';
+              spinBtn.innerText = 'FEITO!';
+              setTimeout(() => { overlay.remove(); initOrUpdateIntegration(); }, 3000);
+            }
+          }, 10100);
+          
+        } else {
+          alert(data.message || 'Erro ao girar a roleta.');
+          spinBtn.disabled = false;
+          spinBtn.innerText = 'Tentar Novamente';
+          spinBtn.style.opacity = '1';
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Erro de conexão ao girar a roleta.');
+        spinBtn.disabled = false;
+        spinBtn.innerText = 'Girar Agora!';
+        spinBtn.style.opacity = '1';
+      }
+    });
   }
 
   // Run on load

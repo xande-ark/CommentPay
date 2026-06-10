@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 const { OAuth2Client } = require('google-auth-library');
@@ -19,6 +20,43 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://accounts.google.com",
+          "https://smartlock.google.com"
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com"
+        ],
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com"
+        ],
+        imgSrc: ["'self'", "data:", "https://*"],
+        frameSrc: [
+          "'self'",
+          "https://accounts.google.com",
+          "https://smartlock.google.com"
+        ],
+        connectSrc: [
+          "'self'",
+          "https://accounts.google.com"
+        ]
+      }
+    }
+  })
+);
 app.use(express.json({
   verify: (req, res, buf, encoding) => {
     req.rawBody = buf.toString(encoding || 'utf8');
@@ -438,6 +476,20 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       });
     }
     
+    // 4.5. Aplica Minigame (Bônus Multiplicador se houver)
+    let appliedMultiplier = 1.0;
+    const activeBonus = await dbGet(`
+      SELECT id, multiplier FROM active_multipliers 
+      WHERE user_id = ? AND site_id = ? AND is_used = 0
+    `, [userId, targetSite.id]);
+
+    if (activeBonus) {
+      appliedMultiplier = activeBonus.multiplier;
+      await dbRun("UPDATE active_multipliers SET is_used = 1 WHERE id = ?", [activeBonus.id]);
+    }
+
+    const finalEscrowAmount = targetSite.reward_amount * appliedMultiplier;
+
     // 5. Criptografa o IP para auditoria segura (LGPD)
     const ipEnc = encrypt(user_ip);
     const commentLogId = crypto.randomUUID();
@@ -446,16 +498,16 @@ app.post('/api/v1/comments/submit', async (req, res) => {
     await dbRun("BEGIN TRANSACTION");
     try {
       await dbRun(`
-        INSERT INTO comments_log (id, user_id, site_id, external_comment_id, ip_hash, ip_encrypted, ip_iv, ip_auth_tag, comment_text_hash, comment_text, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-      `, [commentLogId, userId, targetSite.id, external_comment_id, ipHash, ipEnc.encryptedData, ipEnc.iv, ipEnc.authTag, commentTextHash, comment_text]);
+        INSERT INTO comments_log (id, user_id, site_id, external_comment_id, ip_hash, ip_encrypted, ip_iv, ip_auth_tag, comment_text_hash, comment_text, status, reward_multiplier)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+      `, [commentLogId, userId, targetSite.id, external_comment_id, ipHash, ipEnc.encryptedData, ipEnc.iv, ipEnc.authTag, commentTextHash, comment_text, appliedMultiplier]);
       
       await dbRun(`
         UPDATE wallets 
         SET balance_pending = balance_pending + ?,
             updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
-      `, [targetSite.reward_amount, userId]);
+      `, [finalEscrowAmount, userId]);
       
       await dbRun("COMMIT");
     } catch (e) {
@@ -467,7 +519,7 @@ app.post('/api/v1/comments/submit', async (req, res) => {
       status: 'success',
       message: 'Comentário registrado com sucesso. Saldo pendente alocado.',
       comment_id: commentLogId,
-      escrow_amount: targetSite.reward_amount
+      escrow_amount: finalEscrowAmount
     });
   } catch (err) {
     console.error(err);
@@ -520,7 +572,8 @@ app.post('/api/v1/comments/status-update', async (req, res) => {
     }
     
     const commentSite = await dbGet("SELECT * FROM peripheral_sites WHERE id = ?", [comment.site_id]);
-    const rewardAmount = commentSite ? commentSite.reward_amount : site.reward_amount;
+    const baseRewardAmount = commentSite ? commentSite.reward_amount : site.reward_amount;
+    const rewardAmount = baseRewardAmount * (comment.reward_multiplier || 1.0);
     
     // 4. Transação ACID de atualização de saldos
     await dbRun("BEGIN TRANSACTION");
@@ -653,14 +706,79 @@ app.get('/api/v1/user/site-status', authMiddleware, async (req, res) => {
       LIMIT 1
     `, [userId, site.id]);
 
+    const activeBonus = await dbGet(`
+      SELECT multiplier FROM active_multipliers 
+      WHERE user_id = ? AND site_id = ? AND is_used = 0
+    `, [userId, site.id]);
+
+    const hasPlayed = await dbGet(`
+      SELECT id FROM active_multipliers 
+      WHERE user_id = ? AND site_id = ?
+      LIMIT 1
+    `, [userId, site.id]);
+
     res.json({
       status: 'success',
       has_commented: !!existingComment,
-      comment_status: existingComment ? existingComment.status : null
+      comment_status: existingComment ? existingComment.status : null,
+      has_played_minigame: !!hasPlayed,
+      active_bonus: activeBonus ? activeBonus.multiplier : null
     });
   } catch (err) {
     console.error("Erro ao verificar site status:", err);
     res.status(500).json({ status: 'error', message: 'Erro ao verificar status do site.' });
+  }
+});
+
+// 5.6 Minigame Spin Endpoint
+app.post('/api/v1/minigame/spin', authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  const { domain, path } = req.body;
+
+  if (!domain) return res.status(400).json({ status: 'error', message: 'Domínio não fornecido.' });
+
+  try {
+    const stdPath = path && path.endsWith('/') ? path : `${path || ''}/`;
+    const altPath = path && path.endsWith('/') ? path.slice(0, -1) : path || '';
+
+    let site = await dbGet(
+      "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = ? OR blog_url = ?)", 
+      [domain, stdPath, altPath]
+    );
+
+    if (!site) {
+      site = await dbGet(
+        "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = '/' OR blog_url = '' OR blog_url IS NULL)",
+        [domain]
+      );
+    }
+
+    if (!site) return res.status(404).json({ status: 'error', message: 'Site parceiro não encontrado.' });
+
+    // Verifica se já jogou neste site
+    const hasPlayed = await dbGet("SELECT id FROM active_multipliers WHERE user_id = ? AND site_id = ?", [userId, site.id]);
+    if (hasPlayed) {
+      return res.status(400).json({ status: 'error', message: 'Você já girou a roleta neste site.' });
+    }
+
+    // Sorteio: TEMPORARIAMENTE 100% de chance para você testar (depois voltamos para 5%)
+    const chance = Math.random() * 100;
+    const multiplier = chance <= 100 ? 2.0 : 1.0;
+
+    await dbRun(`
+      INSERT INTO active_multipliers (user_id, site_id, multiplier, is_used)
+      VALUES (?, ?, ?, 0)
+    `, [userId, site.id, multiplier]);
+
+    return res.json({
+      status: 'success',
+      multiplier: multiplier,
+      message: multiplier > 1 ? 'Parabéns! Ganho Duplicado no próximo comentário.' : 'Não foi dessa vez. Continue comentando!'
+    });
+
+  } catch (err) {
+    console.error("Erro no minigame:", err);
+    res.status(500).json({ status: 'error', message: 'Erro ao rodar a roleta.' });
   }
 });
 

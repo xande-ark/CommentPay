@@ -344,12 +344,13 @@ function renderWithdrawals(withdrawals) {
     }
     
     const formattedDate = new Date(w.requested_at).toLocaleString('pt-BR');
-    const gatewayTx = w.gateway_tx_id ? `<code>${w.gateway_tx_id}</code>` : `<span class="text-muted" title="${w.error_message || 'Aguardando processamento'}">-</span>`;
+    const safeErrorMsg = escapeHTML(w.error_message || '');
+    const gatewayTx = w.gateway_tx_id ? `<code>${escapeHTML(w.gateway_tx_id)}</code>` : `<span class="text-muted" title="${safeErrorMsg || 'Aguardando processamento'}">-</span>`;
     
     return `
       <tr>
         <td data-label="Valor"><strong>R$ ${w.amount.toFixed(2).replace('.', ',')}</strong></td>
-        <td data-label="Status"><span class="badge ${badgeClass}" title="${w.error_message || ''}">${badgeLabel}</span></td>
+        <td data-label="Status"><span class="badge ${badgeClass}" title="${safeErrorMsg}">${badgeLabel}</span></td>
         <td data-label="Gateway TX">${gatewayTx}</td>
         <td data-label="Data">${formattedDate}</td>
       </tr>

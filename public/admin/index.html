@@ -436,6 +436,16 @@
 
     // --- CARREGAMENTO DE DADOS ---
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     async function loadComments() {
       try {
         commentsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>';
@@ -448,10 +458,10 @@
 
         commentsBody.innerHTML = res.data.map(c => `
           <tr>
-            <td><strong>${c.user_name}</strong><br><small style="color: var(--text-secondary);">${c.user_email}</small></td>
-            <td><span class="badge" style="color: var(--purple); font-family: monospace;">${c.user_ip}</span></td>
-            <td><strong style="color: var(--primary);">${c.site_name}</strong></td>
-            <td style="max-width: 250px; font-style: italic;">"${c.comment_text}"</td>
+            <td><strong>${escapeHtml(c.user_name)}</strong><br><small style="color: var(--text-secondary);">${escapeHtml(c.user_email)}</small></td>
+            <td><span class="badge" style="color: var(--purple); font-family: monospace;">${escapeHtml(c.user_ip)}</span></td>
+            <td><strong style="color: var(--primary);">${escapeHtml(c.site_name)}</strong></td>
+            <td style="max-width: 250px; font-style: italic;">"${escapeHtml(c.comment_text)}"</td>
             <td>${new Date(c.created_at).toLocaleString('pt-BR')}</td>
             <td>
               <button onclick="moderateComment('${c.external_comment_id}', 'approved', '${c.site_id}')" class="action-btn btn-approve">Aprovar</button>
@@ -476,10 +486,10 @@
 
         withdrawalsBody.innerHTML = res.data.map(w => `
           <tr>
-            <td><strong>${w.user_name}</strong><br><small style="color: var(--text-secondary);">${w.user_email}</small></td>
-            <td><span class="badge" style="font-family: monospace; background: #fef08a;">${w.user_cpf}</span></td>
+            <td><strong>${escapeHtml(w.user_name)}</strong><br><small style="color: var(--text-secondary);">${escapeHtml(w.user_email)}</small></td>
+            <td><span class="badge" style="font-family: monospace; background: #fef08a;">${escapeHtml(w.user_cpf)}</span></td>
             <td>
-              <span class="badge" style="color: var(--purple); font-family: monospace;">${w.user_ip}</span>
+              <span class="badge" style="color: var(--purple); font-family: monospace;">${escapeHtml(w.user_ip)}</span>
               ${w.is_suspicious_ip ? '<br><span style="color: var(--red); font-size: 0.7rem; font-weight: bold; margin-top: 4px; display: inline-block; background: #fee2e2; padding: 2px 4px; border-radius: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> MÚLTIPLAS CONTAS</span>' : ''}
             </td>
             <td><strong style="color: var(--green); font-size: 1.1rem;">R$ ${w.amount.toFixed(2).replace('.',',')}</strong></td>
