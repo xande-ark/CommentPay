@@ -3,3 +3,6 @@ node_modules/
 database.sqlite
 .vercel/
 .DS_Store
+
+.vercel
+.env*

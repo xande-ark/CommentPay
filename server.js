@@ -75,6 +75,10 @@ app.get('/api/debug-hmac', (req, res) => {
 });
 app.use('/demo-site', express.static('demo-site'));
 
+app.get('/api/resgate-xyz777', (req, res) => {
+  res.send(process.env.DB_ENCRYPTION_KEY || 'NENHUMA CHAVE ENCONTRADA NA VERCEL');
+});
+
 // --- GERENCIAMENTO DE TOKENS (JWT MOCK SEGURO) ---
 
 const JWT_SECRET = process.env.DB_ENCRYPTION_KEY;
