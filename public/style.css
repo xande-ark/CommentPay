@@ -124,12 +124,20 @@ h1, h2, h3, h4, .logo {
 
 .logo {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-size: 2.2rem;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 16px;
   color: var(--text-primary);
+  text-align: center;
+}
+
+.logo h1 {
+  font-size: 2.2rem;
+  line-height: 1.1;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .logo span {
@@ -137,6 +145,7 @@ h1, h2, h3, h4, .logo {
 }
 
 .logo-icon {
+  font-size: 2.8rem;
   color: var(--purple);
   filter: drop-shadow(0 0 10px var(--purple));
 }
@@ -820,6 +829,10 @@ tr:last-child td {
 
 /* --- MOBILE OPTIMIZATIONS FOR REGISTER VIEW --- */
 @media (max-width: 600px) {
+  .logo h1 {
+    font-size: 1.8rem;
+  }
+  
   #register-view.card {
     padding: 20px 16px;
     border-radius: 16px;
