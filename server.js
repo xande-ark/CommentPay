@@ -1182,6 +1182,45 @@ app.post('/api/v1/admin/withdrawals/moderate', adminAuthMiddleware, async (req, 
   }
 });
 
+// 5. Listar todos os Usuários Cadastrados (Admin)
+app.get('/api/v1/admin/users/list', adminAuthMiddleware, async (req, res) => {
+  try {
+    const rawUsers = await dbAll(`
+      SELECT u.id, u.name, u.email, u.status, u.created_at, u.cpf_encrypted, u.cpf_iv, u.cpf_auth_tag,
+             w.balance_available, w.balance_pending
+      FROM users u
+      LEFT JOIN wallets w ON u.id = w.user_id
+      ORDER BY u.created_at DESC
+    `);
+    
+    const users = rawUsers.map(u => {
+      let cpfReal = 'Não cadastrado';
+      if (u.cpf_encrypted && u.cpf_iv && u.cpf_auth_tag) {
+        try {
+          cpfReal = decrypt(u.cpf_encrypted, u.cpf_iv, u.cpf_auth_tag);
+        } catch (e) {
+          cpfReal = '[Erro de Criptografia]';
+        }
+      }
+      delete u.cpf_encrypted;
+      delete u.cpf_iv;
+      delete u.cpf_auth_tag;
+      
+      return {
+        ...u,
+        cpf: cpfReal,
+        balance_available: u.balance_available || 0,
+        balance_pending: u.balance_pending || 0
+      };
+    });
+    
+    res.json({ status: 'success', data: users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: 'Erro ao buscar usuários.' });
+  }
+});
+
 // 8. Endpoint auxiliar para o Blog Parceiro
 // Retorna a lista de comentários APROVADOS (publicados) para exibição visual no artigo
 app.get('/api/v1/comments/demo-list', async (req, res) => {

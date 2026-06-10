@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Seguro - CommentPay</title>
+  <title>Admin Seguro - ComentariosLucrativos</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -222,7 +222,7 @@
   <div id="login-view">
     <div class="login-box">
       <h2><i class="fa-solid fa-lock"></i> Acesso Restrito</h2>
-      <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2rem;">Painel Administrativo do CommentPay</p>
+      <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2rem;">Painel Administrativo do ComentariosLucrativos</p>
       
       <div class="form-group">
         <label for="username">Usuário</label>
@@ -253,6 +253,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-target="tab-comments"><i class="fa-solid fa-comments"></i> Moderação de Comentários</button>
       <button class="tab-btn" data-target="tab-withdrawals"><i class="fa-solid fa-money-bill-transfer"></i> Moderação de Saques</button>
+      <button class="tab-btn" data-target="tab-users"><i class="fa-solid fa-users"></i> Gestão de Usuários</button>
       <button class="tab-btn" data-target="tab-integration"><i class="fa-solid fa-code"></i> Códigos WP Code</button>
     </div>
 
@@ -294,6 +295,28 @@
             </tr>
           </thead>
           <tbody id="withdrawals-table-body">
+             <tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Usuários -->
+    <div id="tab-users" class="tab-content">
+      <h3 style="margin-bottom: 1rem;">Gestão de Usuários Cadastrados</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>CPF</th>
+              <th>Status</th>
+              <th>Saldo Disponível</th>
+              <th>Saldo Pendente</th>
+              <th>Data Cadastro</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
              <tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>
           </tbody>
         </table>
@@ -348,6 +371,7 @@
 
     const commentsBody = document.getElementById('comments-table-body');
     const withdrawalsBody = document.getElementById('withdrawals-table-body');
+    const usersBody = document.getElementById('users-table-body');
 
     // NAVEGAÇÃO DE TABS
     tabBtns.forEach(btn => {
@@ -360,6 +384,7 @@
         
         if(btn.dataset.target === 'tab-comments') loadComments();
         if(btn.dataset.target === 'tab-withdrawals') loadWithdrawals();
+        if(btn.dataset.target === 'tab-users') loadUsers();
         if(btn.dataset.target === 'tab-integration') loadIntegrationSites();
       });
     });
@@ -502,6 +527,35 @@
         `).join('');
       } catch (err) {
         withdrawalsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Falha ao carregar.</td></tr>';
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>';
+        const res = await authFetch('/api/v1/admin/users/list');
+        
+        if (res.data.length === 0) {
+          usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Nenhum usuário cadastrado ainda.</td></tr>';
+          return;
+        }
+
+        usersBody.innerHTML = res.data.map(u => `
+          <tr>
+            <td><strong>${escapeHtml(u.name)}</strong><br><small style="color: var(--text-secondary);">${escapeHtml(u.email)}</small></td>
+            <td><span class="badge" style="font-family: monospace; background: #fef08a;">${escapeHtml(u.cpf)}</span></td>
+            <td>
+              <span class="badge" style="color: ${u.status === 'active' ? 'var(--green)' : 'var(--text-secondary)'};">
+                ${u.status === 'active' ? 'Ativo' : 'Pendente'}
+              </span>
+            </td>
+            <td><strong style="color: var(--green);">R$ ${u.balance_available.toFixed(2).replace('.',',')}</strong></td>
+            <td><span style="color: var(--yellow);">R$ ${u.balance_pending.toFixed(2).replace('.',',')}</span></td>
+            <td>${new Date(u.created_at).toLocaleString('pt-BR')}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Falha ao carregar a lista de usuários.</td></tr>';
       }
     }
 

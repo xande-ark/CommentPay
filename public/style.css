@@ -803,6 +803,84 @@ tr:last-child td {
   padding: 30px;
 }
 
+/* --- LOADING STATES --- */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- MOBILE OPTIMIZATIONS FOR REGISTER VIEW --- */
+@media (max-width: 600px) {
+  #register-view.card {
+    padding: 20px 16px;
+    border-radius: 16px;
+    margin: 10px;
+    width: calc(100% - 20px);
+  }
+  
+  #register-view h2 {
+    font-size: 1.3rem;
+  }
+  
+  #register-view .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .withdraw-warning {
+    font-size: 0.8rem;
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .withdraw-warning i {
+    font-size: 1rem;
+  }
+
+  .register-form {
+    gap: 16px;
+  }
+  
+  .input-group input {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  
+  .consent-box {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .checkbox-container {
+    padding-left: 28px;
+  }
+  
+  .checkmark {
+    width: 18px;
+    height: 18px;
+    top: 2px;
+  }
+  
+  .consent-text {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  #btn-register-submit {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
 /* --- PILLS & BADGES --- */
 .badge {
   display: inline-flex;
