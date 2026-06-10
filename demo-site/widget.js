@@ -324,6 +324,9 @@ function showMinigameModal() {
         display: flex; justify-content: center; align-items: center;
         backdrop-filter: blur(5px);
       }
+      .commentpay-minigame-overlay * {
+        box-sizing: border-box !important;
+      }
       .commentpay-minigame-modal {
         background: linear-gradient(180deg, #990000 0%, #4a0000 100%);
         border-radius: 20px; padding: 30px 20px;
@@ -375,6 +378,7 @@ function showMinigameModal() {
       .commentpay-roulette-container {
         width: 100%; height: 100%; border-radius: 50%;
         position: relative; overflow: hidden;
+        border: none !important; margin: 0 !important; outline: none !important;
         background: conic-gradient(
           from -22.5deg,
           #ffd700 0deg 45deg,
