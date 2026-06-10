@@ -312,17 +312,21 @@
     }
 
     // 5. Contador de Caracteres Qualificados para Recompensa
-    const commentTextarea = commentForm.querySelector('textarea[name="comment"]') || commentForm.querySelector('textarea');
-    if (commentTextarea) {
+    const initialTextarea = document.getElementById('comment') || commentForm.querySelector('textarea[name="comment"]') || commentForm.querySelector('textarea');
+    if (initialTextarea) {
       let counterDiv = document.getElementById('commentpay-char-counter');
       if (!counterDiv) {
         counterDiv = document.createElement('div');
         counterDiv.id = 'commentpay-char-counter';
-        commentTextarea.parentNode.insertBefore(counterDiv, commentTextarea.nextSibling);
+        initialTextarea.parentNode.insertBefore(counterDiv, initialTextarea.nextSibling);
       }
       
       const updateCounter = () => {
-        const len = commentTextarea.value.trim().length;
+        // Sempre busca o textarea atual para evitar problemas caso o tema modifique o DOM
+        const currentTextarea = document.getElementById('comment') || commentForm.querySelector('textarea[name="comment"]') || commentForm.querySelector('textarea');
+        if (!currentTextarea) return;
+        
+        const len = currentTextarea.value.trim().length;
         if (!token) {
           counterDiv.style.display = 'none';
           return;
@@ -352,7 +356,11 @@
         }
       };
       
-      commentTextarea.addEventListener('input', updateCounter);
+      // Usa delegação de eventos no formulário para capturar digitação mesmo se o textarea for recriado/modificado
+      commentForm.addEventListener('input', updateCounter);
+      commentForm.addEventListener('keyup', updateCounter);
+      commentForm.addEventListener('change', updateCounter);
+      
       updateCounter();
     }
   }
