@@ -311,8 +311,8 @@ function escapeHTML(str) {
 
 // --- MINIGAME ROLETA ---
 function showMinigameModal() {
-  if (sessionStorage.getItem('widget_minigame_shown')) return;
-  sessionStorage.setItem('widget_minigame_shown', '1');
+  if (localStorage.getItem('widget_minigame_shown')) return;
+  localStorage.setItem('widget_minigame_shown', '1');
 
   if (!document.getElementById('commentpay-minigame-styles')) {
     const style = document.createElement('style');

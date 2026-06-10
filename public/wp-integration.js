@@ -446,7 +446,8 @@
 
   // Minigame Modal Logic
   function showMinigameModal(domain, path) {
-    sessionStorage.setItem('commentpay_minigame_shown', '1');
+    if (localStorage.getItem('commentpay_minigame_shown')) return;
+    localStorage.setItem('commentpay_minigame_shown', '1');
     let overlay = document.getElementById('commentpay-minigame-overlay');
     if (overlay) return;
 
