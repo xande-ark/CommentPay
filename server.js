@@ -204,7 +204,15 @@ app.post('/api/v1/auth/google', async (req, res) => {
     const name = payload.name;
     const google_sub = payload.sub;
 
-    const user = await dbGet("SELECT * FROM users WHERE google_sub = ?", [google_sub]);
+    let user = await dbGet("SELECT * FROM users WHERE google_sub = ?", [google_sub]);
+    
+    if (!user) {
+      user = await dbGet("SELECT * FROM users WHERE email = ?", [email]);
+      if (user) {
+        // Vincula a conta Google ao usuário existente pelo email
+        await dbRun("UPDATE users SET google_sub = ? WHERE id = ?", [google_sub, user.id]);
+      }
+    }
     
     if (user) {
       if (user.status === 'active') {
