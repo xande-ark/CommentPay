@@ -215,7 +215,7 @@ async function fetchWalletData() {
       
       // Atualiza a lista de sites se a aba de sites estiver ativa (para desativar botões)
       if (navSites.classList.contains('active') && cachedSites.length > 0) {
-        renderSitesList(cachedSites);
+        updateSitesList();
       }
       
       // Lógica de Gamificação / Barra de Progresso
@@ -509,7 +509,7 @@ async function fetchSitesList() {
     const body = await res.json();
     if (body.status === 'success') {
       cachedSites = body.data;
-      renderSitesList(cachedSites);
+      updateSitesList();
     }
   } catch (err) {
     console.error("Erro ao carregar sites parceiros:", err);
@@ -655,15 +655,21 @@ function renderSitesList(sites) {
 }
 
 // Filtro de Busca
-if (sitesSearchInput) {
-  sitesSearchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
+function updateSitesList() {
+  const query = sitesSearchInput ? sitesSearchInput.value.toLowerCase().trim() : '';
+  if (!query) {
+    renderSitesList(cachedSites);
+  } else {
     const filtered = cachedSites.filter(s => 
-      s.name.toLowerCase().includes(query) || 
-      s.domain.toLowerCase().includes(query)
+      (s.name && s.name.toLowerCase().includes(query)) || 
+      (s.domain && s.domain.toLowerCase().includes(query))
     );
     renderSitesList(filtered);
-  });
+  }
+}
+
+if (sitesSearchInput) {
+  sitesSearchInput.addEventListener('input', updateSitesList);
 }
 
 

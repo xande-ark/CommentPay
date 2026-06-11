@@ -15,6 +15,14 @@
   }
   
   let token = localStorage.getItem('commentpay_token') || null;
+  let user = null;
+  try {
+    const userJson = localStorage.getItem('commentpay_user');
+    if (userJson) user = JSON.parse(userJson);
+  } catch(e) {
+    console.error('[CommentPay] Error parsing user details:', e);
+  }
+
   const isActiveSession = sessionStorage.getItem('commentpay_active') === '1';
   
   if (!isActiveSession) {
@@ -22,13 +30,20 @@
     return;
   }
 
-  // State
-  let user = null;
-  try {
-    const userJson = localStorage.getItem('commentpay_user');
-    if (userJson) user = JSON.parse(userJson);
-  } catch(e) {
-    console.error('[CommentPay] Error parsing user details:', e);
+  // Sincroniza o input oculto no formulário do WordPress com o token atual
+  function syncHiddenInput() {
+    const commentForm = document.getElementById('commentform') || document.querySelector('form.comment-form');
+    if (!commentForm) return;
+    
+    let hiddenInput = document.getElementById('commentpay_token_input');
+    if (!hiddenInput) {
+      hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'commentpay_token';
+      hiddenInput.id = 'commentpay_token_input';
+      commentForm.appendChild(hiddenInput);
+    }
+    hiddenInput.value = token || '';
   }
 
   // Inject Styles
@@ -213,6 +228,9 @@
       localStorage.setItem('commentpay_token', token);
       localStorage.setItem('commentpay_user', JSON.stringify(user));
       
+      syncHiddenInput();
+      initOrUpdateIntegration();
+      
       console.log('[CommentPay] Conectado com sucesso!', user.name);
       
       // Se tivermos um overlay de minigame aberto pedindo login, fecha ele e recarrega integration
@@ -240,6 +258,7 @@
     sessionStorage.removeItem('commentpay_active');
     token = null;
     user = null;
+    syncHiddenInput();
     window.location.reload(); // Reload to clean up and hide the widget completely
   }
 
@@ -251,6 +270,9 @@
       console.warn('[CommentPay] WordPress comment form not found on this page.');
       return;
     }
+    
+    // Sync Hidden Input
+    syncHiddenInput();
 
     // Se estiver logado, verifica se já comentou neste site e traz status do minigame
     let siteStatus = null;
@@ -261,6 +283,13 @@
         const res = await fetch(`${HUB_URL}/api/v1/user/site-status?domain=${encodeURIComponent(domain)}&path=${encodeURIComponent(path)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+        
+        if (res.status === 401) {
+          console.warn('[CommentPay] Sessão expirada. Desconectando.');
+          disconnect();
+          return;
+        }
+        
         const data = await res.json();
         
         if (data.status === 'success') {
@@ -290,17 +319,6 @@
         showMinigameModal(window.location.hostname, window.location.pathname);
       }
     }
-
-    // 2. Insert/Update Hidden Input for the token
-    let hiddenInput = document.getElementById('commentpay_token_input');
-    if (!hiddenInput) {
-      hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'commentpay_token';
-      hiddenInput.id = 'commentpay_token_input';
-      commentForm.appendChild(hiddenInput);
-    }
-    hiddenInput.value = token || '';
 
     // 3. Inject In-Form Banner (before #commentform or before the comments textarea)
     let banner = document.getElementById('commentpay-form-banner');
@@ -687,6 +705,14 @@
           },
           body: JSON.stringify({ domain, path })
         });
+        
+        if (res.status === 401) {
+           alert("Sessão expirada. Conecte sua carteira novamente.");
+           overlay.remove();
+           disconnect();
+           return;
+        }
+        
         const data = await res.json();
         
         if (data.status === 'success') {
