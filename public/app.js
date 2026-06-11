@@ -43,6 +43,9 @@ window.handleGoogleLogin = async function(response) {
       sessionToken = data.token;
       sessionUser = data.user;
       showDashboard();
+    } else if (data.status === 'pending_cpf') {
+      tempGoogleData = data.user;
+      showRegister();
     } else {
       alert("Erro no login: " + (data.message || "Tente novamente."));
     }
