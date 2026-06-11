@@ -27,6 +27,31 @@ const googleEmailInput = document.getElementById('google-email');
 const googleNameInput = document.getElementById('google-name');
 const btnGoogleLogin = document.getElementById('btn-google-login');
 
+// Callback oficial do Google Identity Services (Modo Popup)
+window.handleGoogleLogin = async function(response) {
+  try {
+    const res = await fetch('/api/v1/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+    
+    const data = await res.json();
+    if (data.status === 'success') {
+      localStorage.setItem('cp_session_token', data.token);
+      localStorage.setItem('cp_session_user', JSON.stringify(data.user));
+      sessionToken = data.token;
+      sessionUser = data.user;
+      showDashboard();
+    } else {
+      alert("Erro no login: " + (data.message || "Tente novamente."));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Erro de comunicação com o servidor ao fazer login com Google.");
+  }
+};
+
 const regCpfInput = document.getElementById('reg-cpf');
 const regConsentCheckbox = document.getElementById('reg-consent');
 const btnRegisterSubmit = document.getElementById('btn-register-submit');
