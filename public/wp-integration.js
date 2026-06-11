@@ -616,7 +616,7 @@
             <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span><br>X2</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span><br>X3</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span><br>X1</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>TENTE<br>NOVAMENTE</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>TENTE<br>DE NOVO</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span><br>X1</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(225deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span><br>X2</span></div>
