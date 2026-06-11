@@ -309,36 +309,56 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
   }
   
   try {
-    // 1. Validação de Unicidade de CPF
-    const cpfHash = hashSHA256(cpf.replace(/[^\d]/g, ''));
-    const existingCpf = await dbGet("SELECT id FROM users WHERE cpf_hash = ?", [cpfHash]);
-    if (existingCpf) {
-      return res.status(400).json({ status: 'error', code: 'DUPLICATE_CPF', message: 'Este CPF já está cadastrado em outra conta.' });
-    }
-    
-    // 2. Criptografa CPF
-    const cpfEnc = encrypt(cpf.replace(/[^\d]/g, ''));
-    const userId = crypto.randomUUID();
-    const walletId = crypto.randomUUID();
-    
-    // 3. Transação ACID de Criação de Usuário + Carteira
-    await dbRun("BEGIN TRANSACTION");
-    try {
-      await dbRun(`
-        INSERT INTO users (id, email, google_sub, name, cpf_hash, cpf_encrypted, cpf_iv, cpf_auth_tag, status, consent_accepted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
-      `, [userId, email, google_sub, name, cpfHash, cpfEnc.encryptedData, cpfEnc.iv, cpfEnc.authTag, new Date().toISOString()]);
+      // 1. Validação de Unicidade de CPF
+      const cpfHash = hashSHA256(cpf.replace(/[^\d]/g, ''));
+      const existingCpf = await dbGet("SELECT id FROM users WHERE cpf_hash = ?", [cpfHash]);
+      if (existingCpf) {
+        return res.status(400).json({ status: 'error', code: 'DUPLICATE_CPF', message: 'Este CPF já está cadastrado em outra conta.' });
+      }
       
-      await dbRun(`
-        INSERT INTO wallets (id, user_id, balance_available, balance_pending)
-        VALUES (?, ?, 0.00, 0.00)
-      `, [walletId, userId]);
+      // Verifica se o email já existe (para casos de importação ou contas incompletas)
+      const existingEmailUser = await dbGet("SELECT id FROM users WHERE email = ?", [email]);
       
-      await dbRun("COMMIT");
-    } catch (e) {
-      await dbRun("ROLLBACK");
-      throw e;
-    }
+      // 2. Criptografa CPF
+      const cpfEnc = encrypt(cpf.replace(/[^\d]/g, ''));
+      const userId = existingEmailUser ? existingEmailUser.id : crypto.randomUUID();
+      const walletId = crypto.randomUUID();
+      
+      // 3. Transação ACID de Criação ou Atualização de Usuário + Carteira
+      await dbRun("BEGIN TRANSACTION");
+      try {
+        if (existingEmailUser) {
+          await dbRun(`
+            UPDATE users 
+            SET google_sub = ?, name = ?, cpf_hash = ?, cpf_encrypted = ?, cpf_iv = ?, cpf_auth_tag = ?, status = 'active', consent_accepted_at = ?
+            WHERE id = ?
+          `, [google_sub, name, cpfHash, cpfEnc.encryptedData, cpfEnc.iv, cpfEnc.authTag, new Date().toISOString(), userId]);
+          
+          // Verifica se já tem carteira, se não tiver, cria
+          const hasWallet = await dbGet("SELECT id FROM wallets WHERE user_id = ?", [userId]);
+          if (!hasWallet) {
+            await dbRun(`
+              INSERT INTO wallets (id, user_id, balance_available, balance_pending)
+              VALUES (?, ?, 0.00, 0.00)
+            `, [walletId, userId]);
+          }
+        } else {
+          await dbRun(`
+            INSERT INTO users (id, email, google_sub, name, cpf_hash, cpf_encrypted, cpf_iv, cpf_auth_tag, status, consent_accepted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
+          `, [userId, email, google_sub, name, cpfHash, cpfEnc.encryptedData, cpfEnc.iv, cpfEnc.authTag, new Date().toISOString()]);
+          
+          await dbRun(`
+            INSERT INTO wallets (id, user_id, balance_available, balance_pending)
+            VALUES (?, ?, 0.00, 0.00)
+          `, [walletId, userId]);
+        }
+        
+        await dbRun("COMMIT");
+      } catch (e) {
+        await dbRun("ROLLBACK");
+        throw e;
+      }
     
     const token = generateUserToken(userId);
     return res.status(201).json({ status: 'success', token, user: { id: userId, email, name, status: 'active' } });
