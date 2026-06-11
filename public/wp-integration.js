@@ -319,12 +319,12 @@
           <span>💬 Ganhe R$ 0,50 por seu comentário!</span>
         </div>
         <p class="commentpay-wp-desc">
-          Este artigo participa do programa de comentários qualificados. Conecte sua conta do <strong>Central Hub CommentPay</strong> antes de comentar para receber a recompensa diretamente na sua carteira.
+          Este artigo participa do programa de comentários qualificados. Conecte sua conta do <strong>Central Hub ComentariosLucrativos</strong> antes de comentar para receber a recompensa diretamente na sua carteira.
         </p>
         <div>
           <button type="button" class="commentpay-wp-btn" id="commentpay-connect-btn">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-3px;"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-            Conectar Carteira CommentPay
+            Conectar Carteira ComentariosLucrativos
           </button>
         </div>
       `;
@@ -332,7 +332,7 @@
     } else {
       banner.innerHTML = `
         <div class="commentpay-wp-title">
-          <span>✅ Carteira CommentPay Conectada!</span>
+          <span>✅ Carteira ComentariosLucrativos Conectada!</span>
         </div>
         <div class="commentpay-wp-connected">
           <div class="commentpay-wp-user-badge">

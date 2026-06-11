@@ -38,7 +38,7 @@ async function renderWidget() {
         <div class="commentpay-logged-out">
           <p><i class="fa-solid fa-lock text-purple"></i> Faça login utilizando sua conta do Central Hub para comentar e ser remunerado.</p>
           <button id="btn-widget-login" class="commentpay-btn">
-            <i class="fa-solid fa-comments-dollar"></i> Entrar com CommentPay
+            <i class="fa-solid fa-comments-dollar"></i> Entrar com ComentariosLucrativos
           </button>
         </div>
       </div>
