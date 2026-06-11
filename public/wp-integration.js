@@ -616,7 +616,7 @@
             <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span><br>X2</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span><br>X3</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span><br>X1</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>TENTE<br>NOVAMENTE</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span><br>X1</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(225deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span><br>X2</span></div>
@@ -678,7 +678,7 @@
             spinBtn.onclick = () => {
                spinBtn.disabled = true;
                spinBtn.innerText = 'GIRANDO...';
-               let newDeg = targetDeg + 360 * 10 + 45; // Vai para 180 (perda garantida)
+               let newDeg = targetDeg + 360 * 10 + 90; // Vai para 225 (NÃO FOI DESSA VEZ)
                wheel.style.transform = `rotate(-${newDeg}deg)`;
                setTimeout(() => {
                   resultText.style.color = '#ffcccc';
