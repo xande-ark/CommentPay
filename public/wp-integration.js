@@ -613,14 +613,14 @@
             <div class="commentpay-slice-line" style="transform: rotate(337.5deg);"></div>
             
             <!-- Texts -->
-            <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span>MULTI<br>POR 2</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span>MULTI<br>POR 3</span></div>
-            <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span>MULTI<br>POR 1</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span><br>X2</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span><br>X3</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span><br>X1</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span>MULTI<br>POR 1</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span><br>X1</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(225deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span>MULTI<br>POR 2</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(315deg);"><span>MULTI<br>POR 1</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span><br>X2</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(315deg);"><span><br>X1</span></div>
             
             <div class="commentpay-center-hub"></div>
           </div>
