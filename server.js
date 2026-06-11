@@ -294,9 +294,9 @@ app.post('/api/v1/auth/google/callback', async (req, res) => {
 
 // 2. Registro de CPF + Finalização de Cadastro
 app.post('/api/v1/auth/register-cpf', async (req, res) => {
-  const { email, name, google_sub, cpf, consent } = req.body;
+  const { credential, cpf, consent } = req.body;
   
-  if (!email || !name || !google_sub || !cpf) {
+  if (!credential || !cpf) {
     return res.status(400).json({ status: 'error', message: 'Campos obrigatórios ausentes.' });
   }
   
@@ -316,8 +316,28 @@ app.post('/api/v1/auth/register-cpf', async (req, res) => {
         return res.status(400).json({ status: 'error', code: 'DUPLICATE_CPF', message: 'Este CPF já está cadastrado em outra conta.' });
       }
       
+      let ticket;
+      try {
+        ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: "1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com",
+        });
+      } catch (jwtErr) {
+        return res.status(401).json({ status: 'error', message: 'Token do Google inválido ou expirado.' });
+      }
+      
+      const payload = ticket.getPayload();
+      const email = payload.email;
+      const name = payload.name;
+      const google_sub = payload.sub;
+
       // Verifica se o email já existe (para casos de importação ou contas incompletas)
-      const existingEmailUser = await dbGet("SELECT id FROM users WHERE email = ?", [email]);
+      const existingEmailUser = await dbGet("SELECT id, status FROM users WHERE email = ?", [email]);
+      
+      // Proteção de segurança: Não permitir alteração de CPF ou sub se a conta já estiver ativa
+      if (existingEmailUser && existingEmailUser.status === 'active') {
+          return res.status(400).json({ status: 'error', message: 'Esta conta já está ativa. Por favor, faça login novamente.' });
+      }
       
       // 2. Criptografa CPF
       const cpfEnc = encrypt(cpf.replace(/[^\d]/g, ''));
