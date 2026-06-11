@@ -483,7 +483,7 @@
           box-sizing: border-box !important;
         }
         .commentpay-minigame-modal {
-          background: linear-gradient(180deg, #990000 0%, #4a0000 100%);
+          background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
           border-radius: 20px; padding: 30px 20px;
           text-align: center; max-width: 380px; width: 90%;
           box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
@@ -499,16 +499,16 @@
         .commentpay-title {
           font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800;
           text-transform: uppercase; letter-spacing: 1px;
-          margin: 0 0 5px 0; color: #fff;
-          text-shadow: 2px 2px 0px #4a0000, 4px 4px 0px rgba(0,0,0,0.3);
+          margin: 0 0 5px 0; color: #ffd700;
+          text-shadow: 2px 2px 0px #0f172a, 4px 4px 0px rgba(0,0,0,0.3);
         }
         .commentpay-subtitle {
           font-size: 0.95rem; font-weight: 500; margin-bottom: 25px;
-          color: #ffcccc; font-family: 'Inter', sans-serif;
+          color: #f8fafc; font-family: 'Inter', sans-serif;
         }
         .commentpay-wheel-wrapper {
           position: relative; width: 260px; height: 260px; margin: 0 auto 30px auto;
-          border-radius: 50%; background: #330000; padding: 8px;
+          border-radius: 50%; background: #0f172a; padding: 8px;
           box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
         .commentpay-wheel-wrapper::before {
@@ -522,13 +522,13 @@
           background: conic-gradient(
             from -22.5deg,
             #ffd700 0deg 45deg,
-            #990000 45deg 90deg,
-            #cc0000 90deg 135deg,
-            #990000 135deg 180deg,
-            #cc0000 180deg 225deg,
-            #990000 225deg 270deg,
-            #cc0000 270deg 315deg,
-            #990000 315deg 360deg
+            #1e3a8a 45deg 90deg,
+            #ffffff 90deg 135deg,
+            #0f172a 135deg 180deg,
+            #1e3a8a 180deg 225deg,
+            #ffffff 225deg 270deg,
+            #0f172a 270deg 315deg,
+            #1e3a8a 315deg 360deg
           );
           box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
           transition: transform 10s cubic-bezier(0.2, 0.8, 0.1, 1);
@@ -542,7 +542,8 @@
           text-shadow: 1px 1px 2px rgba(0,0,0,0.8); letter-spacing: 0.5px;
           width: 60px; text-align: center; line-height: 1.1;
         }
-        .commentpay-slice.jackpot span { color: #451a03; text-shadow: none; font-size: 0.85rem; }
+        .commentpay-slice.text-dark span { color: #0f172a; text-shadow: none; font-size: 0.85rem; }
+        .commentpay-slice.text-gold span { color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
         .commentpay-slice-line {
           position: absolute; top: 0; left: 50%; width: 2px; height: 50%;
           background: rgba(0,0,0,0.15); transform-origin: bottom center;
@@ -550,8 +551,8 @@
         .commentpay-center-hub {
           position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
           width: 50px; height: 50px; border-radius: 50%;
-          background: radial-gradient(circle, #ff0000 0%, #990000 100%);
-          border: 4px solid #e2e8f0;
+          background: radial-gradient(circle, #3b82f6 0%, #1e3a8a 100%);
+          border: 4px solid #ffd700;
           box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.3);
           z-index: 10; display: flex; justify-content: center; align-items: center;
         }
@@ -566,17 +567,19 @@
           width: 100%; height: 100%; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
         }
         .commentpay-spin-btn {
-          background: linear-gradient(180deg, #ffd700 0%, #f59e0b 100%);
-          color: #451a03; padding: 18px; width: 100%; border: none; border-radius: 30px;
+          background: #3b82f6;
+          color: #ffffff; padding: 18px; width: 100%; border: none; border-radius: 30px;
           font-weight: 800; font-size: 1.2rem; cursor: pointer; font-family: 'Outfit', sans-serif;
-          text-transform: uppercase; box-shadow: 0 6px 0 #b45309, 0 10px 15px rgba(0,0,0,0.3);
+          text-transform: uppercase; 
+          box-shadow: 0 0 15px #3b82f6, inset 0 0 10px rgba(255,255,255,0.3);
+          text-shadow: 0 0 5px rgba(255,255,255,0.8);
           transition: transform 0.1s, box-shadow 0.1s; margin-top: 10px;
         }
         .commentpay-spin-btn:active {
-          transform: translateY(6px); box-shadow: 0 0 0 #b45309, 0 4px 5px rgba(0,0,0,0.3);
+          transform: scale(0.95); box-shadow: 0 0 5px #3b82f6;
         }
         .commentpay-spin-btn:disabled {
-          opacity: 0.7; cursor: not-allowed; transform: translateY(6px); box-shadow: 0 0 0 #b45309;
+          opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: 0 0 5px #3b82f6;
         }
       `;
       document.head.appendChild(style);
@@ -594,8 +597,8 @@
         <div class="commentpay-wheel-wrapper">
           <div class="commentpay-roulette-pointer">
             <svg viewBox="0 0 24 36" fill="white">
-              <path d="M12 36 L0 12 A12 12 0 0 1 24 12 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
-              <circle cx="12" cy="12" r="5" fill="#ef4444"/>
+              <path d="M12 36 L0 12 A12 12 0 0 1 24 12 Z" fill="#ffd700" stroke="#0f172a" stroke-width="1"/>
+              <circle cx="12" cy="12" r="5" fill="#3b82f6"/>
             </svg>
           </div>
           <div class="commentpay-roulette-container" id="commentpay-roulette-wheel">
@@ -610,14 +613,14 @@
             <div class="commentpay-slice-line" style="transform: rotate(337.5deg);"></div>
             
             <!-- Texts -->
-            <div class="commentpay-slice jackpot" style="transform: rotate(0deg);"><span>JACKPOT<br>2X</span></div>
-            <div class="commentpay-slice" style="transform: rotate(45deg);"><span>SEM BÔNUS</span></div>
-            <div class="commentpay-slice" style="transform: rotate(90deg);"><span>SUPER COINS</span></div>
-            <div class="commentpay-slice" style="transform: rotate(135deg);"><span>TENTE DE NOVO</span></div>
-            <div class="commentpay-slice" style="transform: rotate(180deg);"><span>NADA AQUI</span></div>
-            <div class="commentpay-slice" style="transform: rotate(225deg);"><span>BÔNUS GRÁTIS</span></div>
-            <div class="commentpay-slice" style="transform: rotate(270deg);"><span>QUASE LÁ</span></div>
-            <div class="commentpay-slice" style="transform: rotate(315deg);"><span>SEM PRÊMIO</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span>MULTI<br>POR 2</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span>MULTI<br>POR 3</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span>MULTI<br>POR 1</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span>MULTI<br>POR 1</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(225deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span>MULTI<br>POR 2</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(315deg);"><span>MULTI<br>POR 1</span></div>
             
             <div class="commentpay-center-hub"></div>
           </div>
