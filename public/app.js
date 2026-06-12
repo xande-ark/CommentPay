@@ -145,7 +145,7 @@ function showDashboard() {
         token: sessionToken,
         user: sessionUser
       }, '*');
-      window.close();
+      setTimeout(() => window.close(), 100);
       return;
     } catch (e) {
       console.error("Erro ao comunicar SSO para o site pai:", e);
