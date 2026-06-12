@@ -216,14 +216,6 @@
 
   // Listen for SSO messages from Central Hub
   window.addEventListener('message', function(event) {
-    try {
-      const originHost = new URL(event.origin).hostname.replace(/^www\./, '');
-      const hubHost = new URL(HUB_URL).hostname.replace(/^www\./, '');
-      if (!hubHost.includes(originHost) && !originHost.includes(hubHost)) return;
-    } catch (e) {
-      return; // Inválido
-    }
-
     if (event.data && event.data.type === 'SSO_SUCCESS') {
       token = event.data.token;
       user = event.data.user;
