@@ -215,13 +215,16 @@
   }
 
   // Listen for SSO messages from Central Hub
-  window.addEventListener('message', function(event) {
-    if (event.origin !== HUB_URL) {
-      // Just check if it's the Hub we expect
-      if (!HUB_URL.includes(event.origin)) return;
-    }
+    window.addEventListener('message', function(event) {
+      try {
+        const originHost = new URL(event.origin).hostname;
+        const hubHost = new URL(HUB_URL).hostname;
+        if (originHost !== hubHost) return;
+      } catch (e) {
+        return; // Inválido
+      }
 
-    if (event.data && event.data.type === 'SSO_SUCCESS') {
+      if (event.data && event.data.type === 'SSO_SUCCESS') {
       token = event.data.token;
       user = event.data.user;
       
@@ -236,16 +239,15 @@
       // Se tivermos um overlay de minigame aberto pedindo login, fecha ele e recarrega integration
       const overlay = document.getElementById('commentpay-minigame-overlay');
       if (overlay) overlay.remove();
-      
-      if (sessionStorage.getItem('pending_anonymous_spin')) {
-         sessionStorage.removeItem('pending_anonymous_spin');
-         // Silent real spin
-         fetch(`${HUB_URL}/api/v1/minigame/spin`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-             body: JSON.stringify({ domain: window.location.hostname, path: window.location.pathname })
-         }).then(() => initOrUpdateIntegration());
-      } else {
+            if (sessionStorage.getItem('pending_anonymous_spin')) {
+           sessionStorage.removeItem('pending_anonymous_spin');
+           // Silent real spin
+           fetch(`${HUB_URL}/api/v1/minigame/spin`, {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+               body: JSON.stringify({ domain: window.location.hostname, path: window.location.pathname })
+           }).catch(e => console.error(e)).finally(() => initOrUpdateIntegration());
+        } else {
         initOrUpdateIntegration();
       }
     }
