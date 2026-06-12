@@ -215,24 +215,44 @@
   }
 
   // Listen for SSO messages from Central Hub
-    window.addEventListener('message', function(event) {
-      try {
-        const originHost = new URL(event.origin).hostname;
-        const hubHost = new URL(HUB_URL).hostname;
-        if (originHost !== hubHost) return;
-      } catch (e) {
-        return; // Inválido
-      }
+  window.addEventListener('message', function(event) {
+    try {
+      const originHost = new URL(event.origin).hostname.replace(/^www\./, '');
+      const hubHost = new URL(HUB_URL).hostname.replace(/^www\./, '');
+      if (!hubHost.includes(originHost) && !originHost.includes(hubHost)) return;
+    } catch (e) {
+      return; // Inválido
+    }
 
-      if (event.data && event.data.type === 'SSO_SUCCESS') {
+    if (event.data && event.data.type === 'SSO_SUCCESS') {
       token = event.data.token;
       user = event.data.user;
       
-      localStorage.setItem('commentpay_token', token);
-      localStorage.setItem('commentpay_user', JSON.stringify(user));
+      try {
+        localStorage.setItem('commentpay_token', token);
+        localStorage.setItem('commentpay_user', JSON.stringify(user));
+      } catch (storageErr) {
+        console.warn('LocalStorage bloqueado, a sessão pode não persistir após recarregar.', storageErr);
+      }
       
       syncHiddenInput();
-      initOrUpdateIntegration();
+      
+      let hasPendingSpin = false;
+      try {
+        hasPendingSpin = sessionStorage.getItem('pending_anonymous_spin');
+        if (hasPendingSpin) sessionStorage.removeItem('pending_anonymous_spin');
+      } catch(e) {}
+
+      if (hasPendingSpin) {
+         // Silent real spin
+         fetch(`${HUB_URL}/api/v1/minigame/spin`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+             body: JSON.stringify({ domain: window.location.hostname, path: window.location.pathname })
+         }).catch(e => console.error(e)).finally(() => initOrUpdateIntegration());
+      } else {
+        initOrUpdateIntegration();
+      }
       
       console.log('[CommentPay] Conectado com sucesso!', user.name);
       
