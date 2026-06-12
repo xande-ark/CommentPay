@@ -222,8 +222,11 @@ function openSSOPopup() {
   // Ouve mensagem de sucesso enviada pelo Hub Central
   window.addEventListener('message', function receiveSSOMessage(event) {
     if (event.data && event.data.type === 'SSO_SUCCESS') {
-      localStorage.setItem('widget_session_token', event.data.token);
-      localStorage.setItem('widget_session_user', JSON.stringify(event.data.user));
+      widgetToken = event.data.token;
+      widgetUser = event.data.user;
+      
+      localStorage.setItem('widget_session_token', widgetToken);
+      localStorage.setItem('widget_session_user', JSON.stringify(widgetUser));
       
       const overlay = document.getElementById('commentpay-minigame-overlay');
       if (overlay) overlay.remove();
@@ -235,7 +238,7 @@ function openSSOPopup() {
              method: 'POST',
              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${widgetToken}` },
              body: JSON.stringify({ domain: window.location.hostname || 'localhost', path: window.location.pathname })
-         }).then(() => renderWidget());
+         }).catch(e => console.error(e)).finally(() => renderWidget());
       } else {
         renderWidget();
       }
