@@ -842,7 +842,7 @@ function commentpay_sync_moderation_status($new_status, $old_status, $comment) {
 add_action('wp_footer', 'commentpay_inject_integration_script');
 function commentpay_inject_integration_script() {
     // Carrega o script JavaScript que ativa o SSO e o banner de login
-    $script_url = COMMENTPAY_HUB_URL . '/wp-integration.js';
+    $script_url = COMMENTPAY_HUB_URL . '/wp-integration.js?v=' . time();
     ?>
     <` + `script>
         window.commentpayHubUrl = "<?php echo esc_url(COMMENTPAY_HUB_URL); ?>";
