@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Seguro - ComentariosLucrativos</title>
+  <link rel="icon" type="image/webp" href="/images/favicon.webp">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -221,7 +222,10 @@
   <!-- TELA DE LOGIN -->
   <div id="login-view">
     <div class="login-box">
-      <h2><i class="fa-solid fa-lock"></i> Acesso Restrito</h2>
+      <div style="text-align: center; margin-bottom: -55px;">
+        <img src="/images/logo.webp" alt="ComentariosLucrativos" style="width: 100%; max-width: 250px; height: auto;">
+      </div>
+      <h2 style="font-size: 1.25rem; margin-top: 0;"><i class="fa-solid fa-lock"></i> Acesso Restrito</h2>
       <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2rem;">Painel Administrativo do ComentariosLucrativos</p>
       
       <div class="form-group">
@@ -242,7 +246,7 @@
   <div id="dashboard-view" class="container">
     <header>
       <div>
-        <h1><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Central de Moderação</h1>
+        <h1 style="display: flex; align-items: center; gap: 12px;"><img src="/images/logo.webp" alt="ComentariosLucrativos" style="height: 36px; width: auto;"> <span style="font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); border-left: 2px solid var(--border-color); padding-left: 12px;"><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Central de Moderação</span></h1>
         <p style="color: var(--text-secondary); margin-top: 4px;">Gerencie Comentários e Saques</p>
       </div>
       <button id="btn-logout" class="btn" style="width: auto; background: var(--border-color); color: var(--text-secondary);"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
