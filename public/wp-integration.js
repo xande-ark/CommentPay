@@ -276,9 +276,9 @@
              method: 'POST',
              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
              body: JSON.stringify({ domain: window.location.hostname, path: window.location.pathname })
-         }).catch(e => console.error(e)).finally(() => initOrUpdateIntegration());
+         }).catch(e => console.error(e)).finally(() => window.location.reload());
       } else {
-        initOrUpdateIntegration();
+         window.location.reload();
       }
       
       console.log('[CommentPay] Conectado com sucesso!', user.name);

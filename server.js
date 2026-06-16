@@ -727,20 +727,25 @@ app.get('/api/v1/user/site-status', authMiddleware, async (req, res) => {
   }
 
   try {
+    let searchDomain = domain;
+    if (searchDomain.startsWith('www.')) {
+      searchDomain = searchDomain.substring(4);
+    }
+
     // Normalizar caminhos para checagem exata (com ou sem barra final)
     const stdPath = path.endsWith('/') ? path : `${path}/`;
     const altPath = path.endsWith('/') ? path.slice(0, -1) : path;
 
     let site = await dbGet(
       "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = ? OR blog_url = ?)", 
-      [domain, stdPath, altPath]
+      [searchDomain, stdPath, altPath]
     );
 
     // Se não encontrou o caminho específico, tenta o fallback para a Página Principal do domínio (onde blog_url é '/' ou vazio ou null)
     if (!site) {
       site = await dbGet(
         "SELECT id FROM peripheral_sites WHERE domain = ? AND (blog_url = '/' OR blog_url = '' OR blog_url IS NULL)",
-        [domain]
+        [searchDomain]
       );
     }
 
