@@ -25,6 +25,26 @@
   if (isFromCommentPayLink) {
     sessionStorage.setItem('commentpay_active', '1');
   }
+
+  // Handling redirect fallback for SSO
+  if (urlParams.has('cp_token')) {
+    const fallbackToken = urlParams.get('cp_token');
+    const fallbackUserStr = urlParams.get('cp_user');
+    try {
+      if (fallbackToken && fallbackUserStr) {
+        const fallbackUser = JSON.parse(decodeURIComponent(fallbackUserStr));
+        localStorage.setItem('commentpay_token', fallbackToken);
+        localStorage.setItem('commentpay_user', JSON.stringify(fallbackUser));
+        sessionStorage.setItem('commentpay_active', '1');
+      }
+      
+      // Clean up URL
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('cp_token');
+      cleanUrl.searchParams.delete('cp_user');
+      window.history.replaceState({}, document.title, cleanUrl.pathname + cleanUrl.search);
+    } catch(e) {}
+  }
   
   let token = localStorage.getItem('commentpay_token') || null;
   let user = null;
@@ -214,15 +234,18 @@
     const left = (window.innerWidth - width) / 2;
     const top = (window.innerHeight - height) / 2;
     
+    const returnUrl = encodeURIComponent(window.location.href);
+    
     // Open Central Hub in a popup window
     const popup = window.open(
-      `${HUB_URL}/dashboard`,
+      `${HUB_URL}/dashboard?sso_return=${returnUrl}`,
       'CommentPaySSO',
       `width=${width},height=${height},top=${top},left=${left},scrollbars=yes`
     );
 
     if (!popup) {
-      alert('Por favor, libere os popups neste site para conectar com a CommentPay.');
+      // Fallback direto se popup for bloqueado completamente
+      window.location.href = `${HUB_URL}/dashboard?sso_return=${returnUrl}`;
     }
   }
 

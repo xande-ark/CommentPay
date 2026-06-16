@@ -137,8 +137,15 @@ function showRegister() {
 }
 
 function showDashboard() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ssoReturn = urlParams.get('sso_return') || sessionStorage.getItem('sso_return');
+  
+  if (ssoReturn) {
+    sessionStorage.setItem('sso_return', ssoReturn); // Persiste caso haja redirecionamentos internos
+  }
+
   // Se for um popup de SSO, avisa o site pai e fecha
-  if (window.opener) {
+  if (window.opener && window.opener !== window) {
     try {
       window.opener.postMessage({
         type: 'SSO_SUCCESS',
@@ -149,6 +156,21 @@ function showDashboard() {
       return;
     } catch (e) {
       console.error("Erro ao comunicar SSO para o site pai:", e);
+    }
+  } 
+  
+  // Fallback: Se o opener foi perdido (mobile/safari) ou é fallback de redirect
+  if (window.name === 'CommentPaySSO' || ssoReturn) {
+    if (ssoReturn) {
+      try {
+        const returnUrl = new URL(ssoReturn);
+        returnUrl.searchParams.set('cp_token', sessionToken);
+        returnUrl.searchParams.set('cp_user', encodeURIComponent(JSON.stringify(sessionUser)));
+        window.location.href = returnUrl.toString();
+        return;
+      } catch (e) {
+        console.error("URL de retorno inválida:", e);
+      }
     }
   }
 
