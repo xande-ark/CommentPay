@@ -100,7 +100,8 @@ function isTokenExpired(token) {
   if (!token) return true;
   try {
     const payloadB64 = token.split('.')[1];
-    const payload = JSON.parse(atob(payloadB64));
+    const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
     return (payload.exp * 1000) < Date.now();
   } catch (e) {
     return true;
@@ -195,7 +196,7 @@ function showDashboard() {
   registerView.classList.add('hidden');
   dashboardView.classList.remove('hidden');
   
-  userDisplayName.textContent = sessionUser.name;
+  userDisplayName.textContent = sessionUser.name ? sessionUser.name.split(' ')[0] : sessionUser.email;
   fetchWalletData();
   
   // Inicia um polling leve para atualizar saldos (a cada 6 segundos)

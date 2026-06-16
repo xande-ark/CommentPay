@@ -38,10 +38,12 @@
                data-client_id="1081514821662-nj1oankja03vijqvccb0fbl25rt6vmdk.apps.googleusercontent.com"
                data-context="signin"
                data-ux_mode="redirect"
-               data-login_uri="https://comment-pay.vercel.app/api/v1/auth/google/callback"
                data-auto_prompt="true"
                data-itp_support="true">
           </div>
+          <script>
+            document.getElementById('g_id_onload').setAttribute('data-login_uri', window.location.origin + '/api/v1/auth/google/callback');
+          </script>
           <div class="g_id_signin"
                data-type="standard"
                data-shape="rectangular"
