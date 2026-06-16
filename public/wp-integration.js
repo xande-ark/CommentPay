@@ -3,8 +3,20 @@
  * This script runs client-side on the WordPress blog post page.
  */
 (function() {
-  // Define Hub URL - dynamically read from global variable or default to local/tunnel endpoint
-  const HUB_URL = window.commentpayHubUrl || 'https://8283eba5b1a8c5fe-138-219-202-201.serveousercontent.com';
+  // Define Hub URL - dynamically read from script tag or fallback to localhost
+  let HUB_URL = window.commentpayHubUrl;
+  if (!HUB_URL) {
+    const currentScript = document.currentScript;
+    if (currentScript && currentScript.src) {
+      try {
+        HUB_URL = new URL(currentScript.src).origin;
+      } catch (e) {
+        HUB_URL = 'http://localhost:3000';
+      }
+    } else {
+      HUB_URL = 'http://localhost:3000';
+    }
+  }
   
   // Check Activation (only show if referred from CommentPay or already logged in)
   const urlParams = new URLSearchParams(window.location.search);
