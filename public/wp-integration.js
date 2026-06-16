@@ -4,19 +4,7 @@
  */
 (function() {
   // Define Hub URL - dynamically read from script tag or fallback to localhost
-  let HUB_URL = window.commentpayHubUrl;
-  if (!HUB_URL) {
-    const currentScript = document.currentScript;
-    if (currentScript && currentScript.src) {
-      try {
-        HUB_URL = new URL(currentScript.src).origin;
-      } catch (e) {
-        HUB_URL = 'http://localhost:3000';
-      }
-    } else {
-      HUB_URL = 'http://localhost:3000';
-    }
-  }
+  let HUB_URL = 'https://comentarioslucrativos.com';
   
   // Check Activation (only show if referred from CommentPay or already logged in)
   const urlParams = new URLSearchParams(window.location.search);
@@ -97,23 +85,7 @@
   
   backBtn.onclick = (e) => {
     e.preventDefault();
-    try {
-      const hubHostname = new URL(HUB_URL).hostname;
-      const isFromDashboard = document.referrer && document.referrer.includes(hubHostname);
-      
-      if (isFromDashboard && window.history.length > 1) {
-        window.history.back();
-      } else if (window.opener) {
-        window.close();
-        setTimeout(() => {
-          window.location.href = `${HUB_URL}/dashboard`;
-        }, 500);
-      } else {
-        window.location.href = `${HUB_URL}/dashboard`;
-      }
-    } catch (err) {
-      window.location.href = `${HUB_URL}/dashboard`;
-    }
+    window.location.href = `${HUB_URL}/dashboard`;
   };
   
   document.body.appendChild(backBtn);
