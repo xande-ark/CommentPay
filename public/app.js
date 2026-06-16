@@ -160,20 +160,6 @@ function showDashboard() {
   if (ssoReturn) {
     sessionStorage.setItem('sso_return', ssoReturn); // Persiste caso haja redirecionamentos internos
   }
-  
-  const manualReturnUrl = urlParams.get('return_url') || sessionStorage.getItem('return_url');
-  if (manualReturnUrl) {
-    sessionStorage.setItem('return_url', manualReturnUrl);
-    const returnBanner = document.getElementById('return-banner');
-    const btnReturnSite = document.getElementById('btn-return-site');
-    if (returnBanner && btnReturnSite) {
-      returnBanner.classList.remove('hidden');
-      btnReturnSite.onclick = () => {
-        // Redireciona de volta ao site sem tokens, apenas volta
-        window.location.href = manualReturnUrl;
-      };
-    }
-  }
 
   // Se for um popup de SSO, avisa o site pai e fecha
   if (window.opener && window.opener !== window) {
@@ -205,12 +191,11 @@ function showDashboard() {
     }
   }
 
-  // Exibe a interface
   authView.classList.add('hidden');
   registerView.classList.add('hidden');
   dashboardView.classList.remove('hidden');
   
-  userDisplayName.textContent = sessionUser.name.split(' ')[0] || sessionUser.email;
+  userDisplayName.textContent = sessionUser.name;
   fetchWalletData();
   
   // Inicia um polling leve para atualizar saldos (a cada 6 segundos)

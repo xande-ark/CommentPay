@@ -55,6 +55,70 @@
     console.error('[CommentPay] Error parsing user details:', e);
   }
 
+  // ----------------------------------------------------
+  // INJETAR BOTÃO GLOBAL DE VOLTAR AO PAINEL
+  // ----------------------------------------------------
+  const globalStyle = document.createElement('style');
+  globalStyle.innerHTML = `
+    .commentpay-global-back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #0f172a;
+      color: #ffffff !important;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 9999999;
+      transition: all 0.3s ease;
+    }
+    .commentpay-global-back-btn:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+    }
+    .commentpay-global-back-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+  `;
+  document.head.appendChild(globalStyle);
+
+  const backBtn = document.createElement('a');
+  backBtn.href = `${HUB_URL}/dashboard`;
+  backBtn.className = 'commentpay-global-back-btn';
+  backBtn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Voltar ao Painel';
+  
+  backBtn.onclick = (e) => {
+    e.preventDefault();
+    try {
+      const hubHostname = new URL(HUB_URL).hostname;
+      const isFromDashboard = document.referrer && document.referrer.includes(hubHostname);
+      
+      if (isFromDashboard && window.history.length > 1) {
+        window.history.back();
+      } else if (window.opener) {
+        window.close();
+        setTimeout(() => {
+          window.location.href = `${HUB_URL}/dashboard`;
+        }, 500);
+      } else {
+        window.location.href = `${HUB_URL}/dashboard`;
+      }
+    } catch (err) {
+      window.location.href = `${HUB_URL}/dashboard`;
+    }
+  };
+  
+  document.body.appendChild(backBtn);
+  // ----------------------------------------------------
+
   const isActiveSession = sessionStorage.getItem('commentpay_active') === '1';
   
   if (!isActiveSession) {
@@ -161,21 +225,6 @@
     .commentpay-wp-logout:hover {
       color: #ef4444;
     }
-    .commentpay-wp-dashboard-btn {
-      font-size: 0.75rem;
-      color: #ffffff;
-      background: #16a34a;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 12px;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .commentpay-wp-dashboard-btn:hover {
-      background: #15803d;
-    }
     .commentpay-wp-floating-badge {
       position: fixed;
       bottom: 20px;
@@ -260,26 +309,6 @@
 
     if (!popup) {
       // Fallback direto se popup for bloqueado completamente
-      window.location.href = `${HUB_URL}/dashboard?sso_return=${returnUrl}`;
-    }
-  }
-
-  // Helper to open the Dashboard
-  function openDashboard() {
-    const width = 600;
-    const height = 720;
-    const left = (window.innerWidth - width) / 2;
-    const top = (window.innerHeight - height) / 2;
-    
-    const returnUrl = encodeURIComponent(window.location.href);
-    
-    const popup = window.open(
-      `${HUB_URL}/dashboard?sso_return=${returnUrl}`,
-      'CommentPayDashboard',
-      `width=${width},height=${height},top=${top},left=${left},scrollbars=yes`
-    );
-
-    if (!popup) {
       window.location.href = `${HUB_URL}/dashboard?sso_return=${returnUrl}`;
     }
   }
@@ -445,7 +474,6 @@
             <span style="font-size: 0.8rem; color: #10b981; font-weight:600; margin-right: 12px;">
               ${siteStatus && siteStatus.active_bonus > 1.0 ? `🔥 + R$ ${(0.50 * siteStatus.active_bonus).toFixed(2).replace('.',',')} ao comentar (Bônus 2x)` : `+ R$ 0,50 ao comentar`}
             </span>
-            <button type="button" class="commentpay-wp-dashboard-btn" id="commentpay-dashboard-btn">Acessar Painel</button>
             <button type="button" class="commentpay-wp-logout" id="commentpay-disconnect-btn">Desconectar</button>
           </div>
         </div>
@@ -454,7 +482,6 @@
         </p>
       `;
       document.getElementById('commentpay-disconnect-btn').addEventListener('click', disconnect);
-      document.getElementById('commentpay-dashboard-btn').addEventListener('click', openDashboard);
     }
 
     // 4. Inject Floating Badge
