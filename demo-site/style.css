@@ -7,8 +7,8 @@
   --text-sub: #475569;
   --text-muted: #64748b;
   
-  --purple: #2563eb;
-  --purple-glow: rgba(37, 99, 235, 0.2);
+  --primary: #16a34a;
+  --primary-glow: rgba(22, 163, 74, 0.2);
   --cyan: #0284c7;
   --cyan-glow: rgba(2, 132, 199, 0.2);
   
@@ -82,7 +82,7 @@ body {
 }
 
 .blog-nav a.hub-link {
-  color: var(--purple);
+  color: var(--primary);
   font-weight: 600;
   border: 1px solid rgba(139, 92, 246, 0.3);
   padding: 6px 12px;
@@ -93,7 +93,7 @@ body {
 .blog-nav a.hub-link:hover {
   background: rgba(139, 92, 246, 0.15);
   color: #fff;
-  box-shadow: 0 0 12px var(--purple-glow);
+  box-shadow: 0 0 12px var(--primary-glow);
 }
 
 .blog-nav a.admin-link {
@@ -183,7 +183,7 @@ body {
 }
 
 .article-content blockquote {
-  border-left: 4px solid var(--purple);
+  border-left: 4px solid var(--primary);
   padding: 10px 20px;
   margin: 30px 0;
   background: rgba(37, 99, 235, 0.05);
@@ -226,7 +226,7 @@ body {
 }
 
 .promo-badge {
-  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-hover) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
@@ -280,7 +280,7 @@ body {
 }
 
 .user-info strong {
-  color: var(--purple);
+  color: var(--primary);
 }
 
 .btn-disconnect {
@@ -318,7 +318,7 @@ body {
 
 .commentpay-textarea:focus {
   outline: none;
-  border-color: var(--purple);
+  border-color: var(--primary);
 }
 
 .char-counter {
@@ -353,7 +353,7 @@ body {
 }
 
 .commentpay-btn {
-  background-color: var(--purple);
+  background-color: var(--primary);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -418,7 +418,7 @@ body {
 }
 
 .text-blue { color: var(--cyan); }
-.text-purple { color: var(--purple); }
+.text-purple { color: var(--primary); }
 .hidden { display: none !important; }
 
 /* --- BLOG FOOTER --- */

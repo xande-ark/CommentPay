@@ -65,7 +65,7 @@
     .commentpay-wp-title {
       font-size: 0.95rem;
       font-weight: 700;
-      color: #2563eb;
+      color: #16a34a;
       margin-top: 0;
       margin-bottom: 8px;
       display: flex;
@@ -79,7 +79,7 @@
       line-height: 1.4;
     }
     .commentpay-wp-btn {
-      background: #2563eb;
+      background: #16a34a;
       border: none;
       color: white;
       padding: 8px 16px;
@@ -95,7 +95,7 @@
     .commentpay-wp-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      background: #1d4ed8;
+      background: #15803d;
     }
     .commentpay-wp-connected {
       display: flex;
@@ -182,7 +182,7 @@
     .commentpay-minigame-close:hover { color: #0f172a; }
     .commentpay-roulette-container {
       width: 200px; height: 200px; margin: 20px auto;
-      border-radius: 50%; border: 5px solid #2563eb;
+      border-radius: 50%; border: 5px solid #16a34a;
       position: relative; overflow: hidden;
       background: conic-gradient(#fcd34d 0deg 18deg, #e2e8f0 18deg 360deg);
       transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
