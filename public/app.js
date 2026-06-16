@@ -96,6 +96,17 @@ regCpfInput.addEventListener('input', (e) => {
 });
 
 // --- INICIALIZAÇÃO ---
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payloadB64 = token.split('.')[1];
+    const payload = JSON.parse(atob(payloadB64));
+    return payload.exp < Date.now();
+  } catch (e) {
+    return true;
+  }
+}
+
 function init() {
   // Update tokens if they were just set by redirect script
   sessionToken = localStorage.getItem('cp_session_token') || null;
@@ -115,9 +126,15 @@ function init() {
     }
   }
 
-  if (sessionToken && sessionUser) {
+  if (sessionToken && sessionUser && !isTokenExpired(sessionToken)) {
     showDashboard();
   } else {
+    if (sessionToken) {
+      localStorage.removeItem('cp_session_token');
+      localStorage.removeItem('cp_session_user');
+      sessionToken = null;
+      sessionUser = null;
+    }
     showAuth();
   }
 }
