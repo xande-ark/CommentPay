@@ -99,10 +99,12 @@ regCpfInput.addEventListener('input', (e) => {
 function isTokenExpired(token) {
   if (!token) return true;
   try {
-    const payloadB64 = token.split('.')[1];
+    const payloadB64 = token.split('.')[0]; // Nosso token tem o payload no índice 0
     const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(atob(base64));
-    return (payload.exp * 1000) < Date.now();
+    let padded = base64;
+    while (padded.length % 4) padded += '=';
+    const payload = JSON.parse(atob(padded));
+    return payload.exp < Date.now();
   } catch (e) {
     return true;
   }
