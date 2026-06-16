@@ -679,7 +679,7 @@ function renderSitesList(sites) {
         `;
       } else {
         actionBtn = `
-          <a href="${targetUrl}" target="_blank" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+          <a href="${targetUrl}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
             <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem;"></i> Acessar
           </a>
         `;
