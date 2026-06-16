@@ -161,6 +161,21 @@
     .commentpay-wp-logout:hover {
       color: #ef4444;
     }
+    .commentpay-wp-dashboard-btn {
+      font-size: 0.75rem;
+      color: #ffffff;
+      background: #16a34a;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .commentpay-wp-dashboard-btn:hover {
+      background: #15803d;
+    }
     .commentpay-wp-floating-badge {
       position: fixed;
       bottom: 20px;
@@ -245,6 +260,26 @@
 
     if (!popup) {
       // Fallback direto se popup for bloqueado completamente
+      window.location.href = `${HUB_URL}/dashboard?sso_return=${returnUrl}`;
+    }
+  }
+
+  // Helper to open the Dashboard
+  function openDashboard() {
+    const width = 600;
+    const height = 720;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+    
+    const returnUrl = encodeURIComponent(window.location.href);
+    
+    const popup = window.open(
+      `${HUB_URL}/dashboard?sso_return=${returnUrl}`,
+      'CommentPayDashboard',
+      `width=${width},height=${height},top=${top},left=${left},scrollbars=yes`
+    );
+
+    if (!popup) {
       window.location.href = `${HUB_URL}/dashboard?sso_return=${returnUrl}`;
     }
   }
@@ -410,6 +445,7 @@
             <span style="font-size: 0.8rem; color: #10b981; font-weight:600; margin-right: 12px;">
               ${siteStatus && siteStatus.active_bonus > 1.0 ? `🔥 + R$ ${(0.50 * siteStatus.active_bonus).toFixed(2).replace('.',',')} ao comentar (Bônus 2x)` : `+ R$ 0,50 ao comentar`}
             </span>
+            <button type="button" class="commentpay-wp-dashboard-btn" id="commentpay-dashboard-btn">Acessar Painel</button>
             <button type="button" class="commentpay-wp-logout" id="commentpay-disconnect-btn">Desconectar</button>
           </div>
         </div>
@@ -418,6 +454,7 @@
         </p>
       `;
       document.getElementById('commentpay-disconnect-btn').addEventListener('click', disconnect);
+      document.getElementById('commentpay-dashboard-btn').addEventListener('click', openDashboard);
     }
 
     // 4. Inject Floating Badge
