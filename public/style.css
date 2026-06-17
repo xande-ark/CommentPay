@@ -1280,3 +1280,12 @@ tr:last-child td {
     border-bottom: 0;
   }
 }
+
+/* --- HACK JIVOCHAT MOBILE (Reduzir tamanho) --- */
+@media screen and (max-width: 768px) {
+  body > jdiv, 
+  #jivo-iframe-container {
+    transform: scale(0.5) !important;
+    transform-origin: bottom right !important;
+  }
+}

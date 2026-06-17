@@ -430,3 +430,12 @@ body {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* --- HACK JIVOCHAT MOBILE (Reduzir tamanho) --- */
+@media screen and (max-width: 768px) {
+  body > jdiv, 
+  #jivo-iframe-container {
+    transform: scale(0.5) !important;
+    transform-origin: bottom right !important;
+  }
+}
