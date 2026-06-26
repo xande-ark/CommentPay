@@ -816,7 +816,17 @@ app.post('/api/v1/minigame/spin', authMiddleware, async (req, res) => {
 
     // Sorteio: TEMPORARIAMENTE 100% de chance para você testar (depois voltamos para 5%)
     const chance = Math.random() * 100;
-    const multiplier = chance <= 100 ? 2.0 : 1.0;
+    
+    let multiplier = 1.0;
+    if (chance < 0) { // 0% de chance
+      multiplier = 10.0;
+    } else if (chance < 0) { // 0% de chance
+      multiplier = 5.0;
+    } else if (chance <= 100) {
+      multiplier = 2.0;
+    } else {
+      multiplier = 1.0;
+    }
 
     await dbRun(`
       INSERT INTO active_multipliers (user_id, site_id, multiplier, is_used)

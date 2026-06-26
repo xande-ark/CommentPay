@@ -700,12 +700,12 @@
             <!-- Texts -->
             <div class="commentpay-slice text-dark" style="transform: rotate(0deg);"><span><br>X2</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(45deg);"><span><br>X3</span></div>
-            <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span><br>X1</span></div>
+            <div class="commentpay-slice text-dark" style="transform: rotate(90deg);"><span><br>X5</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(135deg);"><span>TENTE<br>DE NOVO</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span><br>X1</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(180deg);"><span>TENTE<br>DE NOVO</span></div>
             <div class="commentpay-slice text-dark" style="transform: rotate(225deg);"><span>NÃO FOI<br>DESSA VEZ</span></div>
             <div class="commentpay-slice text-gold" style="transform: rotate(270deg);"><span><br>X2</span></div>
-            <div class="commentpay-slice text-gold" style="transform: rotate(315deg);"><span><br>X1</span></div>
+            <div class="commentpay-slice text-gold" style="transform: rotate(315deg);"><span><br>X10</span></div>
             
             <div class="commentpay-center-hub"></div>
           </div>
@@ -811,7 +811,9 @@
           let baseTurns = Math.abs(currentRotation) + (360 * 10);
           
           let targetDeg = 0;
-          if (data.multiplier === 2.0) targetDeg = baseTurns + 0;
+          if (data.multiplier === 10.0) targetDeg = baseTurns + 315;
+          else if (data.multiplier === 5.0) targetDeg = baseTurns + 90;
+          else if (data.multiplier === 2.0) targetDeg = baseTurns + 0;
           else if (data.multiplier === -1) targetDeg = baseTurns + 135;
           else targetDeg = baseTurns + 180;
           

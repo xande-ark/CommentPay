@@ -478,12 +478,12 @@ function showMinigameModal() {
           <!-- Texts -->
           <div class="commentpay-slice jackpot" style="transform: rotate(0deg);"><span>JACKPOT<br>2X</span></div>
           <div class="commentpay-slice" style="transform: rotate(45deg);"><span>SEM BÔNUS</span></div>
-          <div class="commentpay-slice" style="transform: rotate(90deg);"><span>SUPER COINS</span></div>
+          <div class="commentpay-slice jackpot" style="transform: rotate(90deg);"><span>JACKPOT<br>5X</span></div>
           <div class="commentpay-slice" style="transform: rotate(135deg);"><span>TENTE DE NOVO</span></div>
           <div class="commentpay-slice" style="transform: rotate(180deg);"><span>NADA AQUI</span></div>
           <div class="commentpay-slice" style="transform: rotate(225deg);"><span>BÔNUS GRÁTIS</span></div>
           <div class="commentpay-slice" style="transform: rotate(270deg);"><span>QUASE LÁ</span></div>
-          <div class="commentpay-slice" style="transform: rotate(315deg);"><span>SEM PRÊMIO</span></div>
+          <div class="commentpay-slice jackpot" style="transform: rotate(315deg);"><span>JACKPOT<br>10X</span></div>
           
           <div class="commentpay-center-hub"></div>
         </div>
@@ -578,7 +578,9 @@ function showMinigameModal() {
         let baseTurns = Math.abs(currentRotation) + (360 * 10);
         
         let targetDeg = 0;
-        if (data.multiplier === 2.0) targetDeg = baseTurns + 0;
+        if (data.multiplier === 10.0) targetDeg = baseTurns + 315;
+        else if (data.multiplier === 5.0) targetDeg = baseTurns + 90;
+        else if (data.multiplier === 2.0) targetDeg = baseTurns + 0;
         else if (data.multiplier === -1) targetDeg = baseTurns + 135;
         else targetDeg = baseTurns + 180;
 
