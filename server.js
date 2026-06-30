@@ -67,7 +67,7 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos do dashboard e demo-site
 app.use(express.static('public'));
 
-app.get('/advertorial', (req, res) => {
+app.get('/economia-digital', (req, res) => {
   res.sendFile(require('path').join(__dirname, 'public', 'advertorial.html'));
 });
 
