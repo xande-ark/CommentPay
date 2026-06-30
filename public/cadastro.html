@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comentários Lucrativos — Ganhe Dinheiro Escrevendo Comentários | Cadastro Grátis</title>
+    <meta name="description" content="Plataforma gratuita onde você ganha dinheiro real via PIX escrevendo comentários em blogs. Cadastro em 2 minutos, sem custo.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-white: #0f172a;
+            --text-muted: #475569;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --border-subtle: rgba(0,0,0,0.08);
+            --gradient-hero: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Top Banner */
+        .top-banner {
+            background: linear-gradient(90deg, #00b341, #00d449, #00b341);
+            background-size: 200% 100%;
+            animation: banner-flow 4s ease-in-out infinite;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+        @keyframes banner-flow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Hero */
+        .hero {
+            background: var(--gradient-hero);
+            padding: 56px 0 48px;
+            text-align: center;
+            position: relative;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, var(--bg-dark));
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,212,73,0.1);
+            border: 1px solid rgba(0,212,73,0.25);
+            color: var(--accent-green);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 8px 20px;
+            border-radius: 24px;
+            margin-bottom: 28px;
+        }
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-green), #00ff5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto 36px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Signup Form */
+        .signup-card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid rgba(0,212,73,0.2);
+            border-radius: 20px;
+            padding: 36px 32px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 60px rgba(0,212,73,0.06), 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .signup-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .signup-card .sub {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px var(--accent-green-glow);
+        }
+        .form-group input::placeholder { color: #94a3b8; }
+
+        .signup-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00b341, #00d449);
+            color: white;
+            font-size: 17px;
+            font-weight: 800;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 32px var(--accent-green-glow);
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 48px rgba(0,179,65,0.5);
+        }
+        .signup-trust {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .signup-trust span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 40px 0;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--accent-green);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* How It Works */
+        .section {
+            padding: 60px 0;
+        }
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 48px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0,212,73,0.2);
+        }
+        .step-num {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-green), #00ff5e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--bg-dark);
+            margin: 0 auto 16px;
+        }
+        .step-card h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .step-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .step-card .step-price {
+            display: inline-block;
+            margin-top: 12px;
+            background: rgba(0,212,73,0.1);
+            color: var(--accent-green);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        /* Earnings Calculator */
+        .calc-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 40px 36px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .calc-title {
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .calc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .calc-row:last-child { border: none; }
+        .calc-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .calc-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .calc-slider {
+            width: 100%;
+            margin: 8px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.08);
+            outline: none;
+        }
+        .calc-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-green-glow);
+        }
+        .calc-result {
+            text-align: center;
+            padding: 24px;
+            background: rgba(0,212,73,0.06);
+            border: 1px solid rgba(0,212,73,0.15);
+            border-radius: 14px;
+            margin-top: 20px;
+        }
+        .calc-result-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .calc-result-value {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--accent-green);
+        }
+        .calc-result-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* PIX Grid */
+        .pix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+        .pix-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .pix-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            border-color: rgba(0,212,73,0.2);
+        }
+        .pix-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .pix-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+        }
+        .pix-user-name { font-size: 13px; font-weight: 600; }
+        .pix-user-loc { font-size: 11px; color: var(--text-muted); }
+        .pix-amount {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent-green);
+            margin-bottom: 2px;
+        }
+        .pix-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+        }
+        .testimonial-stars {
+            color: var(--accent-gold);
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .testimonial-text {
+            font-size: 14px;
+            color: #c0cfe0;
+            line-height: 1.7;
+            margin-bottom: 14px;
+            font-style: italic;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .testimonial-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+        }
+        .testimonial-name { font-weight: 600; font-size: 13px; }
+        .testimonial-detail { font-size: 11px; color: var(--text-muted); }
+
+        /* FAQ */
+        .faq-list { max-width: 640px; margin: 0 auto; }
+        .faq-item { border-bottom: 1px solid var(--border-subtle); }
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 22px 0;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: color 0.2s;
+        }
+        .faq-question:hover { color: var(--accent-green); }
+        .faq-arrow {
+            font-size: 20px;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+        }
+        .faq-item.open .faq-arrow { transform: rotate(45deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 22px; }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 60px 0 80px;
+            text-align: center;
+        }
+        .final-cta-box {
+            background: linear-gradient(135deg, #0a1628, #0d2147);
+            border: 1px solid rgba(0,212,73,0.15);
+            border-radius: 24px;
+            padding: 48px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .final-cta-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 70% 30%, rgba(0,212,73,0.06), transparent 50%);
+        }
+        .final-cta-box * { position: relative; z-index: 1; }
+
+        /* Footer */
+        .footer {
+            background: #030710;
+            border-top: 1px solid var(--border-subtle);
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        .footer a { color: var(--accent-blue); text-decoration: none; }
+
+        /* Floating CTA Mobile */
+        .floating-cta {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(5,10,18,0.95);
+            backdrop-filter: blur(16px);
+            padding: 12px 16px;
+            z-index: 1000;
+            border-top: 1px solid rgba(0,212,73,0.2);
+            text-align: center;
+        }
+        .floating-cta .signup-btn {
+            margin: 0;
+            font-size: 15px;
+            padding: 14px;
+        }
+
+        /* Counter */
+        .live-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 28px; }
+            .hero .subtitle { font-size: 15px; }
+            .steps-grid { grid-template-columns: 1fr 1fr; }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .pix-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .pix-amount { font-size: 20px; }
+            .stats-bar { gap: 24px; }
+            .stat-value { font-size: 26px; }
+            .signup-card { padding: 28px 20px; }
+            .calc-section { padding: 28px 20px; }
+            .calc-result-value { font-size: 32px; }
+            .final-cta-box { padding: 36px 20px; }
+            .floating-cta { display: block; }
+            .section-title { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-banner">
+        ✅ CADASTRO 100% GRATUITO — Comece a ganhar dinheiro com comentários hoje mesmo
+    </div>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                PLATAFORMA GRATUITA
+            </div>
+            <img src="logo.jpg" alt="Comentários Lucrativos" style="height: 160px; display: block; margin: 0 auto 24px auto; mix-blend-mode: multiply;">
+            <h1>
+                Ganhe Dinheiro Real<br>
+                <span class="highlight">Escrevendo Comentários</span><br>
+                em Blogs e Sites
+            </h1>
+            <p class="subtitle">Cadastro gratuito. Sem investimento. Ganhe de R$0,50 a R$5,00 por comentário. Saque via PIX quando quiser.</p>
+
+            <div class="signup-card">
+                <h3>Crie sua conta grátis</h3>
+                <p class="sub">Cadastro em 2 minutos — comece a ganhar hoje</p>
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label for="name">Nome completo</label>
+                        <input type="text" id="name" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" placeholder="seuemail@exemplo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">WhatsApp</label>
+                        <input type="tel" id="phone" placeholder="(11) 99999-9999" required>
+                    </div>
+                    <button type="submit" class="signup-btn">
+                        CRIAR MINHA CONTA GRÁTIS →
+                    </button>
+                </form>
+
+                <!-- MENSAGEM DE SUCESSO (Oculta por padrão) -->
+                <div id="successMessage" style="display: none; text-align: center; padding: 30px 10px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                    <h3 style="font-size: 24px; font-weight: 800; color: #10b981; margin-bottom: 12px;">Você está quase lá!</h3>
+                    <p style="font-size: 15px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px;">
+                        Seus dados foram salvos com sucesso.<br>
+                        Você está sendo redirecionado de forma segura para o site oficial do <strong>Comentários Lucrativos</strong>...
+                    </p>
+                    <div style="width: 40px; height: 40px; border: 4px solid rgba(16,185,129,0.2); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                </div>
+
+                <div class="signup-trust" id="signupTrust">
+                    <span>🔒 Dados protegidos</span>
+                    <span>✅ 100% gratuito</span>
+                    <span>💰 Saque via PIX</span>
+                </div>
+                <div class="live-counter">
+                    <span class="live-dot"></span>
+                    <span id="liveCount">284 pessoas se cadastraram hoje</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value" id="usersCount">15.847</div>
+            <div class="stat-label">Comentaristas ativos</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">R$ 0</div>
+            <div class="stat-label">Custo para você</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">R$0,50-5,00</div>
+            <div class="stat-label">Por comentário</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">PIX</div>
+            <div class="stat-label">Saque instantâneo</div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Como Funciona</h2>
+            <p class="section-subtitle">4 passos simples. Tudo gratuito. Comece em minutos.</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h4>Cadastre-se grátis</h4>
+                    <p>Crie sua conta com nome, email e CPF. Validamos sua identidade para garantir segurança.</p>
+                    <span class="step-price">Grátis</span>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h4>Escolha missões</h4>
+                    <p>No painel, veja sites disponíveis, o artigo para ler e quanto cada comentário paga.</p>
+                    <span class="step-price">R$0,50 — R$5,00</span>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h4>Comente</h4>
+                    <p>Leia o artigo e deixe um comentário sincero. 2-3 frases simples. Leva 2-3 minutos.</p>
+                    <span class="step-price">2-3 min</span>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <h4>Receba via PIX</h4>
+                    <p>Após aprovação (24-48h), saque direto na sua conta. PIX instantâneo, sem taxa.</p>
+                    <span class="step-price">Instantâneo</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Simule Seus Ganhos</h2>
+            <p class="section-subtitle">Arraste o slider para ver quanto você pode ganhar por mês</p>
+            <div class="calc-section">
+                <div class="calc-title">💰 Calculadora de Ganhos</div>
+                <div class="calc-row">
+                    <span class="calc-label">Horas por dia dedicadas:</span>
+                    <span class="calc-value" id="hoursDisplay">1 hora</span>
+                </div>
+                <input type="range" min="0.5" max="4" step="0.5" value="1" class="calc-slider" id="hoursSlider" oninput="updateCalc()">
+                <div class="calc-row">
+                    <span class="calc-label">Comentários por hora (média):</span>
+                    <span class="calc-value">~20</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Valor médio por comentário:</span>
+                    <span class="calc-value">R$ 0,50</span>
+                </div>
+                <div class="calc-result">
+                    <div class="calc-result-label">Ganho mensal estimado (30 dias)</div>
+                    <div class="calc-result-value" id="monthlyEarnings">R$ 300,00</div>
+                    <div class="calc-result-sub">*Baseado em 20 comentários/hora a R$0,50 médio</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof PIX -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Saques Reais dos Nossos Usuários</h2>
+            <p class="section-subtitle">Prints verificados de saques via PIX</p>
+            <div class="pix-grid">
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#f093fb,#f5576c);">AF</div>
+                        <div><div class="pix-user-name">Ana F.</div><div class="pix-user-loc">São Paulo, SP</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 42,50</div>
+                    <div class="pix-label">Saque semanal</div>
+                </div>
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#4facfe,#00f2fe);">MS</div>
+                        <div><div class="pix-user-name">Marcos S.</div><div class="pix-user-loc">Rio de Janeiro, RJ</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 135,00</div>
+                    <div class="pix-label">Saque mensal</div>
+                </div>
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#a18cd1,#fbc2eb);">PO</div>
+                        <div><div class="pix-user-name">Patrícia O.</div><div class="pix-user-loc">Belo Horizonte, MG</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 22,00</div>
+                    <div class="pix-label">Primeiro saque</div>
+                </div>
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#ffecd2,#fcb69f);">RC</div>
+                        <div><div class="pix-user-name">Roberto C.</div><div class="pix-user-loc">Curitiba, PR</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 180,00</div>
+                    <div class="pix-label">Acumulado 30 dias</div>
+                </div>
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#84fab0,#8fd3f4);">JL</div>
+                        <div><div class="pix-user-name">Juliana L.</div><div class="pix-user-loc">Recife, PE</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 65,00</div>
+                    <div class="pix-label">Saque quinzenal</div>
+                </div>
+                <div class="pix-card">
+                    <div class="pix-card-header">
+                        <div class="pix-avatar" style="background: linear-gradient(135deg,#fbc2eb,#a6c1ee);">DM</div>
+                        <div><div class="pix-user-name">Diego M.</div><div class="pix-user-loc">Fortaleza, CE</div></div>
+                    </div>
+                    <div class="pix-amount">R$ 31,50</div>
+                    <div class="pix-label">Saque semanal</div>
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 48px;">O Que Dizem Sobre Nós</h2>
+            <p class="section-subtitle">Depoimentos reais de quem já está usando</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"O melhor é que é gratuito de verdade. Não paguei nenhum centavo. Faço enquanto meus filhos estão na escola e já tirei mais de R$600 esse mês."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-av" style="background: linear-gradient(135deg,#f093fb,#f5576c);">CS</div>
+                        <div><div class="testimonial-name">Carla S.</div><div class="testimonial-detail">Dona de casa, 42 anos</div></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Achei que era golpe porque todos os outros pedem pra pagar. Esse não pediu nada. Testei, fiz 5 comentários e saquei R$22 pelo PIX na hora."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-av" style="background: linear-gradient(135deg,#4facfe,#00f2fe);">WS</div>
+                        <div><div class="testimonial-name">Wellington S.</div><div class="testimonial-detail">Motorista, 35 anos</div></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Uso entre as aulas. Em 30 minutos faço 10 comentários e tiro R$40-50. Paga meu almoço e meu Uber."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-av" style="background: linear-gradient(135deg,#84fab0,#8fd3f4);">LP</div>
+                        <div><div class="testimonial-name">Lucas P.</div><div class="testimonial-detail">Estudante, 22 anos</div></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Sou aposentada e minha neta me ensinou. Já comprei remédio e fiz compra do mês com o dinheiro dos comentários."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-av" style="background: linear-gradient(135deg,#a18cd1,#fbc2eb);">MJ</div>
+                        <div><div class="testimonial-name">Maria J.</div><div class="testimonial-detail">Aposentada, 63 anos</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Perguntas Frequentes</h2>
+            <p class="section-subtitle">Tire suas dúvidas antes de se cadastrar</p>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">É realmente gratuito?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Sim, 100% gratuito. Você não paga nada para se cadastrar, fazer missões ou sacar seus ganhos via PIX. Quem paga a plataforma são as empresas parceiras que precisam de comentários reais nos seus sites.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Não é golpe?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Não. A plataforma tem CNPJ registrado, exige validação de CPF e usa sistema Escrow (garantia financeira) — a mesma tecnologia do Mercado Livre. Você recebe quando o site confirma o comentário. E como é gratuito, você não tem nada a perder.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Preciso saber escrever bem?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Se sabe digitar no WhatsApp, sabe o suficiente. Os comentários são frases simples: "Adorei esse artigo! Vou testar a dica número 3." A plataforma oferece modelos prontos.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Por que empresas pagam por comentários?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Comentários reais ajudam sites a subir no Google (SEO). Mais visibilidade = mais clientes. Pagar R$5 por um comentário real é muito mais barato e efetivo do que outros métodos de marketing.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Quanto posso ganhar?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Cada missão paga R$0,50 a R$5,00 e leva 2-3 min. Dedicando 1h/dia, é possível ganhar uma boa renda extra mensal. Resultados variam conforme dedicação e disponibilidade de missões.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">É pirâmide? Preciso indicar pessoas?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Não. Seus ganhos vêm do seu trabalho — seus comentários. Existe programa de indicação opcional, mas não é obrigatório para ganhar.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Como funciona o saque?<span class="faq-arrow">+</span></button>
+                    <div class="faq-answer"><p>Via PIX, direto na sua conta. Quando o site aprova o comentário (24-48h), o valor fica disponível. PIX cai na hora, sem taxa.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <div class="final-cta-box">
+                <div style="display: inline-block; background: rgba(0,212,73,0.12); border: 1px solid rgba(0,212,73,0.25); color: var(--accent-green); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px;">
+                    ✅ 100% Gratuito
+                </div>
+                <h2 class="section-title" style="margin-bottom: 8px; color: var(--accent-green);">Comece a Ganhar Dinheiro Agora</h2>
+                <p style="color: var(--text-muted); margin-bottom: 28px; font-size: 16px;">
+                    Cadastro em 2 minutos. Sem cartão. Sem pegadinha.<br>
+                    Seus primeiros ganhos podem chegar hoje mesmo.
+                </p>
+                <button class="signup-btn" style="max-width: 400px;" onclick="document.getElementById('name').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                    CRIAR MINHA CONTA GRÁTIS →
+                </button>
+                <div class="live-counter" style="margin-top: 16px;">
+                    <span class="live-dot"></span>
+                    <span>+15 mil pessoas já estão ganhando</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating CTA Mobile -->
+    <div class="floating-cta" id="floatingCta">
+        <button class="signup-btn" onclick="document.getElementById('name').focus(); window.scrollTo({top: 0, behavior: 'smooth'});">
+            CADASTRAR GRÁTIS →
+        </button>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p><strong>Comentários Lucrativos</strong> — Todos os direitos reservados © 2026</p>
+            <p style="margin-top: 8px;">
+                <a href="#">Termos de Uso</a> • <a href="#">Política de Privacidade</a> • <a href="#">Contato</a>
+            </p>
+            <p style="margin-top: 16px; font-size: 11px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <em>Os resultados mencionados são baseados em relatos de usuários reais e podem variar de acordo com dedicação e disponibilidade de missões.</em>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // =============================================
+        // CONFIGURAÇÃO — ALTERE AQUI
+        // =============================================
+
+        // Cole aqui a URL do seu webhook (Google Sheets, Zapier, Make, etc.)
+        // Deixe vazio ('') para armazenar apenas localmente
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxOagnyHBhd1N0yYow7qfttFh6ihkF-__AlTEq1JbId8KUE13ejaSYaDB0Q3sUWFejU/exec';
+
+        // Cole aqui o link da API do WhatsApp (ex: Evolution API, Z-API, etc.)
+        // Deixe vazio ('') para não enviar mensagem automática
+        const WHATSAPP_API_URL = '';
+        const WHATSAPP_API_TOKEN = '';
+
+        // Mensagem automática de boas-vindas no WhatsApp
+        const WHATSAPP_WELCOME_MSG = `🎉 Bem-vindo(a) ao Comentários Lucrativos!
+
+Seu cadastro foi confirmado! 🚀
+
+Sua primeira missão já está disponível no painel:
+👉 https://www.comentarioslucrativos.com/dashboard
+
+Dica: comece com missões de R$3-5, leva 2-3 minutos cada.
+
+Qualquer dúvida, é só mandar mensagem aqui! 💬`;
+
+        // =============================================
+        // SISTEMA DE CAPTURA DE LEADS
+        // =============================================
+
+        // Captura UTMs da URL (para tracking de tráfego pago)
+        function getUTMs() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                utm_source: params.get('utm_source') || 'direto',
+                utm_medium: params.get('utm_medium') || '',
+                utm_campaign: params.get('utm_campaign') || '',
+                utm_content: params.get('utm_content') || '',
+                utm_term: params.get('utm_term') || '',
+                fbclid: params.get('fbclid') || '',
+                gclid: params.get('gclid') || '',
+                ref: params.get('ref') || ''
+            };
+        }
+
+        // Salva lead no localStorage
+        function saveLeadLocal(lead) {
+            const leads = JSON.parse(localStorage.getItem('cl_leads') || '[]');
+            leads.push(lead);
+            localStorage.setItem('cl_leads', JSON.stringify(leads));
+            
+            // Atualiza contador de leads
+            const stats = JSON.parse(localStorage.getItem('cl_stats') || '{"total":0,"today":0,"lastDate":""}');
+            const today = new Date().toISOString().split('T')[0];
+            if (stats.lastDate !== today) {
+                stats.today = 0;
+                stats.lastDate = today;
+            }
+            stats.total++;
+            stats.today++;
+            localStorage.setItem('cl_stats', JSON.stringify(stats));
+        }
+
+        // Envia lead para webhook (Google Sheets, Zapier, Make, etc.)
+        async function sendToWebhook(lead) {
+            if (!WEBHOOK_URL) return;
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lead),
+                    mode: 'no-cors'
+                });
+            } catch (err) {
+                console.warn('Webhook error (lead salvo localmente):', err);
+            }
+        }
+
+        // Envia mensagem de boas-vindas via WhatsApp API
+        async function sendWhatsAppWelcome(phone) {
+            if (!WHATSAPP_API_URL || !phone) return;
+            const cleanPhone = phone.replace(/\D/g, '');
+            const fullPhone = cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone;
+            try {
+                await fetch(WHATSAPP_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${WHATSAPP_API_TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        phone: fullPhone,
+                        message: WHATSAPP_WELCOME_MSG
+                    })
+                });
+            } catch (err) {
+                console.warn('WhatsApp API error:', err);
+            }
+        }
+
+        // Dispara evento do Meta Pixel (Lead)
+        function firePixelEvent(lead) {
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Lead', {
+                    content_name: 'Cadastro Comentários Lucrativos',
+                    content_category: 'signup',
+                    value: 0,
+                    currency: 'BRL'
+                });
+            }
+            // Google Ads conversion
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'conversion', {
+                    send_to: 'AW-XXXXXXX/YYYYYYY', // Substitua pelo seu ID
+                    value: 0,
+                    currency: 'BRL'
+                });
+            }
+            // TikTok Pixel
+            if (typeof ttq !== 'undefined') {
+                ttq.track('CompleteRegistration', {
+                    content_name: 'Cadastro CL'
+                });
+            }
+        }
+
+        // Máscara de telefone
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length > 6) {
+                v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+            } else if (v.length > 2) {
+                v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+            }
+            e.target.value = v;
+        });
+
+        // Calculator
+        function updateCalc() {
+            const hours = parseFloat(document.getElementById('hoursSlider').value);
+            const commentsPerHour = 20;
+            const avgValue = 0.50;
+            const monthly = hours * commentsPerHour * avgValue * 30;
+
+            let displayHours = hours === 0.5 ? '30 minutos' : (hours === 1 ? '1 hora' : hours + ' horas');
+            document.getElementById('hoursDisplay').textContent = displayHours;
+            document.getElementById('monthlyEarnings').textContent = 'R$ ' + monthly.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+        });
+
+        // =============================================
+        // HANDLER PRINCIPAL DE CADASTRO
+        // =============================================
+        function handleSignup(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            
+            if (!name || !email || !phone) return;
+
+            const btn = e.target.querySelector('.signup-btn');
+            btn.textContent = '⏳ PROCESSANDO...';
+            btn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+            btn.disabled = true;
+
+            // Monta objeto do lead
+            const utms = getUTMs();
+            const lead = {
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+                nome: name,
+                email: email,
+                whatsapp: phone,
+                data: new Date().toISOString(),
+                data_br: new Date().toLocaleString('pt-BR'),
+                pagina: window.location.pathname,
+                referrer: document.referrer || 'direto',
+                dispositivo: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+                navegador: navigator.userAgent.split(' ').pop(),
+                ...utms,
+                status: 'novo'
+            };
+
+            // 1. Salva localmente com segurança ANTES do redirect
+            saveLeadLocal(lead);
+
+            // 2. Envia para webhook (Google Sheets)
+            if (WEBHOOK_URL) {
+                try {
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(lead),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    });
+                } catch (err) {
+                    console.warn('Webhook error:', err);
+                }
+            }
+
+            // 3. Envia mensagem WhatsApp
+            sendWhatsAppWelcome(phone);
+
+            // 4. Dispara pixels de conversão
+            firePixelEvent(lead);
+
+            // 5. Esconde o form e mostra mensagem de sucesso
+            document.getElementById('signupForm').style.display = 'none';
+            const trust = document.getElementById('signupTrust');
+            if(trust) trust.style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+
+            // Faz scroll pra cima caso esteja no mobile para a pessoa ler a mensagem
+            window.scrollTo({ top: document.getElementById('successMessage').offsetTop - 100, behavior: 'smooth' });
+
+            // 6. Aguarda 3.5 segundos para a pessoa ler e salvar no localStorage e então redireciona
+            setTimeout(() => {
+                window.location.href = 'https://www.comentarioslucrativos.com/dashboard';
+            }, 3500);
+        }
+
+        // Live counter animation
+        let todayCount = 284;
+        setInterval(() => {
+            if (Math.random() > 0.6) {
+                todayCount++;
+                document.getElementById('liveCount').textContent = todayCount + ' pessoas se cadastraram hoje';
+            }
+        }, 8000);
+
+        // Show floating CTA on scroll (mobile)
+        if (window.innerWidth <= 768) {
+            window.addEventListener('scroll', () => {
+                const floatingEl = document.getElementById('floatingCta');
+                if (window.scrollY > 600) {
+                    floatingEl.style.display = 'block';
+                } else {
+                    floatingEl.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

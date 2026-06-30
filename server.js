@@ -67,6 +67,14 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos do dashboard e demo-site
 app.use(express.static('public'));
 
+app.get('/advertorial', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'advertorial.html'));
+});
+
+app.get('/cadastro', (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'public', 'cadastro.html'));
+});
+
 app.get('/api/debug-hmac', (req, res) => {
   res.json({
     hmacError: global.lastHmacError || { message: 'No HMAC error yet' },

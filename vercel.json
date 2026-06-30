@@ -35,6 +35,14 @@
       "dest": "/public/admin/index.html"
     },
     {
+      "src": "/cadastro",
+      "dest": "/public/cadastro.html"
+    },
+    {
+      "src": "/advertorial",
+      "dest": "/public/advertorial.html"
+    },
+    {
       "src": "/demo-site/(.*)",
       "dest": "/demo-site/$1"
     },

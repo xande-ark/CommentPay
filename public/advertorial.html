@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasileiros Estão Ganhando Até R$3.000/Mês Escrevendo Comentários — Entenda</title>
+    <meta name="description" content="Descubra como milhares de brasileiros estão ganhando renda extra escrevendo comentários simples em blogs e sites parceiros. Cadastro gratuito, saque via PIX.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #fafaf7;
+            --bg-article: #ffffff;
+            --text-body: #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --accent: #0066cc;
+            --accent-hover: #004d99;
+            --highlight-bg: #fffde6;
+            --highlight-border: #f0c800;
+            --cta-bg: linear-gradient(135deg, #00b341 0%, #00d449 100%);
+            --cta-hover: linear-gradient(135deg, #009e39 0%, #00b341 100%);
+            --border-light: #e8e8e8;
+            --shadow-soft: 0 2px 20px rgba(0,0,0,0.06);
+            --shadow-card: 0 4px 30px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Merriweather', Georgia, serif;
+            background-color: var(--bg-primary);
+            color: var(--text-body);
+            line-height: 1.85;
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .top-bar {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 8px 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .top-bar span { opacity: 0.7; }
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 3px solid #0066cc;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .navbar-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        .nav-logo span { color: #0066cc; }
+        .nav-category {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #0066cc;
+            background: #e8f0fe;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        .article-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        .article-meta {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .article-meta .category {
+            background: #0066cc;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .article-headline {
+            font-size: 36px;
+            line-height: 1.25;
+            font-weight: 900;
+            color: #0d0d0d;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .article-subtitle {
+            font-size: 20px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .author-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 36px;
+        }
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .author-info { font-family: 'Inter', sans-serif; }
+        .author-name { font-weight: 600; font-size: 15px; color: var(--text-body); }
+        .author-role { font-size: 13px; color: var(--text-muted); }
+
+        .article-body p {
+            margin-bottom: 24px;
+            text-align: justify;
+        }
+        .article-body h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #0d0d0d;
+            margin: 48px 0 20px;
+            line-height: 1.3;
+        }
+
+        .highlight-box {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
+            padding: 24px 28px;
+            margin: 32px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 16px;
+        }
+        .highlight-box strong { color: #b8860b; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 36px 0;
+        }
+        .stat-card {
+            background: #f0f7ff;
+            border: 1px solid #d0e3ff;
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0066cc;
+            display: block;
+        }
+        .stat-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            display: block;
+        }
+
+        .testimonial {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 36px 0;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+        .testimonial::before {
+            content: '"';
+            font-size: 72px;
+            color: #0066cc;
+            opacity: 0.15;
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        .testimonial-text {
+            font-style: italic;
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            padding-left: 8px;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .testimonial-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .testimonial-name {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-body);
+        }
+        .testimonial-detail {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .pix-proof {
+            background: #0d1117;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 32px 0;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .pix-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #8b949e;
+        }
+        .pix-icon {
+            width: 32px;
+            height: 32px;
+            background: #00b341;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .pix-entries { display: flex; flex-direction: column; gap: 12px; }
+        .pix-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: #161b22;
+            border-radius: 10px;
+            border: 1px solid #21262d;
+        }
+        .pix-entry-info { display: flex; flex-direction: column; gap: 2px; }
+        .pix-entry-desc { font-size: 14px; font-weight: 500; color: #e6edf3; }
+        .pix-entry-date { font-size: 11px; color: #8b949e; }
+        .pix-entry-value { font-size: 18px; font-weight: 700; color: #3fb950; }
+
+        .how-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 36px 0;
+            position: relative;
+        }
+        .how-step {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            position: relative;
+        }
+        .how-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 23px;
+            top: 60px;
+            bottom: 0;
+            width: 2px;
+            background: #d0e3ff;
+        }
+        .step-number {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            background: linear-gradient(135deg, #0066cc, #0088ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+            z-index: 1;
+        }
+        .step-content h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #0d0d0d;
+            margin-bottom: 6px;
+        }
+        .step-content p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* FREE BADGE */
+        .free-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #15803d;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #0a1628 0%, #0d2147 50%, #0a1628 100%);
+            border-radius: 20px;
+            padding: 48px 36px;
+            margin: 48px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(0,102,204,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(0,179,65,0.1) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .cta-section * { position: relative; z-index: 1; }
+        .cta-badge {
+            display: inline-block;
+            background: rgba(0,179,65,0.15);
+            border: 1px solid rgba(0,179,65,0.3);
+            color: #3fb950;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .cta-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .cta-subtitle {
+            font-size: 16px;
+            color: #8b949e;
+            margin-bottom: 32px;
+            font-style: normal;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--cta-bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 18px 48px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,179,65,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        .cta-button:hover {
+            background: var(--cta-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0,179,65,0.5);
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0,179,65,0.35); }
+            50% { box-shadow: 0 4px 35px rgba(0,179,65,0.55); }
+        }
+        .cta-trust {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #8b949e;
+            flex-wrap: wrap;
+        }
+        .cta-trust span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .share-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .share-btn:hover {
+            background: #0066cc;
+            color: white;
+            border-color: #0066cc;
+        }
+
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #0066cc, #00b341);
+            z-index: 9999;
+            transition: width 0.1s linear;
+        }
+
+        @media (max-width: 640px) {
+            .article-headline { font-size: 26px; }
+            .article-subtitle { font-size: 17px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .cta-section { padding: 36px 24px; }
+            .cta-title { font-size: 22px; }
+            .cta-button { font-size: 16px; padding: 16px 32px; }
+            .article-container { padding: 24px 16px 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <div class="top-bar">
+        <span>📰 Portal Economia Digital — Matérias sobre tecnologia, finanças e oportunidades online</span>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="nav-logo">Economia<span>Digital</span></div>
+            <div class="nav-category">💰 Renda Extra</div>
+        </div>
+    </nav>
+
+    <article class="article-container">
+        <div class="article-meta">
+            <span class="category">EXCLUSIVO</span>
+            <span id="articleDate"></span>
+            <span>⏱ 5 min de leitura</span>
+        </div>
+
+        <h1 class="article-headline">Brasileiros Estão Ganhando Até R$3.000/Mês Escrevendo Comentários em Blogs — E o Cadastro É Gratuito</h1>
+
+        <p class="article-subtitle">Uma nova plataforma gratuita conecta pessoas comuns a sites que pagam por comentários reais. Já são mais de 15 mil cadastrados no Brasil.</p>
+
+        <div class="author-box">
+            <div class="author-avatar">RM</div>
+            <div class="author-info">
+                <div class="author-name">Renata Machado</div>
+                <div class="author-role">Editora de Economia Digital • Jornalista especializada em mercado digital</div>
+            </div>
+        </div>
+
+        <div class="share-bar">
+            Compartilhar:
+            <button class="share-btn" title="Facebook">f</button>
+            <button class="share-btn" title="WhatsApp">W</button>
+            <button class="share-btn" title="Twitter">𝕏</button>
+            <button class="share-btn" title="Copiar link">🔗</button>
+        </div>
+
+        <div class="article-body">
+            <p><strong>O mercado de SEO movimenta mais de R$10 bilhões por ano no Brasil.</strong> E uma fatia crescente desse investimento está indo para um lugar inesperado: os bolsos de pessoas comuns que aceitam escrever comentários em blogs e sites corporativos.</p>
+
+            <p>O que parece bom demais para ser verdade já é realidade para milhares de brasileiros que utilizam a plataforma <strong>Comentários Lucrativos</strong> — e o melhor: <strong>o cadastro é 100% gratuito.</strong></p>
+
+            <div class="free-badge">✅ Cadastro gratuito — sem nenhum pagamento para começar</div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">R$10bi+</span>
+                    <span class="stat-label">Mercado de SEO no Brasil/ano</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">15.000+</span>
+                    <span class="stat-label">Comentaristas cadastrados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Gratuito para o usuário</span>
+                </div>
+            </div>
+
+            <h2>Por Que Empresas Pagam Por Comentários?</h2>
+
+            <p>Para entender esse fenômeno, é preciso entender como o Google decide quem aparece no topo das buscas. Entre dezenas de critérios, um dos mais importantes é o <strong>engajamento do usuário</strong> — e comentários reais são um sinal poderoso de que um conteúdo é relevante.</p>
+
+            <p>"Quando um artigo tem 30, 40 comentários de pessoas reais discutindo o assunto, o Google interpreta aquilo como conteúdo de alta qualidade", explica um especialista em SEO. "É por isso que empresas preferem pagar R$5 por um comentário real do que R$500 por um link patrocinado que dura 30 dias."</p>
+
+            <div class="highlight-box">
+                <strong>💡 Como você ganha:</strong> Empresas pagam a plataforma pelo serviço de engajamento. A plataforma repassa o valor para você por cada comentário aprovado. Você não paga nada em momento algum — o cadastro, as missões e os saques são 100% gratuitos.
+            </div>
+
+            <h2>Como Funciona na Prática</h2>
+
+            <div class="how-steps">
+                <div class="how-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Cadastro gratuito com CPF</h4>
+                        <p>Crie sua conta em 2 minutos. A plataforma valida seu CPF para garantir que todos são pessoas reais. <strong>Não paga nada.</strong></p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Escolha suas missões</h4>
+                        <p>No painel, veja as missões disponíveis: qual site, qual artigo e quanto paga (R$0,50 a R$5,00 por comentário).</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Leia e comente</h4>
+                        <p>Leia o artigo e deixe um comentário natural e sincero. 2-3 frases bastam. Modelos prontos estão disponíveis.</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Receba via PIX</h4>
+                        <p>Após aprovação (24-48h), o valor fica disponível. Saque via PIX — cai na hora, sem taxa.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Quanto É Possível Ganhar?</h2>
+
+            <p>Segundo dados da plataforma, usuários que dedicam <strong>1 a 2 horas por dia</strong> reportam ganhos entre R$1.200 e R$3.000 por mês. O valor depende da quantidade de missões e da qualidade dos comentários.</p>
+
+            <div class="pix-proof">
+                <div class="pix-header">
+                    <div class="pix-icon">₱</div>
+                    Extratos reais de usuários da plataforma
+                </div>
+                <div class="pix-entries">
+                    <div class="pix-entry">
+                        <div class="pix-entry-info">
+                            <span class="pix-entry-desc">Comentários Lucrativos - Saque</span>
+                            <span class="pix-entry-date">Hoje, 14:32</span>
+                        </div>
+                        <span class="pix-entry-value">+ R$ 87,50</span>
+                    </div>
+                    <div class="pix-entry">
+                        <div class="pix-entry-info">
+                            <span class="pix-entry-desc">Comentários Lucrativos - Saque</span>
+                            <span class="pix-entry-date">Ontem, 09:15</span>
+                        </div>
+                        <span class="pix-entry-value">+ R$ 142,00</span>
+                    </div>
+                    <div class="pix-entry">
+                        <div class="pix-entry-info">
+                            <span class="pix-entry-desc">Comentários Lucrativos - Saque</span>
+                            <span class="pix-entry-date">23/06, 18:47</span>
+                        </div>
+                        <span class="pix-entry-value">+ R$ 63,00</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2>O Que Dizem Os Usuários</h2>
+
+            <div class="testimonial">
+                <p class="testimonial-text">"No começo achei que era golpe, porque já caí em vários aplicativos assim. Mas esse é gratuito de verdade — não paguei nada. Fiz 5 comentários no primeiro dia e saquei R$22 pelo PIX. Hoje já saquei mais de R$1.400."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">CS</div>
+                    <div>
+                        <div class="testimonial-name">Carla S.</div>
+                        <div class="testimonial-detail">Dona de casa, 38 anos — Belo Horizonte/MG</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial">
+                <p class="testimonial-text">"Uso entre as aulas da faculdade. Em 30 minutos faço uns 10 comentários e tiro R$40-50. Paga meu almoço e meu Uber. E não gastei nenhum centavo pra entrar."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">LP</div>
+                    <div>
+                        <div class="testimonial-name">Lucas P.</div>
+                        <div class="testimonial-detail">Estudante, 21 anos — São Paulo/SP</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial">
+                <p class="testimonial-text">"Sou aposentada e minha neta me ensinou. Nunca pensei que fosse ganhar dinheiro na internet. Já comprei remédio, fiz compra do mês... tudo com dinheiro dos comentários. E não precisei investir nada."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">MJ</div>
+                    <div>
+                        <div class="testimonial-name">Maria J.</div>
+                        <div class="testimonial-detail">Aposentada, 63 anos — Recife/PE</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>É Seguro?</h2>
+
+            <p>✅ <strong>100% Gratuito</strong> — Você não paga nada para se cadastrar, fazer missões ou sacar<br>
+            ✅ <strong>Validação de CPF</strong> — Apenas pessoas reais podem se cadastrar<br>
+            ✅ <strong>Sistema Escrow</strong> — O dinheiro fica em garantia até a aprovação (tecnologia do Mercado Livre)<br>
+            ✅ <strong>PIX instantâneo</strong> — Saque direto na sua conta, sem taxa<br>
+            ✅ <strong>Sem indicação obrigatória</strong> — Seus ganhos vêm do seu trabalho</p>
+
+            <div class="cta-section">
+                <div class="cta-badge">✅ Cadastro Gratuito</div>
+                <h3 class="cta-title">Crie Sua Conta Grátis e Comece a Ganhar Hoje</h3>
+                <p class="cta-subtitle">Cadastro em 2 minutos. Sem cartão de crédito. Sem pegadinha. Comece a comentar e ganhar imediatamente.</p>
+                <a href="https://mkt-comentarios-lucrativos.vercel.app/cadastro" class="cta-button" id="mainCta">
+                    CRIAR MINHA CONTA GRÁTIS →
+                </a>
+                <div class="cta-trust">
+                    <span>🔒 100% Gratuito</span>
+                    <span>✅ CPF Verificado</span>
+                    <span>💰 Saque via PIX</span>
+                    <span>👥 +15 mil usuários</span>
+                </div>
+            </div>
+
+            <p style="font-size: 12px; color: #999; text-align: center; margin-top: 40px; font-family: 'Inter', sans-serif;">
+                <em>Conteúdo publicitário produzido em parceria com a plataforma Comentários Lucrativos.
+                Resultados variam de acordo com dedicação e disponibilidade de missões.</em>
+            </p>
+        </div>
+    </article>
+
+    <script>
+        const now = new Date();
+        document.getElementById('articleDate').textContent = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('readingProgress').style.width = (scrollTop / docHeight) * 100 + '%';
+        });
+
+        const cta = document.querySelector('.cta-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.2 });
+        cta.style.opacity = '0';
+        cta.style.transform = 'translateY(30px)';
+        cta.style.transition = 'all 0.8s ease';
+        observer.observe(cta);
+    </script>
+</body>
+</html>
